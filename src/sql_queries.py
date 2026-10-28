@@ -1,6 +1,8 @@
 """Export all DOCDB patent families matching 64 humanoid-robotics CPC prefixes."""
 
 import csv
+import io
+import zipfile
 from epo.tipdata.patstat import PatstatClient
 
 ENV = "PROD"  # Change to "TEST" for a trial run on the small test dataset.
@@ -107,13 +109,15 @@ ORDER BY f.docdb_family_id
 
 client = PatstatClient(env=ENV)
 count = 0
-with open("humanoid_patents.csv", "w", newline="", encoding="utf-8") as output:
-    writer = csv.writer(output)
-    writer.writerow(["docdb_family_id", "year", "title", "title_language", "abstract", "abstract_language", "matched_cpcs"])
-    for row in client.sql_query_iterator(query, use_legacy_sql=False):
-        writer.writerow([row["docdb_family_id"], row["year"], row["title"],
-                         row["title_language"], row["abstract"], row["abstract_language"],
-                         row["matched_cpcs"]])
-        count += 1
+with zipfile.ZipFile("humanoid_patents.zip", "w", compression=zipfile.ZIP_DEFLATED) as archive:
+    with archive.open("humanoid_patents.csv", "w") as raw:
+        with io.TextIOWrapper(raw, newline="", encoding="utf-8") as output:
+            writer = csv.writer(output)
+            writer.writerow(["docdb_family_id", "year", "title", "title_language", "abstract", "abstract_language", "matched_cpcs"])
+            for row in client.sql_query_iterator(query, use_legacy_sql=False):
+                writer.writerow([row["docdb_family_id"], row["year"], row["title"],
+                                 row["title_language"], row["abstract"], row["abstract_language"],
+                                 row["matched_cpcs"]])
+                count += 1
 
-print(f"Saved {count} families (64 CPC codes, {ENV}) to humanoid_patents.csv")
+print(f"Saved {count} families (64 CPC codes, {ENV}) to humanoid_patents.zip")
