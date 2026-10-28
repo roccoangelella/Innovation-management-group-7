@@ -74,16 +74,34 @@ family_titles AS (
         PARTITION BY a.docdb_family_id
         ORDER BY IF(LOWER(t.appln_title_lg) = 'en', 0, 1), a.appln_id
     ) = 1
+),
+family_abstracts AS (
+    SELECT
+        a.docdb_family_id,
+        ab.appln_abstract AS abstract,
+        ab.appln_abstract_lg AS abstract_language
+    FROM tls201_appln AS a
+    JOIN families AS f ON a.docdb_family_id = f.docdb_family_id
+    JOIN tls203_appln_abstr AS ab ON a.appln_id = ab.appln_id
+    WHERE a.ipr_type = 'PI'
+      AND NULLIF(TRIM(ab.appln_abstract), '') IS NOT NULL
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY a.docdb_family_id
+        ORDER BY IF(LOWER(ab.appln_abstract_lg) = 'en', 0, 1), a.appln_id
+    ) = 1
 )
 SELECT
     f.docdb_family_id,
     y.year,
     t.title,
     t.title_language,
+    ab.abstract,
+    ab.abstract_language,
     f.matched_cpcs
 FROM families AS f
 LEFT JOIN family_years AS y USING (docdb_family_id)
 LEFT JOIN family_titles AS t USING (docdb_family_id)
+LEFT JOIN family_abstracts AS ab USING (docdb_family_id)
 ORDER BY f.docdb_family_id
 """
 
@@ -91,10 +109,11 @@ client = PatstatClient(env=ENV)
 count = 0
 with open("humanoid_patents.csv", "w", newline="", encoding="utf-8") as output:
     writer = csv.writer(output)
-    writer.writerow(["docdb_family_id", "year", "title", "title_language", "matched_cpcs"])
+    writer.writerow(["docdb_family_id", "year", "title", "title_language", "abstract", "abstract_language", "matched_cpcs"])
     for row in client.sql_query_iterator(query, use_legacy_sql=False):
         writer.writerow([row["docdb_family_id"], row["year"], row["title"],
-                         row["title_language"], row["matched_cpcs"]])
+                         row["title_language"], row["abstract"], row["abstract_language"],
+                         row["matched_cpcs"]])
         count += 1
 
 print(f"Saved {count} families (64 CPC codes, {ENV}) to humanoid_patents.csv")
