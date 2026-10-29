@@ -4,9 +4,11 @@ import io
 from pathlib import Path
 import tempfile
 import unittest
+import sys
 import zipfile
 
-from src.sample_abstracts import sample
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
+from sample_abstracts import sample
 
 
 class SamplingTests(unittest.TestCase):
