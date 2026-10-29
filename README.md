@@ -49,3 +49,27 @@ The first run defaults to **20 requests/minute**, without assuming any provider 
 **Important:** the CSV may be partial when the run ends with errors or exhausted quota. Use it as a *complete* screening corpus **only when the summary contains `incomplete: 0`**. In Perplexity Decider, pass only `abstract_en` as patent text (not the original language, title, CPC, or translation notes), along with the separately versioned screening definition. The translation step does not perform classification or scoring.
 
 Do not run multiple processes against the same state journal. When a request succeeds but the process crashes before the fsync, that one request may be repeated after restart. Real endpoint compatibility and translation fidelity must be verified by a live test, since the offline tests intentionally use mocked responses.
+
+## Fixed 100-family evaluation benchmark
+
+Run from the repository root:
+
+```bash
+python src/sample_abstracts.py
+python -m unittest discover -s tests -v
+```
+
+The deterministic sampler reads the **unchanged** `humanoid_patents.zip` and selects exactly 90 originally English and 10 originally non-English records, using seed `20261029`. It requires a nonempty abstract and a usable original-language code, detects duplicate DOCDB family IDs, and maintains all seven source columns without labeling or translation. SHA-256 hash-ranked bounded candidate pools make selection independent of input row order; a CPC membership-deficit heuristic encourages technology breadth without imposing equal per-CPC quotas. The ten non-English records are diversified across languages present. One family may cover several CPCs, but is sampled only once.
+
+Outputs (not automatically committed as bulk PATSTAT data):
+- `outputs/sampling/humanoid_100_abstracts.csv`: 100 unchanged source rows.
+- `outputs/sampling/humanoid_100_abstracts.zip`: identical 100 records archived under `humanoid_patents.csv`, as required by the translation reader.
+- `outputs/sampling/sampling_summary.json`: language counts, CPC coverage, missing codes, seed and limitations.
+
+To translate just the sampled ZIP without colliding with the production translation journal:
+
+```bash
+python src/translate_abstracts.py --input outputs/sampling/humanoid_100_abstracts.zip --output outputs/sampling/humanoid_100_abstracts_en.csv --state outputs/sampling/translation_progress.jsonl
+```
+
+Do **not** apply the default full-corpus translation journal to this subset: the manifest binds each journal to its source ZIP hash. This stage is only evaluation sampling, not classification or annotation. The deliberately fixed 90/10 language mix and the CPC-balanced heuristic mean the benchmark must not be interpreted as a random representative estimate of production-corpus accuracy.
