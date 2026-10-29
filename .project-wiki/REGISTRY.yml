@@ -1,0 +1,102 @@
+version: 1
+updated: '2026-10-29'
+documents:
+  - id: PROJECT
+    type: project
+    title: "Project Overview"
+    path: PROJECT.md
+    status: active
+    tags: []
+    related: []
+    source_paths: []
+    confidence: confirmed
+  - id: PRODUCT-BRIEF
+    type: note
+    title: "Product Brief"
+    path: requirements/product-brief.md
+    status: active
+    tags: []
+    related: []
+    source_paths: []
+    confidence: confirmed
+  - id: CONSTRAINTS
+    type: note
+    title: "Constraints"
+    path: requirements/constraints.md
+    status: active
+    tags: []
+    related: []
+    source_paths: []
+    confidence: confirmed
+  - id: OPEN-QUESTIONS
+    type: note
+    title: "Open Questions"
+    path: requirements/open-questions.md
+    status: active
+    tags: []
+    related: []
+    source_paths: []
+    confidence: confirmed
+  - id: TECH-ARCHITECTURE
+    type: technical
+    title: "Architecture"
+    path: technical/architecture.md
+    status: active
+    tags: []
+    related: []
+    source_paths: []
+    confidence: confirmed
+  - id: TECH-CODEBASE-MAP
+    type: technical
+    title: "Codebase Map"
+    path: technical/codebase-map.md
+    status: active
+    tags: []
+    related: []
+    source_paths: []
+    confidence: confirmed
+  - id: TECH-TESTING
+    type: technical
+    title: "Testing"
+    path: technical/testing.md
+    status: active
+    tags: []
+    related: []
+    source_paths: []
+    confidence: confirmed
+  - id: TECH-SECURITY
+    type: technical
+    title: "Security"
+    path: technical/security.md
+    status: active
+    tags: []
+    related: []
+    source_paths: []
+    confidence: confirmed
+  - id: CURRENT-PLAN
+    type: note
+    title: "Current Plan"
+    path: implementation/current-plan.md
+    status: active
+    tags: []
+    related: []
+    source_paths: []
+    confidence: confirmed
+  - id: GLOSSARY
+    type: note
+    title: "Glossary"
+    path: GLOSSARY.md
+    status: active
+    tags: []
+    related: []
+    source_paths: []
+    confidence: confirmed
+  - id: SCAN-20261029
+    type: scan-report
+    title: "Baseline Repository Scan"
+    path: implementation/scans/scan-20261029.md
+    status: active
+    tags: []
+    related: []
+    source_paths: []
+    confidence: confirmed

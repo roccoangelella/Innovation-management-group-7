@@ -1,0 +1,2 @@
+# Paths excluded from source scans (repository-root relative)
+outputs/translation/

@@ -1,0 +1,6 @@
+schema: project-wiki
+schema_version: 1.6.1
+schema_updated: 2026-09-27
+last_migrated: '2026-10-29'
+maintained_by_skill: project-wiki
+notes: Canonical project-wiki 1.6.1 documentation baseline.
