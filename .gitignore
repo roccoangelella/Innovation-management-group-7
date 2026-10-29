@@ -8,3 +8,9 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Local API credentials and resumable translation output
+.env
+.env.*
+!.env.example
+outputs/translation/
