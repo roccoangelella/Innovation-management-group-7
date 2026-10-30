@@ -67,7 +67,7 @@ Report precision, recall, F1 and error cases with the sampling caveat: this is a
 
 ## Curated 50/50 humanoid challenge (2026-10-30)
 
-After reviewing the original English patent abstracts without looking at Decider predictions, 50 provisional positives, 30 hard negatives and 20 clear negatives were selected in `samples/humanoid_challenge_100/`. These 100 source families are **disjoint** from the earlier pure-random 100. Their labels are AI-authored provisional judgments, **not human gold labels**.
+After reviewing the original English patent abstracts without looking at Decider predictions, 50 provisional positives, 30 hard nonhumanoid robotics negatives, 10 lexical-decoy negatives, and 10 clear negatives were selected in `samples/humanoid_challenge_100/`. These 100 source families are **disjoint** from the earlier pure-random 100. Their labels are AI-authored provisional judgments, **not human gold labels**.
 
 From the repo root, run a single command:
 
@@ -75,7 +75,9 @@ From the repo root, run a single command:
 python kaggle/run.py --challenge
 ```
 
-This selects the committed challenge input and provisional labels automatically and writes `predictions.csv`, `evaluation.json`, `evaluation_cases.csv`, and a separate resume journal under **`/kaggle/working/challenge_100/`**, without colliding with the earlier pilot. No extra Kaggle dataset or translation call is needed. For details and selection caveats see [the challenge annotation protocol](../samples/humanoid_challenge_100/ANNOTATION_PROTOCOL.md).
+This selects the single committed `samples/humanoid_challenge_100/challenge_100_labeled.csv`, containing both abstracts and provisional labels, and writes `predictions.csv`, `evaluation.json`, `evaluation_cases.csv`, and a separate resume journal under **`/kaggle/working/challenge_100/`**, without colliding with the earlier pilot. **Only the abstract_en text is passed into Decider**; label and annotation fields are loaded only by the evaluation stage. No extra Kaggle dataset or translation call is needed. For details and selection caveats see [the challenge annotation protocol](../samples/humanoid_challenge_100/ANNOTATION_PROTOCOL.md).
+
+You can also run a single uploaded CSV anywhere on Kaggle: `python kaggle/run.py --dataset /kaggle/input/<your-dataset>/challenge_100_labeled.csv --output /kaggle/working/custom_test/predictions.csv`. The combined CSV needs at least `docdb_family_id,abstract_en,label,needs_review`. The two-file `--input` + `--labels` interface is preserved for compatibility. The labels are **hidden from the model request, not hidden from the CSV or Python runtime**.
 
 Because this is **purposively enriched to 50% positives**, its precision and F1 are NOT estimates of production performance; and if the prompt/threshold is tuned on this set, subsequent scores on this same set are not held-out estimates.
 

@@ -1,5 +1,6 @@
 """Offline tests for single-command Kaggle setup; no network/GPU needed."""
 import importlib.util
+import csv
 from pathlib import Path
 import tempfile
 import unittest
@@ -9,6 +10,10 @@ MODULE = Path(__file__).resolve().parents[1] / "run.py"
 spec = importlib.util.spec_from_file_location("kaggle_run", MODULE)
 run = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(run)
+SCREEN = Path(__file__).resolve().parents[1] / "screen.py"
+screen_spec = importlib.util.spec_from_file_location("kaggle_screen", SCREEN)
+screen = importlib.util.module_from_spec(screen_spec)
+screen_spec.loader.exec_module(screen)
 
 
 class LauncherTests(unittest.TestCase):
@@ -16,8 +21,36 @@ class LauncherTests(unittest.TestCase):
         source = MODULE.read_text(encoding="utf-8")
         self.assertIn('parser.add_argument("--challenge"', source)
         self.assertIn('"/kaggle/working/challenge_100/predictions.csv"', source)
-        self.assertIn("challenge_dir / FILENAME", source)
-        self.assertIn("challenge_dir / LABEL_FILENAME", source)
+        self.assertIn("challenge_dir / COMBINED_FILENAME", source)
+        self.assertIn("args.input = args.dataset", source)
+        self.assertIn("args.labels = args.dataset", source)
+
+    def test_single_labeled_csv_is_blind_to_ground_truth(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "challenge_100_labeled.csv"
+            def write(label, reason):
+                with path.open("w", newline="", encoding="utf-8") as stream:
+                    writer = csv.DictWriter(stream, fieldnames=[
+                        "docdb_family_id", "abstract_en", "label", "needs_review",
+                        "confidence", "evidence_quote", "reason"
+                    ])
+                    writer.writeheader()
+                    writer.writerow({
+                        "docdb_family_id": "123", "abstract_en": "A robot walks on two legs.",
+                        "label": label, "needs_review": "0", "confidence": "high",
+                        "evidence_quote": reason, "reason": reason,
+                    })
+            write("1", "this is a test positive label")
+            first = list(screen.rows(path))
+            request_1 = screen.make_request(first[0][1])
+            write("0", "THIS MUST NOT LEAK INTO THE MODEL")
+            second = list(screen.rows(path))
+            request_2 = screen.make_request(second[0][1])
+            self.assertEqual(first, second)
+            self.assertEqual(request_1, request_2)
+            self.assertEqual(request_1["state"], "A robot walks on two legs.")
+            self.assertNotIn("label", str(request_1))
+            self.assertNotIn("THIS MUST NOT LEAK", str(request_2))
 
     def test_preferred_input_discovery(self):
         with tempfile.TemporaryDirectory() as directory:

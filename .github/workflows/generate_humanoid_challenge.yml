@@ -28,12 +28,17 @@ jobs:
               with (p/n).open(newline="",encoding="utf-8") as f:return list(csv.DictReader(f))
           data=load("humanoid_100_abstracts_en.csv")
           labels=load("humanoid_100_manual_labels.csv")
-          assert len(data)==len(labels)==100
+          combined=load("challenge_100_labeled.csv")
+          assert len(data)==len(labels)==len(combined)==100
           assert [x["docdb_family_id"] for x in data]==[x["docdb_family_id"] for x in labels]
+          assert [x["docdb_family_id"] for x in combined]==[x["docdb_family_id"] for x in labels]
+          assert all(c["abstract_en"]==d["abstract_en"] for c,d in zip(combined,data))
+          assert all(c["label"]==l["label"] and c["needs_review"]==l["needs_review"] for c,l in zip(combined,labels))
           assert sum(x["label"]=="1" for x in labels)==50
           assert sum(x["label"]=="0" for x in labels)==50
           assert all(x["abstract"]==x["abstract_en"] and x["abstract_language"]=="en" for x in data)
           assert all(x["evidence_quote"] in y["abstract"] for x,y in zip(labels,data))
+          assert all(c["evidence_quote"] in c["abstract_en"] for c in combined)
           print("100 matched unique source-faithful labels and Kaggle inputs verified")
           PY
       - name: Commit challenge CSV and provenance outputs

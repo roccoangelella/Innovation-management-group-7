@@ -13,6 +13,7 @@ MODEL_ID = "perplexity-ai/pplx-decider-flash-v1.2"
 REVISION = "6d771ad7b5ecff5e93b8fc7b90d4c5ccc341954d"
 FILENAME = "humanoid_100_abstracts_en.csv"
 LABEL_FILENAME = "humanoid_100_manual_labels.csv"
+COMBINED_FILENAME = "challenge_100_labeled.csv"
 OLD_DTYPE = 'dtype = torch.bfloat16 if self.device.type == "cuda" else torch.float32'
 NEW_DTYPE = 'dtype = torch.float16 if self.device.type == "cuda" else torch.float32'
 
@@ -144,16 +145,21 @@ def main():
     parser.add_argument("--skip-install", action="store_true", help="Only if model dependencies are already installed")
     parser.add_argument("--check", action="store_true", help="Check the CSV path without downloading or loading a model")
     parser.add_argument("--labels", help="Optional CSV with manual labels; auto-detected from Kaggle inputs")
+    parser.add_argument("--dataset", help="Single CSV with abstract_en and label; used independently for scoring and evaluation")
     parser.add_argument("--challenge", action="store_true", help="Use committed curated 50/50 humanoid challenge with independent output directory")
     args = parser.parse_args()
     if args.challenge:
-        if args.input or args.labels:
-            parser.error("--challenge already selects input and labels; do not combine with --input/--labels")
+        if args.input or args.labels or args.dataset:
+            parser.error("--challenge selects its own labeled dataset; do not combine with --input/--labels/--dataset")
         challenge_dir = Path(__file__).resolve().parents[1] / "samples" / "humanoid_challenge_100"
-        args.input = str(challenge_dir / FILENAME)
-        args.labels = str(challenge_dir / LABEL_FILENAME)
+        args.dataset = str(challenge_dir / COMBINED_FILENAME)
         if args.output == "/kaggle/working/predictions.csv":
             args.output = "/kaggle/working/challenge_100/predictions.csv"
+    if args.dataset:
+        if args.input or args.labels:
+            parser.error("--dataset already contains abstracts and labels; do not combine with --input/--labels")
+        args.input = args.dataset
+        args.labels = args.dataset
 
     input_path = discover_input(args.input)
     # Validate the sample *before* downloading approximately 9 GB of weights.

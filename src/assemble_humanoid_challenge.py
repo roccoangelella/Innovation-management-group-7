@@ -18,6 +18,7 @@ OUT=ROOT/"samples/humanoid_challenge_100"
 ZIP=ROOT/"humanoid_patents.zip"
 FIELDS=["docdb_family_id","year","title","title_language","abstract","abstract_language","matched_cpcs"]
 LABEL_COLUMNS=["docdb_family_id","label","needs_review","confidence","evidence_quote","reason"]
+COMBINED_COLUMNS=["docdb_family_id","abstract_en","label","needs_review","confidence","evidence_quote","reason"]
 SEED="humanoid-challenge-v1-20261030"
 
 def sha256(path):
@@ -78,6 +79,12 @@ def main():
         ("humanoid_100_manual_labels.csv",LABEL_COLUMNS,
           [{**{c:keyed[i][c] for c in ("docdb_family_id","label","needs_review","confidence","reason")},
             "evidence_quote":quote(selected[i]["abstract"],keyed[i]["label"])} for i in ids]),
+        ("challenge_100_labeled.csv",COMBINED_COLUMNS,
+          [{"docdb_family_id":i,"abstract_en":selected[i]["abstract"],
+            "label":keyed[i]["label"],"needs_review":keyed[i]["needs_review"],
+            "confidence":keyed[i]["confidence"],
+            "evidence_quote":quote(selected[i]["abstract"],keyed[i]["label"]),
+            "reason":keyed[i]["reason"]} for i in ids]),
     ]:
         path=OUT/filename
         with path.open("w",encoding="utf-8",newline="") as f:

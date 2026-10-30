@@ -53,6 +53,11 @@ def rows(path):
             yield key, abstract
 
 
+def make_request(abstract):
+    """Strict model input boundary: do not forward label, reason, evidence, or other CSV fields."""
+    return {"state": abstract, "questions": {"relevant": QUESTION}}
+
+
 def write_csv(path, results):
     tmp = path.with_suffix(path.suffix + ".tmp")
     with tmp.open("w", newline="", encoding="utf-8") as f:
@@ -107,7 +112,7 @@ def main():
             raise RuntimeError("Native model is not in FP16; run via kaggle/run.py to patch the local loader.")
         with journal.open("a", encoding="utf-8") as f:
             for index, (key, abstract) in enumerate(pending, 1):
-                request = {"state": abstract, "questions": {"relevant": QUESTION}}
+                request = make_request(abstract)
                 answer = model.decide(request)["answers"]["relevant"]
                 probability = float(answer["noul"])
                 if not (0 <= probability <= 1):

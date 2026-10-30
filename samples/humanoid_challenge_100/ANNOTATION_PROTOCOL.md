@@ -15,6 +15,8 @@ The labels, short rationales and verbatim source excerpts are **AI-authored prov
 
 ## Files
 
+- **`challenge_100_labeled.csv`**: the recommended single Kaggle dataset containing original English abstract, provisional label, confidence, source evidence, and reason. Decider receives only `abstract_en`; `label` and other annotations are read **after inference** by the evaluator. There is no cryptographic hiding: the ground truth is present in the file but never passed to the model.
+
 - `humanoid_100_abstracts_en.csv`: direct Kaggle input (English abstract duplicated exactly to `abstract_en`, original source preserved).
 - `humanoid_100_manual_labels.csv`: direct `kaggle/evaluate.py` input, same columns as prior pilot, 50/50 binary labels.
 - `annotation_audit.csv`: why each provisional label was chosen, grouped by positive/hard negative/clear negative.
@@ -25,11 +27,10 @@ The labels, short rationales and verbatim source excerpts are **AI-authored prov
 
 ## Kaggle command
 
-From repo root after pulling latest main, simply run `python kaggle/run.py --challenge`, or use the equivalent explicit command below:
+From repo root after pulling latest main, run `python kaggle/run.py --challenge`. For your own downloaded combined dataset use `--dataset PATH --output /kaggle/working/custom_test/predictions.csv`. The equivalent explicit command for this challenge is:
 
 ```bash
-python kaggle/run.py --input samples/humanoid_challenge_100/humanoid_100_abstracts_en.csv \
-  --labels samples/humanoid_challenge_100/humanoid_100_manual_labels.csv \
+python kaggle/run.py --dataset samples/humanoid_challenge_100/challenge_100_labeled.csv \
   --output /kaggle/working/challenge_100/predictions.csv
 ```
 
