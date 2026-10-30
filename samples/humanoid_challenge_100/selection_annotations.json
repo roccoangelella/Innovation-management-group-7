@@ -1,19 +1,19 @@
 [
   {
-    "docdb_family_id": "68325199",
+    "docdb_family_id": "39621199",
     "label": 1,
     "needs_review": 0,
     "confidence": "high",
     "bucket": "explicit_positive",
-    "reason": "Structure and geared actuation of a humanoid robot crotch and hip assembly"
+    "reason": "Modular five-finger anthropomorphic robot hand with underactuated tendons"
   },
   {
-    "docdb_family_id": "94517092",
+    "docdb_family_id": "91185849",
     "label": 1,
     "needs_review": 0,
     "confidence": "high",
     "bucket": "explicit_positive",
-    "reason": "Impact-resistant wrist system explicitly for humanoid robots"
+    "reason": "Motor-driven articulated finger joint of an anthropomorphic robot hand"
   },
   {
     "docdb_family_id": "44393363",
@@ -24,12 +24,12 @@
     "reason": "Real-time control of a humanoid via an upper-body exoskeleton"
   },
   {
-    "docdb_family_id": "97115579",
+    "docdb_family_id": "39886128",
     "label": 1,
     "needs_review": 0,
     "confidence": "high",
     "bucket": "explicit_positive",
-    "reason": "Joint module expressly developed for humanoid robot articulation"
+    "reason": "All-terrain robot with a powered anthropomorphic torso and articulated arms"
   },
   {
     "docdb_family_id": "93849034",
@@ -232,12 +232,12 @@
     "reason": "Series-elastic actuation of a humanoid upper- and lower-limb system"
   },
   {
-    "docdb_family_id": "94568596",
+    "docdb_family_id": "65521386",
     "label": 1,
     "needs_review": 0,
     "confidence": "high",
     "bucket": "explicit_positive",
-    "reason": "Humanoid robot yaw/pitch driven lower limb mechanism"
+    "reason": "Anthropomorphic robot reproducing human motion via multi-chain kinematics"
   },
   {
     "docdb_family_id": "72861919",
@@ -384,12 +384,12 @@
     "reason": "Mechanical forearm/wrist assembly expressly provided for a humanoid robot"
   },
   {
-    "docdb_family_id": "93568267",
+    "docdb_family_id": "69554601",
     "label": 1,
     "needs_review": 0,
     "confidence": "high",
     "bucket": "explicit_positive",
-    "reason": "Hip-leg connecting assembly for a humanoid robot"
+    "reason": "Anthropomorphic embodied robot designed to assist elderly users walking"
   },
   {
     "docdb_family_id": "67576501",
@@ -664,28 +664,12 @@
     "reason": "Path planning for an amphibious unmanned platform, not humanoid robots"
   },
   {
-    "docdb_family_id": "94627502",
-    "label": 0,
-    "needs_review": 0,
-    "confidence": "high",
-    "bucket": "clear_negative",
-    "reason": "Reinforcement learning for electrical micro-grid voltage regulation"
-  },
-  {
     "docdb_family_id": "63618351",
     "label": 0,
     "needs_review": 0,
     "confidence": "high",
     "bucket": "clear_negative",
     "reason": "Folding industrial robot mechanism with a hydraulic rack"
-  },
-  {
-    "docdb_family_id": "92556890",
-    "label": 0,
-    "needs_review": 0,
-    "confidence": "high",
-    "bucket": "clear_negative",
-    "reason": "General large-language-model reasoning, not embodied humanoid robotics"
   },
   {
     "docdb_family_id": "63001358",
@@ -704,14 +688,6 @@
     "reason": "Robotic-arm wafer transfer apparatus for semiconductor handling"
   },
   {
-    "docdb_family_id": "93633169",
-    "label": 0,
-    "needs_review": 0,
-    "confidence": "high",
-    "bucket": "clear_negative",
-    "reason": "Computer-vision monitoring of classroom student behavior"
-  },
-  {
     "docdb_family_id": "97402681",
     "label": 0,
     "needs_review": 0,
@@ -728,38 +704,6 @@
     "reason": "Precision-operation truss-mounted manipulator, not humanoid"
   },
   {
-    "docdb_family_id": "81368436",
-    "label": 0,
-    "needs_review": 0,
-    "confidence": "high",
-    "bucket": "clear_negative",
-    "reason": "Machine-room inspection robot with navigation and camera modules"
-  },
-  {
-    "docdb_family_id": "84045273",
-    "label": 0,
-    "needs_review": 0,
-    "confidence": "high",
-    "bucket": "clear_negative",
-    "reason": "Robotic following and container handling in agricultural harvesting"
-  },
-  {
-    "docdb_family_id": "76615454",
-    "label": 0,
-    "needs_review": 0,
-    "confidence": "high",
-    "bucket": "clear_negative",
-    "reason": "Injection-molding industrial manipulator structure"
-  },
-  {
-    "docdb_family_id": "62602944",
-    "label": 0,
-    "needs_review": 0,
-    "confidence": "high",
-    "bucket": "clear_negative",
-    "reason": "Vehicle-based wall-climbing inspection robot, not humanoid"
-  },
-  {
     "docdb_family_id": "96175452",
     "label": 0,
     "needs_review": 0,
@@ -768,35 +712,91 @@
     "reason": "Snake-arm continuum robot, not humanoid"
   },
   {
-    "docdb_family_id": "65041718",
-    "label": 0,
-    "needs_review": 0,
-    "confidence": "high",
-    "bucket": "clear_negative",
-    "reason": "Autonomous vehicle sensor arrangement and vehicle operation"
-  },
-  {
-    "docdb_family_id": "93653637",
-    "label": 0,
-    "needs_review": 0,
-    "confidence": "high",
-    "bucket": "clear_negative",
-    "reason": "Vertical farming robot arm for sowing and crop estimation"
-  },
-  {
-    "docdb_family_id": "87070026",
-    "label": 0,
-    "needs_review": 0,
-    "confidence": "high",
-    "bucket": "clear_negative",
-    "reason": "Rail-mounted datacenter robotic handling system, not humanoid"
-  },
-  {
     "docdb_family_id": "97284798",
     "label": 0,
     "needs_review": 0,
     "confidence": "high",
     "bucket": "clear_negative",
     "reason": "Automated mobile robot planning material transport routes"
+  },
+  {
+    "docdb_family_id": "96036252",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "lexical_negative",
+    "reason": "Head-mounted AR display produces an anthropomorphic *virtual image*, not an embodied humanoid robot"
+  },
+  {
+    "docdb_family_id": "62598352",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "lexical_negative",
+    "reason": "Humanoid is only a virtual avatar representing a real robot in a game-like environment"
+  },
+  {
+    "docdb_family_id": "78126791",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "lexical_negative",
+    "reason": "Humanoid describes personality-like robot emotions, not a humanoid-specific physical platform"
+  },
+  {
+    "docdb_family_id": "82385152",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "lexical_negative",
+    "reason": "Humanoid characters are VR/AR projections, not actual robots"
+  },
+  {
+    "docdb_family_id": "83486901",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "lexical_negative",
+    "reason": "AR helmet enables gesture interaction with humans/machines; humanoid is only possible context"
+  },
+  {
+    "docdb_family_id": "69117102",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "lexical_negative",
+    "reason": "Public display voice response described as humanoid interaction, with no humanoid robot"
+  },
+  {
+    "docdb_family_id": "81904892",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "lexical_negative",
+    "reason": "Virtual character speech personalization described as humanoid feeling, not a physical robot"
+  },
+  {
+    "docdb_family_id": "96779252",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "lexical_negative",
+    "reason": "Anthropomorphic cognitive software agent rather than an embodied robot"
+  },
+  {
+    "docdb_family_id": "94303770",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "lexical_negative",
+    "reason": "Anthropomorphic voice-driven work-order alarm, not humanoid-robot technology"
+  },
+  {
+    "docdb_family_id": "51935665",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "lexical_negative",
+    "reason": "Humanoid-shaped interactive action figurines, not an autonomous humanoid-robot technology"
   }
 ]
