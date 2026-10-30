@@ -11,3 +11,5 @@
 2026-10-30 — Created separate source-faithful 100-family, English-only 50/50 relevance challenge with assistant-authored provisional labels, 30 hard robotics negatives, 10 lexical decoys and 10 clear negatives. Added reproducible generator, GitHub Actions validation, and isolated Kaggle `--challenge` run; human adjudication and model inference pending.
 
 2026-10-30 — Consolidated curated 100-family challenge into one source-faithful labeled CSV with `--dataset` / `--challenge` CLI. The model receives abstract text only; the evaluator compares the provisional reference labels afterward. Retained backward compatibility with split files and added isolation tests.
+
+2026-10-30 — Audited direct label leakage and benchmark difficulty. The newly uploaded predictions were for the old random sample, not the new challenge. Decider source only receives abstract text; a keyword baseline attains 90% on the intentionally selected 50/50 challenge, so strong scores would not yet prove semantic generalization.
