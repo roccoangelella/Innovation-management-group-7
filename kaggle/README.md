@@ -49,3 +49,22 @@ python kaggle/evaluate.py --predictions /kaggle/working/predictions.csv \
 ```
 
 Report precision, recall, F1 and error cases with the sampling caveat: this is an English-only random sample of broad CPC candidates, and it may have too few truly relevant humanoid patents for reliable precision/recall estimates. It does not assess translated non-English abstracts. No full-corpus deployment until a held-out calibration strategy is agreed.
+
+## Evaluate the 100 manually labeled abstracts
+
+The independent labeling file `humanoid_100_manual_labels.csv` contains **98 negative labels, no positive labels, and 2 unresolved rows** (family IDs `93663023`, `24533336`). These labels were produced by an AI-assisted annotator and require adjudication. **Do not publish them as human gold labels.**
+
+In Kaggle, add this CSV as a Kaggle Dataset using **Add Input**. After cloning the repository, `python kaggle/run.py` automatically finds the unique attached `/kaggle/input/**/humanoid_100_manual_labels.csv` and runs evaluation immediately after model inference. Or supply `--labels /kaggle/input/<dataset-slug>/humanoid_100_manual_labels.csv` to disambiguate.
+
+Outputs:
+- `/kaggle/working/evaluation.json`: confusion counts, false-positive rate, specificity, and 95% Wilson confidence interval. With **zero confirmed positives**, precision, recall and F1 are correctly `null` (not zero).
+- `/kaggle/working/evaluation_cases.csv`: joined labels/predictions ranked by descending model probability, including unresolved cases for review.
+- `/kaggle/working/predictions.csv`: full inference results, independent of the labels.
+
+To evaluate existing predictions without repeating expensive inference, run:
+
+```bash
+python kaggle/evaluate.py --predictions /kaggle/working/predictions.csv --labels /kaggle/input/<dataset-slug>/humanoid_100_manual_labels.csv --output /kaggle/working/evaluation.json
+```
+
+The pilot is an initial **negative-case test**, not a valid recall/precision test. Add an independently adjudicated positive-enriched evaluation set before selecting any production acceptance threshold. The model never sees labels during inference. Kaggle GPU execution remains unverified.

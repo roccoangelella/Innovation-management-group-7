@@ -12,6 +12,7 @@ MODEL_ID = "perplexity-ai/pplx-decider-flash-v1.2"
 # Known model source release, including the native decision readout and attention.
 REVISION = "6d771ad7b5ecff5e93b8fc7b90d4c5ccc341954d"
 FILENAME = "humanoid_100_abstracts_en.csv"
+LABEL_FILENAME = "humanoid_100_manual_labels.csv"
 OLD_DTYPE = 'dtype = torch.bfloat16 if self.device.type == "cuda" else torch.float32'
 NEW_DTYPE = 'dtype = torch.float16 if self.device.type == "cuda" else torch.float32'
 
@@ -42,6 +43,22 @@ def discover_input(specified=None, root=None):
         f"No {FILENAME} found. Attach the translated 100-family CSV as a Kaggle Dataset "
         "or supply --input. The un-translated humanoid_patents.zip cannot be scored."
     )
+
+
+def discover_labels(specified=None):
+    """Find user-attached labels without ever adding them to Git."""
+    if specified:
+        path = Path(specified).expanduser().resolve()
+        if not path.is_file():
+            raise FileNotFoundError(f"Labels CSV not found: {path}")
+        return path
+    candidates = [Path("/kaggle/working") / LABEL_FILENAME]
+    if Path("/kaggle/input").exists():
+        candidates += sorted(Path("/kaggle/input").glob(f"**/{LABEL_FILENAME}"))
+    found = [p.resolve() for p in candidates if p.is_file()]
+    if len(found) > 1:
+        raise ValueError(f"More than one labels file found: {found}; use --labels")
+    return found[0] if found else None
 
 
 def patch_native_fp16(checkpoint):
@@ -98,6 +115,7 @@ def main():
     parser.add_argument("--checkpoint", default="/kaggle/working/pplx-decider-flash-v1.2-fp16")
     parser.add_argument("--skip-install", action="store_true", help="Only if model dependencies are already installed")
     parser.add_argument("--check", action="store_true", help="Check the CSV path without downloading or loading a model")
+    parser.add_argument("--labels", help="Optional CSV with manual labels; auto-detected from Kaggle inputs")
     args = parser.parse_args()
 
     input_path = discover_input(args.input)
@@ -105,6 +123,20 @@ def main():
     from screen import rows
     examples = list(rows(input_path))
     print(f"Input: {input_path} ({len(examples)} English-abstract records)", flush=True)
+    labels = discover_labels(args.labels)
+    if labels:
+        # Fail before downloading weights if label identifiers do not match the sample.
+        import csv
+        with labels.open(newline="", encoding="utf-8-sig") as f:
+            label_reader = csv.DictReader(f)
+            if not {"docdb_family_id", "label", "needs_review"}.issubset(label_reader.fieldnames or []):
+                raise ValueError("Labels CSV is missing required fields")
+            label_ids = [r["docdb_family_id"].strip() for r in label_reader]
+        if len(label_ids) != len(set(label_ids)) or set(label_ids) != {k for k, _ in examples}:
+            raise ValueError("Labels contain duplicate/missing/extra patent family IDs")
+        print(f"Labels: {labels} ({len(label_ids)} matching family IDs)", flush=True)
+    else:
+        print("No manual labels attached: model predictions only; add a Kaggle Dataset to evaluate.", flush=True)
     if args.check:
         return
 
@@ -127,6 +159,13 @@ def main():
         "--output", str(Path(args.output).expanduser().resolve()),
         "--model-revision", REVISION,
     ], check=True)
+    if labels:
+        subprocess.run([
+            sys.executable, str(Path(__file__).with_name("evaluate.py")),
+            "--predictions", str(Path(args.output).expanduser().resolve()),
+            "--labels", str(labels),
+            "--output", str(Path(args.output).expanduser().resolve().with_name("evaluation.json")),
+        ], check=True)
 
 
 if __name__ == "__main__":
