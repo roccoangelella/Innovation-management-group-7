@@ -13,3 +13,5 @@
 2026-10-30 — Consolidated curated 100-family challenge into one source-faithful labeled CSV with `--dataset` / `--challenge` CLI. The model receives abstract text only; the evaluator compares the provisional reference labels afterward. Retained backward compatibility with split files and added isolation tests.
 
 2026-10-30 — Audited direct label leakage and benchmark difficulty. The newly uploaded predictions were for the old random sample, not the new challenge. Decider source only receives abstract text; a keyword baseline attains 90% on the intentionally selected 50/50 challenge, so strong scores would not yet prove semantic generalization.
+
+2026-10-30 — Verified user-uploaded 100-case curated challenge predictions against SHA-matched combined dataset and provisional AI labels: TP=50/TN=50/FP=0/FN=0; no direct label-column leakage in reviewed source, but benchmark is purposively enriched and vulnerable to lexical shortcuts. Independent adjudication/held-out validation still needed.
