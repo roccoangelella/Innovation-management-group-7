@@ -1,0 +1,30 @@
+{
+  "seed": "semantic-heldout-v1-20261030",
+  "selection": "seeded hash sample within independently routed abstract-only candidate strata; NOT labels",
+  "forbidden_terms": [
+    "humanoid",
+    "humanoids",
+    "anthropomorphic"
+  ],
+  "prior_sets_excluded": 200,
+  "pool_size": 780,
+  "pool_buckets": {
+    "biped": 280,
+    "body_parts": 200,
+    "robot_tasks": 130,
+    "lexical_decoys": 110,
+    "random_background": 60
+  },
+  "source_counts": {
+    "random_background": 55384,
+    "robot_tasks": 7063,
+    "biped": 539,
+    "lexical_decoys": 4209,
+    "body_parts": 319
+  },
+  "rejected": {
+    "excluded/language/empty": 6388,
+    "not_routed": 163291,
+    "explicit_name": 1631
+  }
+}
