@@ -1,0 +1,25 @@
+name: Mine implicit humanoid challenge candidates
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/mine_implicit_humanoid_candidates.py"
+      - ".github/workflows/mine_implicit_humanoid.yml"
+permissions:
+  contents: write
+jobs:
+  mine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mine disjoint English candidates without explicit labels
+        run: python3 src/mine_implicit_humanoid_candidates.py
+      - name: Commit inspection-only pool
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f samples/semantic_challenge_100/candidate*
+          if ! git diff --cached --quiet; then
+            git commit -m "Generate semantic challenge candidate pool [skip ci]"
+            git push origin HEAD:main
+          fi
