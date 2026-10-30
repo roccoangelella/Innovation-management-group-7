@@ -39,8 +39,12 @@
       "size_bytes": 105576
     },
     "random_100_for_translation.zip": {
-      "sha256": "836bcc38d6bf704b72e395eb6fe8e01d7d8f95d6d83606a38f10b206b50231ab",
+      "sha256": "660394c000e470b4ac527b31857e8521d0f12ac5f21328617e2eb8e228994adf",
       "size_bytes": 31761
+    },
+    "humanoid_100_abstracts_en.csv": {
+      "sha256": "83c9ab7ce442883b2ded663c4049660af118eaee2c46c4ae3fc52936e834a5eb",
+      "size_bytes": 220640
     }
   }
 }
