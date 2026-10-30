@@ -1,0 +1,48 @@
+name: Generate implicit semantic 100-family challenge
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/assemble_semantic_challenge.py"
+      - "samples/semantic_challenge_100/selection_annotations.json"
+      - ".github/workflows/generate_semantic_challenge.yml"
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble source-authentic 40/60 annotated cases
+        run: python3 src/assemble_semantic_challenge.py
+      - name: Verify exact rows and implicit terminology
+        run: |
+          python3 - <<'PY'
+          import csv, re
+          from pathlib import Path
+          folder=Path("samples/semantic_challenge_100")
+          def read(f):
+              with (folder/f).open(newline="",encoding="utf-8") as h:return list(csv.DictReader(h))
+          combined=read("semantic_100_labeled.csv")
+          plain=read("semantic_100_for_blind_review.csv")
+          assert len(combined)==len(plain)==100
+          assert len({r["docdb_family_id"] for r in combined})==100
+          assert sum(r["label"]=="1" for r in combined)==40
+          assert sum(r["label"]=="0" for r in combined)==60
+          assert all(x["docdb_family_id"]==y["docdb_family_id"] and x["abstract_en"]==y["abstract"] for x,y in zip(combined,plain))
+          assert all(r["evidence_quote"] in r["abstract_en"] and r["needs_review"]=="0" for r in combined)
+          assert all(not re.search(r"\b(?:humanoids?|anthropomorphic)\b",r["abstract_en"],re.I) for r in combined)
+          print("100 IDs, 40/60 labels, original English, no prior-family overlaps or forbidden keywords")
+          PY
+      - name: Verify Kaggle one-command dataset handoff without GPU
+        run: python3 kaggle/run.py --semantic-challenge --check
+      - name: Commit materialized benchmark and provenance
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f samples/semantic_challenge_100/*.csv samples/semantic_challenge_100/sample_summary.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Materialize implicit semantic challenge CSV [skip ci]"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi

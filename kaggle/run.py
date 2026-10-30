@@ -147,7 +147,15 @@ def main():
     parser.add_argument("--labels", help="Optional CSV with manual labels; auto-detected from Kaggle inputs")
     parser.add_argument("--dataset", help="Single CSV with abstract_en and label; used independently for scoring and evaluation")
     parser.add_argument("--challenge", action="store_true", help="Use committed curated 50/50 humanoid challenge with independent output directory")
+    parser.add_argument("--semantic-challenge", action="store_true", help="Run implicit-humanoid 40/60 benchmark with isolated outputs")
     args = parser.parse_args()
+    if args.semantic_challenge:
+        if args.challenge or args.input or args.labels or args.dataset:
+            parser.error("--semantic-challenge cannot be combined with other dataset selectors")
+        semantic_dir = Path(__file__).resolve().parents[1] / "samples" / "semantic_challenge_100"
+        args.dataset = str(semantic_dir / "semantic_100_labeled.csv")
+        if args.output == "/kaggle/working/predictions.csv":
+            args.output = "/kaggle/working/semantic_100/predictions.csv"
     if args.challenge:
         if args.input or args.labels or args.dataset:
             parser.error("--challenge selects its own labeled dataset; do not combine with --input/--labels/--dataset")
