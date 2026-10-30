@@ -1,0 +1,38 @@
+{
+  "n": 100,
+  "label_counts": {
+    "relevant": 50,
+    "not_relevant": 50,
+    "needs_review": 0
+  },
+  "selection_groups": {
+    "explicit_positive": 50,
+    "hard_negative": 30,
+    "clear_negative": 20
+  },
+  "language": "en",
+  "seed_for_output_order": "humanoid-challenge-v1-20261030",
+  "source_zip_sha256": "fbdc57c362f076cee1a7da5c98d7309e398425c48015064bcbf78eba4c329e72",
+  "annotation_source": "AI-authored prospective labeling based only on patent abstract, before Kaggle model scores",
+  "labeling_definition": "1 only for explicit humanoid/anthropomorphic robot or a component/control system expressly designed for one; 0 for related robotics without such a link",
+  "limitations": "Purposive 50:50 case-control challenge; not representative of production prevalence. AI labels provisional pending independent human adjudication. Precision and F1 from this challenge are NOT field prevalence estimates. Re-using it to choose a threshold makes reported performance in-sample.",
+  "excluded_previous_sample": true,
+  "files": {
+    "challenge_100_full.csv": {
+      "sha256": "0370796cbb4653b08c5ef4bfa6bb6327ace1de1d1d5a7795bbf9fcff5d3af194",
+      "size_bytes": 118137
+    },
+    "humanoid_100_abstracts_en.csv": {
+      "sha256": "460fcafae710d84b0d7d8632e365d2f5769ad0519b7b9e244155f15441c9726a",
+      "size_bytes": 227304
+    },
+    "challenge_100_for_labeling.csv": {
+      "sha256": "1af201d02db7fb68f5fffb0a315dae04d0212199da21df38b1e1f7a02882a662",
+      "size_bytes": 109280
+    },
+    "humanoid_100_manual_labels.csv": {
+      "sha256": "faf86427bb38b91081b69a0668a507b48e68d68f5bf5cf70cc7ac965c6554f8c",
+      "size_bytes": 20789
+    }
+  }
+}
