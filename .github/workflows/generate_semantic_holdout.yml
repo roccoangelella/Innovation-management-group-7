@@ -1,0 +1,57 @@
+name: Generate keyword-blind semantic challenge
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/assemble_semantic_holdout.py"
+      - ".github/workflows/generate_semantic_holdout.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate source-faithful abstracts and provisional labels
+        run: python3 src/assemble_semantic_holdout.py
+      - name: Verify schema, exact source excerpts and nonoverlap
+        run: |
+          python3 - <<'PY'
+          import csv, json
+          from pathlib import Path
+          p=Path("samples/humanoid_semantic_holdout_100")
+          def load(name):
+              with (p/name).open(encoding="utf-8",newline="") as f:return list(csv.DictReader(f))
+          labels=load("semantic_holdout_100_labeled.csv")
+          blind=load("semantic_holdout_100_blind_review.csv")
+          first=load("../random_100/random_100_full.csv")
+          second=load("../humanoid_challenge_100/challenge_100_full.csv")
+          assert len(labels)==len(blind)==100
+          assert len({x["docdb_family_id"] for x in labels})==100
+          assert sum(int(x["label"]) for x in labels)==40
+          assert all(x["needs_review"]=="0" and x["evidence_quote"] in x["abstract_en"] for x in labels)
+          assert all(a["abstract_en"]==b["abstract_en"] and a["docdb_family_id"]==b["docdb_family_id"] for a,b in zip(labels,blind))
+          assert {x["docdb_family_id"] for x in labels}.isdisjoint({x["docdb_family_id"] for x in first+second})
+          import re
+          cues=re.compile(r"\b(?:humanoids?|anthropomorphic|human[- ]like|human[- ]shaped|human[- ]form|android robots?)\b",re.I)
+          assert all(not cues.search(x["abstract_en"]) for x in labels)
+          print("100 original English families, 40/60 labels, zero explicit lexical cues, no prior overlap")
+          PY
+      - name: Commit held-out challenge artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f samples/humanoid_semantic_holdout_100/semantic_holdout_100_*.csv samples/humanoid_semantic_holdout_100/annotation_audit.csv samples/humanoid_semantic_holdout_100/sample_summary.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Materialize 100-family keyword-blind semantic holdout [skip ci]"
+            for attempt in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then exit 0; fi
+              sleep 2
+            done
+            exit 1
+          fi
