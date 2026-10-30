@@ -1,28 +1,15 @@
 {
-  "method": "Uniform seeded SHA-256 hash-ranking of DOCDB families with nonempty abstracts; no CPC/language strata or deterministic keyword relevance filtering",
+  "method": "Uniform seeded SHA-256 hash-ranking of DOCDB families with nonempty original-English abstracts; no CPC strata or relevance filtering",
   "seed": 20261030,
   "sample_size": 100,
   "total_source_rows": 238824,
-  "eligible_families": 237538,
+  "eligible_families": 232636,
   "excluded": {
-    "empty_abstract": 1286
+    "empty_abstract": 1286,
+    "non_english_abstract": 4902
   },
   "eligible_languages": {
-    "cs": 2,
-    "de": 1488,
-    "en": 232636,
-    "es": 2,
-    "fi": 2,
-    "fr": 271,
-    "it": 1,
-    "ja": 2,
-    "ko": 2623,
-    "nl": 10,
-    "pl": 11,
-    "pt": 43,
-    "sk": 1,
-    "sv": 10,
-    "zh": 436
+    "en": 232636
   },
   "selected_languages": {
     "en": 100
@@ -39,7 +26,7 @@
       "size_bytes": 105576
     },
     "random_100_for_translation.zip": {
-      "sha256": "660394c000e470b4ac527b31857e8521d0f12ac5f21328617e2eb8e228994adf",
+      "sha256": "932869b42ff4c301cdff8f3f44672d3e7798962cf08a4b7e89834d4b2ffb40b8",
       "size_bytes": 31761
     },
     "humanoid_100_abstracts_en.csv": {
