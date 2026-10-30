@@ -21,3 +21,5 @@ jobs:
           python-version: "3.13"
       - name: Test inference launcher, FP16 patch and evaluator without GPU
         run: python -m unittest discover -s kaggle/tests -v
+      - name: Validate curated challenge and annotation IDs (CPU only)
+        run: python kaggle/run.py --challenge --check
