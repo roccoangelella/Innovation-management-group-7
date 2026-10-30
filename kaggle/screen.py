@@ -66,6 +66,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True)
     parser.add_argument("--checkpoint", required=True, help="Local snapshot of native Decider checkpoint")
+    parser.add_argument("--model-revision", default="unversioned")
     parser.add_argument("--output", default="/kaggle/working/predictions.csv")
     args = parser.parse_args()
     input_path = Path(args.input)
@@ -74,7 +75,7 @@ def main():
     journal = output.with_suffix(".jsonl")
     metadata = output.with_name("run_metadata.json")
     examples = list(rows(input_path))
-    config = {"input_sha256": sha256(input_path), "model": MODEL_ID, "question": QUESTION}
+    config = {"input_sha256": sha256(input_path), "model": MODEL_ID, "revision": args.model_revision, "dtype": "float16", "question": QUESTION}
     if metadata.exists():
         if json.loads(metadata.read_text()) != config:
             raise ValueError("Input/model/prompt changed: use a different output directory.")
@@ -100,7 +101,10 @@ def main():
             raise FileNotFoundError(f"Native Decider source missing under {checkpoint}")
         sys.path.insert(0, str(checkpoint / "source" / "src"))
         from pplx_decider import Decider
-        model = Decider.from_pretrained(checkpoint, device="cuda")
+        model = Decider.from_pretrained(checkpoint, device="cuda", fast=False)
+        import torch
+        if next(model.backbone.parameters()).dtype != torch.float16 or model.readout.weight.dtype != torch.float16:
+            raise RuntimeError("Native model is not in FP16; run via kaggle/run.py to patch the local loader.")
         with journal.open("a", encoding="utf-8") as f:
             for index, (key, abstract) in enumerate(pending, 1):
                 request = {"state": abstract, "questions": {"relevant": QUESTION}}

@@ -1,38 +1,46 @@
-# Kaggle · Perplexity Decider patent screening
+# Kaggle · Perplexity Decider FP16 screening pilot
 
-Self-contained **inference experiment** for Group 7's humanoid-robot patent corpus. Translation and 100-family sampling remain under `src/`; this folder owns only model inference and evaluation. No fine-tuning.
+Standalone **100-family inference experiment**. Data collection, translation and sampling remain under `src/`. There is no fine-tuning and no production filtering threshold yet.
 
-## Model
+## One-command launch in Kaggle
 
-`perplexity-ai/pplx-decider-flash-v1.2` (native Perplexity `pplx_decider.Decider` API). Do **not** use ordinary causal language-model generation or `AutoModelForSequenceClassification`: the checkpoint has a specialized decision readout and attention configuration. Official instructions: https://huggingface.co/perplexity-ai/pplx-decider-flash-v1.2
+First enable **GPU** and **Internet** in Kaggle Notebook settings, attach the translated 100-family CSV (`humanoid_100_abstracts_en.csv`) as a Kaggle Dataset, and ensure Python 3.12+. If Hugging Face access is required, add your private token as Kaggle secret `HF_TOKEN` (never commit it).
 
-The model's repository may require Hugging Face authentication. The BF16 checkpoint needs ~9 GiB GPU memory for weights **plus runtime memory**. Kaggle GPU availability, download permissions, runtime limits and Internet settings must be checked in Kaggle itself. We have **not** run a Kaggle GPU evaluation yet.
+From a notebook cell:
 
-## Run in a Kaggle notebook
-
-1. Upload the **translated** 100-family CSV from `outputs/sampling/humanoid_100_abstracts_en.csv` as a Kaggle Dataset. Do not upload the original ZIP in place of the translated CSV.
-2. Enable GPU and, when required, Internet access; configure `HF_TOKEN` as a Kaggle secret if the repository is gated. Never put tokens in notebooks, Git, or outputs.
-3. Run the cells from `notebook_cells.py`, modifying only the dataset path. The setup cell downloads the pinned Perplexity model, installs its own repository requirements (which may require restarting the kernel), and then runs `screen.py`.
-4. Download `predictions.csv`, `run_metadata.json` and optional `evaluation.json`. Upload only non-sensitive aggregate results to GitHub.
-
-If Kaggle's notebook session cannot download the weights, provision a Kaggle Model/Dataset with the checkpoint in advance and pass its local path as `--checkpoint`. Run from repo root, or explicitly upload this folder to Kaggle.
-
-## CLI
-
-```bash
-python kaggle/screen.py \
-  --input /kaggle/input/translated-sample/humanoid_100_abstracts_en.csv \
-  --checkpoint /kaggle/working/pplx-decider-flash-v1.2 \
-  --output /kaggle/working/predictions.csv
+```python
+!git clone https://github.com/roccoangelella/Innovation-management-group-7.git
+%cd Innovation-management-group-7
+!python kaggle/run.py
 ```
 
-Only `docdb_family_id` and `abstract_en` are read from the CSV; `translation_status` is validated when present. Original title, CPC, source language and patent metadata are never passed to the model. The prompt uses a fixed definition of humanoid robots: general-purpose articulated anthropomorphic robots, their control, perception, manipulation, locomotion, and systems explicitly designed for such robots. Ordinary appliances, standalone grippers, industrial robot arms, autonomous vehicles, and generic ML are not included without an explicit humanoid-robot link.
+**Only the last line is the pipeline entrypoint.** It discovers `/kaggle/input/**/humanoid_100_abstracts_en.csv` (or `outputs/sampling/humanoid_100_abstracts_en.csv` when present), checks the input, checks CUDA, installs pinned dependencies, downloads the pinned model, patches its **local** native loader for genuine FP16 execution, and runs/resumes inference. Installation and inference run in separate Python processes, so the notebook kernel does not need to be manually restarted.
 
-The script outputs **unthresholded** model probability estimates and the model's binary decision. No threshold is presented as validated. It writes each result immediately to a resumable JSONL journal and regenerates `predictions.csv` upon completion; it verifies the input and configuration hashes before resume.
+For a different CSV path:
 
-## Evaluation
+```bash
+python kaggle/run.py --input /kaggle/input/my-sample/humanoid_100_abstracts_en.csv
+```
 
-Once the 100 patents have been independently hand labeled, supply a CSV with `docdb_family_id,label` (`label` is 0 or 1):
+Preflight the input without downloading weights: `python kaggle/run.py --check`.
+
+## Why an explicit FP16 patch?
+
+The official checkpoint at `perplexity-ai/pplx-decider-flash-v1.2` stores BF16 tensors; in the pinned release the native `pplx_decider/model.py` hardcodes BF16 for CUDA. NVIDIA T4 GPUs do not execute BF16 natively. The launcher replaces **one exact dtype assignment** with `torch.float16` in the locally downloaded source, then loads the model natively. If the source changes, it fails instead of silently falling back to BF16. The model's noncausal attention, per-question readout, decision request format and saved temperature calibration are unchanged. FP16 results must still be tested against manually labeled patents; no equivalence to the official BF16 benchmark is claimed.
+
+Model revision: `6d771ad7b5ecff5e93b8fc7b90d4c5ccc341954d`.
+Official reference: https://huggingface.co/perplexity-ai/pplx-decider-flash-v1.2
+The checkpoint is ~9.1 GB, plus working GPU memory. On dual T4 setups, **one** 16 GiB GPU is used; memory is not pooled. Adequate GPU memory, Hugging Face permissions, internet access and compatible Kaggle Python/PyTorch versions are required. **The GPU run has not yet been verified on Kaggle.**
+
+## Output
+
+- `/kaggle/working/predictions.csv`: `docdb_family_id,probability_relevant,model_decision`. Decision uses exploratory 0.5, **not** a validated filtering threshold.
+- `/kaggle/working/predictions.jsonl`: append-only resumable results.
+- `/kaggle/working/run_metadata.json`: input hash, question/prompt, pinned model and revision.
+
+Only `abstract_en` is provided to the decision model. Source language, title, CPCs and metadata are not in the request. The input requires successful translation status (`original_en` or `translated`) when the field exists, and unique DOCDB family identifiers. The 100-family data must already be translated; the launch does not invoke the private translation API.
+
+Manual evaluation after independently labeling all 100 families:
 
 ```bash
 python kaggle/evaluate.py --predictions /kaggle/working/predictions.csv \
@@ -40,8 +48,4 @@ python kaggle/evaluate.py --predictions /kaggle/working/predictions.csv \
   --output /kaggle/working/evaluation.json
 ```
 
-The evaluation computes confusion-matrix counts and precision, recall and F1 at the **exploratory** 0.5 cut-off. Report these with the 90/10 stratification caveat; do not interpret the dataset as a random estimate of production prevalence or automatically deploy this threshold. Any threshold selection requires distinct calibration and held-out test sets or a documented cross-validation procedure.
-
-## Scope
-
-This is the first Flash v1.2 experiment only. Comparisons to the larger Decider, prompt alternatives, calibration and full-corpus production scaling come **after** assessing manually reviewed results. Keep the translated CSV and labels outside the repository when licensing/privacy restrictions require it.
+Report precision, recall, F1 and error cases with the sampling caveat: the 90/10 language mix is not the production prevalence, and the dataset is not a representative random sample. No full-corpus deployment until a held-out calibration strategy is agreed.
