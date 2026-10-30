@@ -1,9 +1,11 @@
 # Project Status
 
-Updated 2026-10-30. Project documentation reflects the course kickoff, project decisions and current `main` repository code.
+Updated 2026-10-30. Current main includes TIP/PATSTAT candidate export, resumable translation code, two distinct 100-family samplers, and an isolated Perplexity Decider Flash v1.2 FP16 Kaggle pilot.
 
-**Implemented in code:** broad CPC patent export; resumable multilingual translation; deterministic 100-family stratified sampling; isolated Kaggle Decider Flash v1.2 FP16 pilot with `python kaggle/run.py`, native decision readout, probability journal and optional evaluation. This includes a pinned checkpoint and exact-match local dtype patch to FP16.
+**Observed sample:** Uniform seeded sample over 232,636 original-English nonempty abstracts (238,824 source rows in all); 100 original-English families saved under `samples/random_100/`, with source text copied verbatim into `abstract_en`. The previously proposed 90/10 multilingual/CPC-stratified sampler is separate.
 
-**Not verified as complete:** live endpoint translation to full coverage, actual Kaggle GPU compatibility and inference, 100-family human annotations, calibrated relevance threshold, firm scoring, quadrant or client recommendation.
+**Provisional labels provided 2026-10-30:** 100 unique sample IDs match the source list in order; 98 labeled not relevant, 0 labeled relevant, 2 marked for review. The label data were AI-assisted in another chat and have not been independently adjudicated. No precision/recall/F1 can currently be validated without positive labeled examples.
 
-**Next:** generate/attach the translated 100-family CSV; execute the single-command Kaggle pilot on a GPU, inspect errors and outputs; evaluate independently annotated labels; resolve year semantics (priority vs filing). Open issues: [questions](requirements/open-questions.md). **Submission:** Sunday 20 December 2026.
+**Implemented but not GPU-verified:** `python kaggle/run.py` downloads/loads the native Decider Flash checkpoint as FP16 on CUDA, scores the committed sample, and (when the labeling CSV is attached as a Kaggle Dataset) automatically evaluates predictions. Evaluation excludes unresolved labels and reports specificity, false-positive rate, and 95% Wilson interval. No actual Kaggle GPU run has been witnessed.
+
+**Next:** run a Kaggle GPU pilot and inspect results, independently review provisional labels, and create an additional *positive-enriched* evaluation set for recall and threshold calibration. Translation, applicant/year corrections, landscaping, valuation, quadrant and recommendation remain separate work. Deadline: Sunday 20 December 2026.

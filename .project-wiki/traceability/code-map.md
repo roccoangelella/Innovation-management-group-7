@@ -4,7 +4,8 @@
 | --- | --- | --- |
 | Kickoff slide 9: DOCDB-family data | `src/sql_queries.py` | Implemented candidate export; year discrepancy |
 | Global multilingual inclusion | `src/sql_queries.py`; `src/translate_abstracts.py` | Captured; translation implementation pending real full-corpus verification |
-| Abstract-only calibrated relevance | `kaggle/run.py`; `kaggle/screen.py`; `kaggle/evaluate.py` | FP16 pilot implemented; Kaggle inference, manual labels, validation and threshold open |
+| Kickoff slide 9: hand-validate ~100 random families | `src/sample_random_100.py`; `samples/random_100/`; `samples/LABELING_PROMPT.md` | Actual source draw generated; AI-assisted labels received, pending independent adjudication; no positives in current 100 |
+| Abstract-only calibrated relevance | `kaggle/run.py`; `kaggle/screen.py`; `kaggle/evaluate.py` | FP16 pilot and unresolved-aware evaluator implemented; provisional negative-only labels received; GPU validation, positive examples and threshold selection open |
 | Sector trends, competition, PEST | None | Planned |
 | Present/future scores, Magic Quadrant | None | Planned |
 | Electrolux strategy recommendation | None | Planned |

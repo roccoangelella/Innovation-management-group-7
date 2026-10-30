@@ -1,5 +1,9 @@
 # Deployment and execution
 
-TIP/PATSTAT export runs within the TIP environment. Translation runs with Python >=3.12 and the private OpenAI-compatible endpoint configured locally.
+TIP/PATSTAT extraction runs in TIP; private endpoint translation runs locally under Python 3.12+ and is independent of screening.
 
-The Kaggle experiment is run from the repository root with `python kaggle/run.py` after enabling GPU and Internet and attaching a translated `humanoid_100_abstracts_en.csv`. If needed, provide the `HF_TOKEN` Kaggle secret. The command installs checkpoint requirements and executes inference through a fresh Python subprocess. Its local model patch replaces exactly the upstream CUDA BF16 dtype assignment with FP16, retaining the native decision model architecture. One GPU is used. The Kaggle runtime and the complete execution path remain unverified pending a real run. See `kaggle/README.md`.
+Kaggle pilot: enable GPU and Internet, then clone the repository, change into its root, and run `python kaggle/run.py`. The 100-family original-English input is committed at `samples/random_100/humanoid_100_abstracts_en.csv` and discovered automatically. No translation or sample upload is required. Downloading the private Hugging Face checkpoint may require the `HF_TOKEN` Kaggle secret.
+
+To evaluate the supplied AI-assisted labels, attach `humanoid_100_manual_labels.csv` as a Kaggle Dataset; the launcher finds it uniquely under `/kaggle/input/**/`, validates IDs, then runs `kaggle/evaluate.py` after scoring. Its outputs under `/kaggle/working` are `predictions.csv`, `evaluation.json`, `evaluation_cases.csv` and state/provenance files. For an existing predictions file, call `kaggle/evaluate.py` directly. See `kaggle/README.md`.
+
+Current behavior uses a pinned native Decider checkpoint, local BF16→FP16 loader patch and single CUDA GPU. The full Kaggle GPU path remains unverified.

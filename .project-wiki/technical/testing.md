@@ -13,10 +13,11 @@ confidence: confirmed
 
 # Testing and evidence boundaries
 
-`python -m unittest discover -s tests -v` exercises translation with mocked responses and sampling with synthetic data. Translation completeness requires a summary with `incomplete: 0`. The tests cannot establish private endpoint compatibility or translation fidelity.
+- `python -m unittest discover -s tests -v`: offline tests for translation and source sampling.
+- `python -m unittest discover -s kaggle/tests -v`: isolated tests for Kaggle input detection, native FP16 patch and evaluation. These cannot verify actual GPU behavior.
+- `python kaggle/run.py --check`: verifies the chosen English-abstract input and optional attached label identifier set without downloading model weights.
+- `python kaggle/run.py`: pilot inference; with a uniquely attached `humanoid_100_manual_labels.csv`, runs evaluation automatically. `python kaggle/evaluate.py --predictions ... --labels ...` evaluates existing predictions without GPU.
 
-`python -m unittest discover -s kaggle/tests -v` exercises local input resolution and exact-match FP16 native-loader patching without downloading weights. `python kaggle/run.py --check` preflights the translated input without model download.
+**Evidence (30 October 2026):** `samples/random_100/` contains 100 source-derived unmodified English abstracts. The supplied provisional annotation CSV has 98 negatives, **zero positives**, and 2 unresolved records (`93663023`, `24533336`). Its 100 IDs were checked against the stored source IDs with exact order. Unresolved rows must be excluded. On these labels, only false-positive behavior and specificity can be assessed, with sampling intervals; recall, precision, F1 and production threshold quality are not established. AI-assisted annotations require human adjudication.
 
-**Not yet verified with Kaggle GPU:** Python/CUDA/requirements combination, pinned private Hugging Face snapshot access, precision compatibility, peak memory, throughput or decision quality. The FP16 patch is enforced by source check and downstream assertions but must be tested on an actual T4 or other GPU. The 100-family sample is deliberately stratified (90/10 English/non-English) and cannot be treated as production prevalence. Compare scores with independent manual labels; choose production thresholds on separate calibration/evaluation evidence.
-
-Future verification: translation fidelity, source ZIP coverage, priority-year validation, duplicate family handling, temporally valid patent-score backtests, and reproducible sector figures.
+**Unverified:** Kaggle GPU/T4 memory, runtime dependencies, model loading and precision compatibility, model scores, translation endpoint/full-corpus coverage, and any calibration. The larger/model-comparison plan requires a separate positive-enriched sample and non-leaking calibration/test design.
