@@ -9,3 +9,5 @@
 2026-10-30 — User-supplied Kaggle predictions verify a completed 100-family single-T4 pilot after the dependency fix. No positives in the provisional labels; production two-T4 data parallelism is a proposed throughput optimization, not implemented or benchmarked.
 
 2026-10-30 — Created separate source-faithful 100-family, English-only 50/50 relevance challenge with assistant-authored provisional labels, 30 hard robotics negatives, 10 lexical decoys and 10 clear negatives. Added reproducible generator, GitHub Actions validation, and isolated Kaggle `--challenge` run; human adjudication and model inference pending.
+
+2026-10-30 — Consolidated curated 100-family challenge into one source-faithful labeled CSV with `--dataset` / `--challenge` CLI. The model receives abstract text only; the evaluator compares the provisional reference labels afterward. Retained backward compatibility with split files and added isolation tests.
