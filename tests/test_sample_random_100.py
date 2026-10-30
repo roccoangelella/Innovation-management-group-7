@@ -42,6 +42,7 @@ class TestRandomSampling(unittest.TestCase):
             mod.write_sample(a, path / "out")
             with (path / "out/random_100_for_labeling.csv").open(newline="") as f:
                 self.assertEqual(100, len(list(csv.DictReader(f))))
+            self.assertFalse((path / "out/humanoid_100_abstracts_en.csv").exists())
             with zipfile.ZipFile(path / "out/random_100_for_translation.zip") as z:
                 self.assertEqual(["humanoid_patents.csv"], z.namelist())
 

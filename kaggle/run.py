@@ -27,6 +27,7 @@ def discover_input(specified=None, root=None):
     root = Path(root or Path(__file__).resolve().parents[1])
     preferred = [
         root / "outputs/sampling" / FILENAME,
+        root / "samples/random_100" / FILENAME,
         Path("/kaggle/working") / FILENAME,
     ]
     for candidate in preferred:

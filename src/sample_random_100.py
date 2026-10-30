@@ -103,8 +103,17 @@ def write_sample(input_zip, output_dir, n=100, seed=SEED):
         w.writerows({field: row[field] for field in REVIEW_COLUMNS} for row in chosen)
     with zipfile.ZipFile(subset_zip, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as z:
         z.write(full, arcname=SOURCE_NAME)
+    output_files = [full, review, subset_zip]
+    if all((row["abstract_language"] or "").strip().lower() == "en" for row in chosen):
+        kaggle_csv = out / "humanoid_100_abstracts_en.csv"
+        with kaggle_csv.open("w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=[*fields, "abstract_en", "translation_status"])
+            w.writeheader()
+            for row in chosen:
+                w.writerow({**row, "abstract_en": row["abstract"], "translation_status": "original_en"})
+        output_files.append(kaggle_csv)
     stats["files"] = {p.name: {"sha256": sha256(p), "size_bytes": p.stat().st_size}
-                      for p in (full, review, subset_zip)}
+                      for p in output_files}
     (out / "sample_summary.json").write_text(json.dumps(stats, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(stats, ensure_ascii=False, indent=2))
     return stats
