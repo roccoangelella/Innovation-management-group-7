@@ -96,12 +96,12 @@ def main():
     with (OUT/"annotation_audit.csv").open("w",encoding="utf-8",newline="") as f:
         w=csv.DictWriter(f,fieldnames=["docdb_family_id","label","discovery_group","confidence","evidence_quote","reason"])
         w.writeheader()
-        w.writerows({"docdb_family_id":i,"label":keyed[i]["label"],"discovery_group":keyed[i]["bucket"],
+        w.writerows({"docdb_family_id":i,"label":keyed[i]["label"],"discovery_group":keyed[i]["selection_group"],
                      "confidence":keyed[i]["confidence"],"evidence_quote":quote(selected[i]["abstract"],keyed[i]["label"]),
                      "reason":keyed[i]["reason"]} for i in ids)
     summary={
         "n":len(ids),"label_counts":{"relevant":40,"not_relevant":60,"needs_review":0},
-        "selection_groups":dict(Counter(x["bucket"] for x in data)),
+        "selection_groups":dict(Counter(x["selection_group"] for x in data)),
         "language":"en","seed_for_output_order":SEED,
         "source_zip_sha256":sha256(ZIP),
         "forbidden_whole_words":["humanoid","humanoids","anthropomorphic"],
