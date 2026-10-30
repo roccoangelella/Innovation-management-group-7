@@ -17,3 +17,5 @@
 2026-10-30 — Verified user-uploaded 100-case curated challenge predictions against SHA-matched combined dataset and provisional AI labels: TP=50/TN=50/FP=0/FN=0; no direct label-column leakage in reviewed source, but benchmark is purposively enriched and vulnerable to lexical shortcuts. Independent adjudication/held-out validation still needed.
 
 2026-10-30 — Added non-keyword, English-only 40/60 semantic challenge from 100 previously unused patent families, isolated Kaggle `--semantic-challenge` CLI, provenance and wiki. No explicit humanoid/anthropomorphic terms, but simple biped-vs-exoskeleton baseline still 94%; annotations AI-assisted, not human gold labels.
+
+2026-10-30 — Generated and source-verified a separate 100-case original-English keyword-blind humanoid task challenge with 40/60 provisional labels, baseline checks (60–86%), blind-review file, and explicit Kaggle `--dataset` evaluation command. Human adjudication and live GPU results pending.

@@ -113,3 +113,13 @@ python kaggle/run.py --semantic-challenge
 The launcher selects both abstract and labels from the combined file but `screen.py` forwards **only** `abstract_en` to the model. Results go into `/kaggle/working/semantic_100/` (not the old challenge directory). `--semantic-challenge --check` validates input without downloading weights. Blind annotation input is `semantic_100_for_blind_review.csv`.
 
 **Shortcut audit:** A classifier matching case-insensitive biped/two-legged terminology gives TP 35, TN 56, FP 4, FN 5 (91% accuracy). Excluding abstracts mentioning *exoskeleton* gives TP 34, TN 60, FP 0, FN 6 (94% accuracy). The old exact-word `humanoid OR anthropomorphic` baseline now returns no positives (60% accuracy). So this is useful for analyzing **false negatives and decision-boundary ambiguity**, but it is **not a clean semantic-generalization benchmark**: selected examples remain lexically correlated and were AI-labeled, not independently adjudicated. A later human-validated, realistic-prevalence set with more difficult concept-matched examples is still required.
+
+## Additional keyword-blind semantic holdout
+
+Another independently selected 100-family dataset is in `samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv` (40 provisional task-relevant positives, 60 near negatives). This is distinct from `--semantic-challenge` and from the earlier `--challenge` test. To run the **new** holdout, use:
+
+```bash
+python kaggle/run.py --dataset samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv --output /kaggle/working/semantic_holdout_100/predictions.csv
+```
+
+This uses the existing `--dataset` single-file interface and isolated output directory. Only `abstract_en` enters the model request. See `samples/humanoid_semantic_holdout_100/ANNOTATION_PROTOCOL.md`; labels are AI-provisional, class balance enriched, and the broader morphology/task-relevance definition may differ from the model's strict explicit-link prompt. No GPU predictions have been recorded for this set.

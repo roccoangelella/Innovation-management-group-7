@@ -83,3 +83,7 @@ python src/translate_abstracts.py --input outputs/sampling/humanoid_100_abstract
 ```
 
 Do **not** apply the default full-corpus translation journal to this subset: the manifest binds each journal to its source ZIP hash. This stage is only evaluation sampling, not classification or annotation. The deliberately fixed 90/10 language mix and the CPC-balanced heuristic mean the benchmark must not be interpreted as a random representative estimate of production-corpus accuracy.
+
+## Additional keyword-blind 100-family relevance stress test
+
+A disjoint original-English sample of **40 provisional positives + 60 negatives**, designed to test morphology and biped/whole-body tasks without overt humanoid name words, is available in [`samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv`](samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv). Full selection criteria, source provenance, label caveats and lexical baselines are in [the annotation protocol](samples/humanoid_semantic_holdout_100/ANNOTATION_PROTOCOL.md). Run from the repository root: `python kaggle/run.py --dataset samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv --output /kaggle/working/semantic_holdout_100/predictions.csv`. No translation needed. AI labels are provisional and require independent review.

@@ -13,3 +13,5 @@
 | Electrolux strategy recommendation | None | Planned |
 | Translation behavior | `src/translate_abstracts.py`; `tests/test_translate_abstracts.py` | Implemented; offline-tested |
 | Kaggle FP16 setup | `kaggle/run.py`; `kaggle/tests/test_run.py` | Pinned model/dtype conversion, local tests authored; GPU verification pending |
+
+| Keyword-blind additional semantic challenge | `src/mine_keyword_blind_candidates.py`; `src/assemble_semantic_holdout.py`; `samples/humanoid_semantic_holdout_100/`; `kaggle/run.py --dataset` | 100 source-verified families, 40/60 AI provisional labels, no overt humanoid cues and no overlap with first 200; held-out GPU predictions and human adjudication pending |

@@ -15,3 +15,7 @@ After pulling main from the repository root, run `python kaggle/run.py --challen
 ## Implicit semantic challenge
 
 From the cloned repository root after pulling main: `python kaggle/run.py --semantic-challenge` (`--check` for input-only preflight). The launcher automatically selects the single `samples/semantic_challenge_100/semantic_100_labeled.csv` and writes outputs into `/kaggle/working/semantic_100/`; it never reuses the previous challenge journal. Only source abstract enters `screen.py`'s model request; labels and rationale go to `evaluate.py` afterward. The 40/60 labels are AI-provisional and intentionally treat biped-specific technologies as relevant, broader than the earlier strict humanoid-only prompt. No live GPU evaluation of this set has been seen.
+
+## Additional keyword-blind source holdout
+
+The generated `samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv` is a 100-row combined source-abstract and AI-provisional-label file; it is **not** the existing `--semantic-challenge` input. Run `python kaggle/run.py --dataset samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv --output /kaggle/working/semantic_holdout_100/predictions.csv` in the cloned Kaggle repo with GPU/Internet and cached HF weights. The explicit output directory avoids mixing result journals or input SHA manifests. Input `abstract_en` only is used for Decider; labels are compared after inference. This test was assembled from different patent families and has no GPU results yet.

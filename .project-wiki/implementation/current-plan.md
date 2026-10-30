@@ -23,3 +23,5 @@ confidence: confirmed
 8. **Later:** corrected temporal metadata, applicant normalization, sector landscape, present/future scores and no-leakage backtest, quadrant, recommendation, deck and pitch.
 
 Deadline: 20 December 2026.
+
+**Additional task-relevance stress test (implemented 2026-10-30):** `samples/humanoid_semantic_holdout_100/` contains 100 further original-English patent families labeled AI-provisionally 40 positive and 60 negative, with overt humanoid terms absent, 200 earlier IDs excluded, and independently saved blind-review file. Run `python kaggle/run.py --dataset samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv --output /kaggle/working/semantic_holdout_100/predictions.csv` to evaluate model behavior, then analyze definition disagreements between biped-compatible tasks and the existing explicit-humanoid prompt. Do not use this purposive dataset to claim production accuracy or to pick a threshold without a separate held-out evaluation.
