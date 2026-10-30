@@ -1,0 +1,45 @@
+{
+  "version": "v1",
+  "n": 100,
+  "positive_labels": 40,
+  "negative_labels": 60,
+  "needs_review": 0,
+  "language": "en",
+  "shuffle_seed": "keyword-blind-semantic-holdout-v1-20261030",
+  "method": "Purposive, manually curated candidate IDs from source abstracts without overt humanoid terms; independent of any Decider predictions for these 100 cases",
+  "label_policy": "Humanoid body configuration, coordinated humanlike biped locomotion, or integrated upper/lower-body tasks vs closely related but nonhuman robots and generic devices",
+  "label_status": "AI-authored provisional relevance judgments; NOT independently adjudicated human gold labels",
+  "known_risks": "Broader morphology/task relevance may differ from the existing Decider prompt's strict explicit humanoid link. Class balance is enriched. Positive labeling of biped-only components needs independent review. Do not calibrate a production threshold or claim prevalence-generalized precision from this set.",
+  "excluded_prior_family_count": 200,
+  "explicit_humanoid_or_anthropomorphic_terms_found": 0,
+  "selection_groups": {
+    "positive_integrated_body": 14,
+    "positive_biped_human_gait": 17,
+    "positive_whole_body_tasks": 9,
+    "negative_nonhuman_bipeds": 10,
+    "negative_multilegged_animals": 15,
+    "negative_dual_arm_manipulators": 12,
+    "negative_generic_robot_hands": 10,
+    "negative_wearable_exoskeletons": 8,
+    "negative_mobile_specialists": 5
+  },
+  "source_zip_sha256": "fbdc57c362f076cee1a7da5c98d7309e398425c48015064bcbf78eba4c329e72",
+  "files": {
+    "semantic_holdout_100_labeled.csv": {
+      "sha256": "c4635ceefd05d599a0551696158cbac849eca84a1928c8e3247cd8c6a965178c",
+      "bytes": 141120
+    },
+    "semantic_holdout_100_blind_review.csv": {
+      "sha256": "f901d0a6a1850f843c4dff8fefd526f8f78dc02b41c8434d7cda02f11fe0c38c",
+      "bytes": 111674
+    },
+    "annotation_audit.csv": {
+      "sha256": "ae2b68702a78c0cc958c2327bdbcd2bbb2caa4600f3c9a239dc93bb6a3e09fee",
+      "bytes": 33024
+    },
+    "semantic_holdout_100_full.csv": {
+      "sha256": "e54b3edecb00bdbd7906c58d1eb68afbb9afbec9649c3f3fba8a552baabf6e18",
+      "bytes": 120915
+    }
+  }
+}
