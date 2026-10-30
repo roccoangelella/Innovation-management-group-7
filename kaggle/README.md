@@ -65,7 +65,21 @@ python kaggle/evaluate.py --predictions /kaggle/working/predictions.csv \
 
 Report precision, recall, F1 and error cases with the sampling caveat: this is an English-only random sample of broad CPC candidates, and it may have too few truly relevant humanoid patents for reliable precision/recall estimates. It does not assess translated non-English abstracts. No full-corpus deployment until a held-out calibration strategy is agreed.
 
-## Evaluate the 100 manually labeled abstracts
+## Curated 50/50 humanoid challenge (2026-10-30)
+
+After reviewing the original English patent abstracts without looking at Decider predictions, 50 provisional positives, 30 hard negatives and 20 clear negatives were selected in `samples/humanoid_challenge_100/`. These 100 source families are **disjoint** from the earlier pure-random 100. Their labels are AI-authored provisional judgments, **not human gold labels**.
+
+From the repo root, run a single command:
+
+```bash
+python kaggle/run.py --challenge
+```
+
+This selects the committed challenge input and provisional labels automatically and writes `predictions.csv`, `evaluation.json`, `evaluation_cases.csv`, and a separate resume journal under **`/kaggle/working/challenge_100/`**, without colliding with the earlier pilot. No extra Kaggle dataset or translation call is needed. For details and selection caveats see [the challenge annotation protocol](../samples/humanoid_challenge_100/ANNOTATION_PROTOCOL.md).
+
+Because this is **purposively enriched to 50% positives**, its precision and F1 are NOT estimates of production performance; and if the prompt/threshold is tuned on this set, subsequent scores on this same set are not held-out estimates.
+
+## Evaluate the original 100 manually labeled abstracts
 
 The independent labeling file `humanoid_100_manual_labels.csv` contains **98 negative labels, no positive labels, and 2 unresolved rows** (family IDs `93663023`, `24533336`). These labels were produced by an AI-assisted annotator and require adjudication. **Do not publish them as human gold labels.**
 

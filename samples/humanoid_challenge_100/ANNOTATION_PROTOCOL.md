@@ -25,7 +25,7 @@ The labels, short rationales and verbatim source excerpts are **AI-authored prov
 
 ## Kaggle command
 
-From repo root after pulling latest main:
+From repo root after pulling latest main, simply run `python kaggle/run.py --challenge`, or use the equivalent explicit command below:
 
 ```bash
 python kaggle/run.py --input samples/humanoid_challenge_100/humanoid_100_abstracts_en.csv \

@@ -144,7 +144,16 @@ def main():
     parser.add_argument("--skip-install", action="store_true", help="Only if model dependencies are already installed")
     parser.add_argument("--check", action="store_true", help="Check the CSV path without downloading or loading a model")
     parser.add_argument("--labels", help="Optional CSV with manual labels; auto-detected from Kaggle inputs")
+    parser.add_argument("--challenge", action="store_true", help="Use committed curated 50/50 humanoid challenge with independent output directory")
     args = parser.parse_args()
+    if args.challenge:
+        if args.input or args.labels:
+            parser.error("--challenge already selects input and labels; do not combine with --input/--labels")
+        challenge_dir = Path(__file__).resolve().parents[1] / "samples" / "humanoid_challenge_100"
+        args.input = str(challenge_dir / FILENAME)
+        args.labels = str(challenge_dir / LABEL_FILENAME)
+        if args.output == "/kaggle/working/predictions.csv":
+            args.output = "/kaggle/working/challenge_100/predictions.csv"
 
     input_path = discover_input(args.input)
     # Validate the sample *before* downloading approximately 9 GB of weights.

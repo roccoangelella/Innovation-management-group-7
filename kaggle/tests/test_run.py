@@ -12,6 +12,13 @@ spec.loader.exec_module(run)
 
 
 class LauncherTests(unittest.TestCase):
+    def test_challenge_cli_is_exposed_and_has_disjoint_default_output(self):
+        source = MODULE.read_text(encoding="utf-8")
+        self.assertIn('parser.add_argument("--challenge"', source)
+        self.assertIn('"/kaggle/working/challenge_100/predictions.csv"', source)
+        self.assertIn("challenge_dir / FILENAME", source)
+        self.assertIn("challenge_dir / LABEL_FILENAME", source)
+
     def test_preferred_input_discovery(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
