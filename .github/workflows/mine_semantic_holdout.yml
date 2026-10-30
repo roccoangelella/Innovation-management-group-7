@@ -24,5 +24,11 @@ jobs:
           git add -f samples/humanoid_semantic_holdout_100/candidate_pool.jsonl samples/humanoid_semantic_holdout_100/candidate_index.csv samples/humanoid_semantic_holdout_100/candidate_summary.json samples/humanoid_semantic_holdout_100/review_*.jsonl
           if ! git diff --cached --quiet; then
             git commit -m "Generate keyword-blind humanoid challenge candidate pool [skip ci]"
-            git push origin HEAD:main
+            for attempt in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then exit 0; fi
+              sleep 2
+            done
+            exit 1
           fi
