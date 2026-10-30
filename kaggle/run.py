@@ -108,6 +108,34 @@ def install(*args):
     subprocess.run([sys.executable, "-m", "pip", "install", "--disable-pip-version-check", *args], check=True)
 
 
+def prepare_model_dependencies(checkpoint, skip_install=False):
+    """Set up reference inference, excluding Kaggle's optional CUDA-mismatched audio extension.
+
+    Native Decider uses text and (optionally) images, not audio. Transformers
+    imports torchaudio when it is installed; Kaggle's CUDA-12.8 torchaudio
+    crashes against the checkpoint's pinned CUDA-13.0 torch. Uninstalling
+    that unnecessary package ensures Transformers will skip its audio backend.
+    """
+    if not skip_install:
+        install("-r", str(Path(checkpoint) / "requirements.txt"))
+    # Even with --skip-install, remove the incompatible optional library.
+    subprocess.run(
+        [sys.executable, "-m", "pip", "uninstall", "--yes", "torchaudio"],
+        check=True,
+    )
+    # Execute in a new interpreter so both PyTorch and Transformers are read
+    # from the installed versions, not stale imports in the launcher.
+    subprocess.run(
+        [
+            sys.executable, "-c",
+            "import torch; from transformers import AutoProcessor; "
+            "print('Runtime import check OK: torch=' + torch.__version__ "
+            "+ ', CUDA=' + str(torch.version.cuda), flush=True)",
+        ],
+        check=True,
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", help="Translated 100-family CSV. Auto-discovered when omitted.")
@@ -149,8 +177,7 @@ def main():
     print("Downloading/checking pinned Perplexity Decider checkpoint...", flush=True)
     snapshot_download(repo_id=MODEL_ID, revision=REVISION, local_dir=checkpoint, token=token)
     patch_native_fp16(checkpoint)
-    if not args.skip_install:
-        install("-r", str(checkpoint / "requirements.txt"))
+    prepare_model_dependencies(checkpoint, skip_install=args.skip_install)
     print("Starting native FP16 decision inference...", flush=True)
     subprocess.run([
         sys.executable, str(Path(__file__).with_name("screen.py")),

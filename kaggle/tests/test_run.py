@@ -3,6 +3,7 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch, call
 
 MODULE = Path(__file__).resolve().parents[1] / "run.py"
 spec = importlib.util.spec_from_file_location("kaggle_run", MODULE)
@@ -34,6 +35,23 @@ class LauncherTests(unittest.TestCase):
             self.assertNotIn(run.OLD_DTYPE, model_file.read_text())
             self.assertIn(run.NEW_DTYPE, model_file.read_text())
             run.patch_native_fp16(directory)
+
+    def test_prepare_dependencies_uninstalls_torchaudio_before_import_check(self):
+        with patch.object(run, "install") as install, patch.object(run.subprocess, "run") as execute:
+            run.prepare_model_dependencies("/tmp/checkpoint")
+        install.assert_called_once_with("-r", "/tmp/checkpoint/requirements.txt")
+        self.assertEqual(execute.call_count, 2)
+        self.assertEqual(execute.call_args_list[0], call(
+            [run.sys.executable, "-m", "pip", "uninstall", "--yes", "torchaudio"],
+            check=True,
+        ))
+        self.assertIn("from transformers import AutoProcessor", execute.call_args_list[1].args[0][-1])
+
+    def test_skip_install_still_removes_broken_torchaudio(self):
+        with patch.object(run, "install") as install, patch.object(run.subprocess, "run") as execute:
+            run.prepare_model_dependencies("/tmp/checkpoint", skip_install=True)
+        install.assert_not_called()
+        self.assertEqual(execute.call_count, 2)
 
     def test_refuse_unknown_dtype_implementation(self):
         with tempfile.TemporaryDirectory() as directory:

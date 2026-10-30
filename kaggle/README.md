@@ -32,6 +32,21 @@ Model revision: `6d771ad7b5ecff5e93b8fc7b90d4c5ccc341954d`.
 Official reference: https://huggingface.co/perplexity-ai/pplx-decider-flash-v1.2
 The checkpoint is ~9.1 GB, plus working GPU memory. On dual T4 setups, **one** 16 GiB GPU is used; memory is not pooled. Adequate GPU memory, Hugging Face permissions, internet access and compatible Kaggle Python/PyTorch versions are required. **The GPU run has not yet been verified on Kaggle.**
 
+## Kaggle runtime error: TorchAudio CUDA mismatch (2026-10-30)
+
+An observed Kaggle T4 run successfully validated the 100 original-English abstracts and 100 attached provisional labels and downloaded the 9.10 GB model checkpoint. It then failed **before inference** because the requirements installed PyTorch 2.14.0 with CUDA 13.0 while Kaggle's preinstalled TorchAudio extension was compiled against CUDA 12.8. Importing `transformers.AutoProcessor` indirectly imported TorchAudio and raised a CUDA-version mismatch.
+
+The single-command launcher now uninstalls **only the unnecessary optional `torchaudio` package** after installing the checkpoint requirements (including with `--skip-install`), then checks `from transformers import AutoProcessor` in a fresh subprocess before model loading. No audio inputs are used for this study. This modifies the ephemeral Kaggle Python environment; other audio tasks in the same notebook may need a compatible TorchAudio reinstallation.
+
+In the **existing clone**, run:
+
+```python
+!git pull --ff-only
+!python kaggle/run.py
+```
+
+Run from the repository root (do not clone into itself again). Keep the existing `/kaggle/working/pplx-decider-flash-v1.2-fp16` checkpoint to reuse cached weights. The change addresses the observed import error; model initialization, GPU memory use, 100-case inference and evaluation still require a real rerun to verify.
+
 ## Output
 
 - `/kaggle/working/predictions.csv`: `docdb_family_id,probability_relevant,model_decision`. Decision uses exploratory 0.5, **not** a validated filtering threshold.
