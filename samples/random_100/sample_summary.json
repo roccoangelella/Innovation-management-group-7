@@ -1,0 +1,46 @@
+{
+  "method": "Uniform seeded SHA-256 hash-ranking of DOCDB families with nonempty abstracts; no CPC/language strata or deterministic keyword relevance filtering",
+  "seed": 20261030,
+  "sample_size": 100,
+  "total_source_rows": 238824,
+  "eligible_families": 237538,
+  "excluded": {
+    "empty_abstract": 1286
+  },
+  "eligible_languages": {
+    "cs": 2,
+    "de": 1488,
+    "en": 232636,
+    "es": 2,
+    "fi": 2,
+    "fr": 271,
+    "it": 1,
+    "ja": 2,
+    "ko": 2623,
+    "nl": 10,
+    "pl": 11,
+    "pt": 43,
+    "sk": 1,
+    "sv": 10,
+    "zh": 436
+  },
+  "selected_languages": {
+    "en": 100
+  },
+  "input_zip_sha256": "fbdc57c362f076cee1a7da5c98d7309e398425c48015064bcbf78eba4c329e72",
+  "translated": false,
+  "files": {
+    "random_100_full.csv": {
+      "sha256": "6339c08b3422c76f30b62bef2294f549a232eb85372c54ac77a1c25beee29ad4",
+      "size_bytes": 115177
+    },
+    "random_100_for_labeling.csv": {
+      "sha256": "3dcccc23aa4a4e20c9d875b3811f29d42d3feeccc0b250e742053ee002bcc2f5",
+      "size_bytes": 105576
+    },
+    "random_100_for_translation.zip": {
+      "sha256": "836bcc38d6bf704b72e395eb6fe8e01d7d8f95d6d83606a38f10b206b50231ab",
+      "size_bytes": 31761
+    }
+  }
+}
