@@ -22,7 +22,7 @@ confidence: confirmed
 | `samples/random_100/` | Generated 100-family labeling/full/translation CSV/ZIP and native-English Kaggle input, with manifest |
 | `samples/LABELING_PROMPT.md` | Independent abstract-only annotation protocol |
 | `tests/` | Offline tests for sampling and translation |
-| `kaggle/run.py` | One-command Kaggle launcher: discover translated CSV, check GPU, install dependencies, download pinned model, patch local BF16 loader to FP16 and execute inference in fresh Python subprocess |
+| `kaggle/run.py` | One-command Kaggle launcher: discover English CSV and labels, check GPU, download pinned model, install dependencies; remove mismatched unnecessary torchaudio; verify AutoProcessor import in fresh interpreter; patch native FP16 loader and execute inference |
 | `kaggle/screen.py` | Native Perplexity Decider Flash v1.2 abstract-only inference, FP16 assertions, probability journaling |
 | `kaggle/evaluate.py` | Manual-label evaluator: unresolved labels excluded; confusion matrix, specificity/FPR/Wilson CI; null positive-class metrics when 0 positives; case-level CSV |
 | `kaggle/tests/test_run.py` | Synthetic/no-GPU launch preflight and dtype patch tests |

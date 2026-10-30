@@ -1,0 +1,23 @@
+name: Kaggle launcher offline regression
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "kaggle/**"
+      - ".github/workflows/kaggle_offline_tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Test inference launcher, FP16 patch and evaluator without GPU
+        run: python -m unittest discover -s kaggle/tests -v
