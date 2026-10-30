@@ -52,6 +52,17 @@ class LauncherTests(unittest.TestCase):
             self.assertNotIn("label", str(request_1))
             self.assertNotIn("THIS MUST NOT LEAK", str(request_2))
 
+    def test_semantic_challenge_cli_has_isolated_dataset_and_output(self):
+        source = MODULE.read_text(encoding="utf-8")
+        self.assertIn('parser.add_argument("--semantic-challenge"', source)
+        self.assertIn('semantic_dir / "semantic_100_labeled.csv"', source)
+        self.assertIn('"/kaggle/working/semantic_100/predictions.csv"', source)
+        # The dedicated runner still maps the same file to separate input/labels
+        # consumers; no labels are forwarded by screen.make_request.
+        request = screen.make_request("A two-legged robot walks.")
+        self.assertEqual(request["state"], "A two-legged robot walks.")
+        self.assertNotIn("label", str(request))
+
     def test_preferred_input_discovery(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -25,6 +25,9 @@ confidence: confirmed
 | `src/mine_challenge_candidates.py` | Keyword-assisted recall into a candidate pool for *human-style review*, not automatic labels |
 | `src/assemble_humanoid_challenge.py` | Source-faithful curated dataset generator producing a combined abstract-and-label CSV and legacy split CSVs, with annotation/ID checks |
 | `samples/humanoid_challenge_100/` | Curated 50/50 English case-control challenge, one combined `challenge_100_labeled.csv` for scoring and evaluation, legacy split CSVs, evidence audit and provenance |
+| `src/mine_implicit_humanoid_candidates.py` | Mine disjoint non-humanoid-word English patent candidates for independent semantic review |
+| `src/assemble_semantic_challenge.py` | Materialize a source-authentic 100-family 40/60 challenge, evidence audit and hashes |
+| `samples/semantic_challenge_100/` | New combined dataset with 40 provisional biped-related positives and 60 negatives, blind input, evidence and summary |
 | `kaggle/run.py` | One-command Kaggle launcher (`--challenge` for committed single-CSV 50/50 challenge; `--dataset PATH` for external combined input): discover English CSV and labels, check GPU, download pinned model, install dependencies; remove mismatched unnecessary torchaudio; verify AutoProcessor import in fresh interpreter; patch native FP16 loader and execute inference |
 | `kaggle/screen.py` | Native Perplexity Decider Flash v1.2 abstract-only inference: `rows` yields only ID/abstract and `make_request` sends only abstract text and fixed question; FP16 and journal checks |
 | `kaggle/evaluate.py` | Manual-label evaluator: unresolved labels excluded; confusion matrix, specificity/FPR/Wilson CI; null positive-class metrics when 0 positives; case-level CSV |

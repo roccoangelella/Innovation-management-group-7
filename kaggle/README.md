@@ -99,3 +99,17 @@ python kaggle/evaluate.py --predictions /kaggle/working/predictions.csv --labels
 ```
 
 The pilot is an initial **negative-case test**, not a valid recall/precision test. Add an independently adjudicated positive-enriched evaluation set before selecting any production acceptance threshold. The model never sees labels during inference. Kaggle GPU execution remains unverified.
+
+## Original-English semantic challenge, 40/60 (2026-10-30)
+
+One combined input file: [`samples/semantic_challenge_100/semantic_100_labeled.csv`](../samples/semantic_challenge_100/semantic_100_labeled.csv), containing 100 previously unused source abstracts, AI-assisted provisional `label`, `needs_review`, `confidence`, evidence excerpt and reason. No selected abstract contains the whole words *humanoid* or *anthropomorphic*. The relevant class includes **independent biped-specific robot motion and structure**, extending the previous prompt's strict explicit humanoid connection. Label-definition disagreements are possible.
+
+Run from the repo root, after pulling current main:
+
+```bash
+python kaggle/run.py --semantic-challenge
+```
+
+The launcher selects both abstract and labels from the combined file but `screen.py` forwards **only** `abstract_en` to the model. Results go into `/kaggle/working/semantic_100/` (not the old challenge directory). `--semantic-challenge --check` validates input without downloading weights. Blind annotation input is `semantic_100_for_blind_review.csv`.
+
+**Shortcut audit:** A classifier matching case-insensitive biped/two-legged terminology gives TP 35, TN 56, FP 4, FN 5 (91% accuracy). Excluding abstracts mentioning *exoskeleton* gives TP 34, TN 60, FP 0, FN 6 (94% accuracy). The old exact-word `humanoid OR anthropomorphic` baseline now returns no positives (60% accuracy). So this is useful for analyzing **false negatives and decision-boundary ambiguity**, but it is **not a clean semantic-generalization benchmark**: selected examples remain lexically correlated and were AI-labeled, not independently adjudicated. A later human-validated, realistic-prevalence set with more difficult concept-matched examples is still required.

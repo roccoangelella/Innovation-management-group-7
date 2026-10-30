@@ -15,3 +15,12 @@ python kaggle/run.py --semantic-challenge
 ```
 
 The runner uses only abstract text for inference; labels are loaded by the evaluator afterward. Outputs are isolated in `/kaggle/working/semantic_100/`. No translation or extra Kaggle Dataset upload required. Scores must be interpreted against provisional labels and benchmark selection biases.
+
+## Independent baseline and scientific limitations
+
+A vocabulary-only diagnostic on the 100 provisional labels yields:
+- `humanoid OR anthropomorphic`: TP 0 / FP 0 / TN 60 / FN 40 (60% accuracy), because both terms were excluded by design.
+- `biped OR bipedal OR two-legged OR two-footed`: TP 35 / FP 4 / TN 56 / FN 5 (91% accuracy).
+- The same biped rule, but exclude any mention of `exoskeleton`: TP 34 / FP 0 / TN 60 / FN 6 (94% accuracy).
+
+This means the benchmark still has significant lexical cue dependence. It should be reported with this baseline rather than described as a clean semantic test. Labels were assigned from original abstracts, and no Perplexity predictions on these cases were used for selection; however the challenge was designed *after* reviewing the previous model's success, and case selection is purposive. Because the positive class includes biped-specific technologies not necessarily described as general-purpose humanoids, a disagreement with the current strict prompt might be a task-definition mismatch.
