@@ -1,0 +1,28 @@
+name: Extract random 100-family sample
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/sample_random_100.py"
+      - ".github/workflows/extract_random_100.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate unmodified source-language sample
+        run: python3 src/sample_random_100.py
+      - name: Commit four resulting files to samples/random_100
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f samples/random_100/
+          if ! git diff --cached --quiet; then
+            git commit -m "Generate random 100-family labeling sample [skip ci]"
+            git push origin HEAD:main
+          fi
