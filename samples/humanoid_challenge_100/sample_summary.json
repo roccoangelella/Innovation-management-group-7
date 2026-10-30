@@ -8,7 +8,8 @@
   "selection_groups": {
     "explicit_positive": 50,
     "hard_negative": 30,
-    "clear_negative": 20
+    "clear_negative": 10,
+    "lexical_negative": 10
   },
   "language": "en",
   "seed_for_output_order": "humanoid-challenge-v1-20261030",
@@ -19,20 +20,20 @@
   "excluded_previous_sample": true,
   "files": {
     "challenge_100_full.csv": {
-      "sha256": "0370796cbb4653b08c5ef4bfa6bb6327ace1de1d1d5a7795bbf9fcff5d3af194",
-      "size_bytes": 118137
+      "sha256": "42630c76d20c1a0b2ee28d3af1ff69af09fee3942a6e89709f52348884ddb7a1",
+      "size_bytes": 116021
     },
     "humanoid_100_abstracts_en.csv": {
-      "sha256": "460fcafae710d84b0d7d8632e365d2f5769ad0519b7b9e244155f15441c9726a",
-      "size_bytes": 227304
+      "sha256": "cb20f17cfa620dfe96e9e389b0daeeaa3edb92cc6ea2ce1823dbbe67add8523c",
+      "size_bytes": 222843
     },
     "challenge_100_for_labeling.csv": {
-      "sha256": "1af201d02db7fb68f5fffb0a315dae04d0212199da21df38b1e1f7a02882a662",
-      "size_bytes": 109280
+      "sha256": "cf651430b61801639529546e52dda1f5632eed3506c4e1445cb42a9d5cea5f56",
+      "size_bytes": 106935
     },
     "humanoid_100_manual_labels.csv": {
-      "sha256": "faf86427bb38b91081b69a0668a507b48e68d68f5bf5cf70cc7ac965c6554f8c",
-      "size_bytes": 20789
+      "sha256": "1170161665ce0f1be18557bba7c7bc924a6074ff77fd7c00af62293cd490c611",
+      "size_bytes": 21128
     }
   }
 }
