@@ -1,0 +1,46 @@
+{
+  "n": 100,
+  "label_counts": {
+    "relevant": 40,
+    "not_relevant": 60,
+    "needs_review": 0
+  },
+  "selection_groups": {
+    "implicit_positive": 40,
+    "hard_negative": 60
+  },
+  "language": "en",
+  "seed_for_output_order": "semantic-challenge-v1-20261030",
+  "source_zip_sha256": "fbdc57c362f076cee1a7da5c98d7309e398425c48015064bcbf78eba4c329e72",
+  "forbidden_whole_words": [
+    "humanoid",
+    "humanoids",
+    "anthropomorphic"
+  ],
+  "annotation_source": "AI-authored prospective labeling based only on patent abstract, before Kaggle model scores",
+  "labeling_definition": "1 for independent biped robots, humanlike embodied robot systems or their explicitly biped-specific locomotion/structure/control; 0 for human-worn exoskeletons, nonhuman multi-leg robots and general robotics without embodied humanlike design",
+  "limitations": "Purposive 40:60 non-keyword development challenge, not representative of field prevalence, generated after previous benchmark feedback. AI labels provisional pending independent human adjudication. The positive definition intentionally includes biped-specific technology without an explicit humanoid cue and may differ from the current strict Decider prompt. Never interpret its precision/F1 as deployment metrics.",
+  "excluded_previous_sample": true,
+  "files": {
+    "semantic_100_full.csv": {
+      "sha256": "48c02cefec7a93cf5e994ab6ba1431bfff97363cd9d4bb527db91e602088a0cf",
+      "size_bytes": 115772
+    },
+    "semantic_100_abstracts_en.csv": {
+      "sha256": "0d0151ec7adb3beb2c538132b8306b87c75b764e3c394335be0dbe38546e46ee",
+      "size_bytes": 222974
+    },
+    "semantic_100_for_blind_review.csv": {
+      "sha256": "9195a2d1190d1514b6f1e7653359f9d42342e07f36b6f3a24c3eaf24a03f8a6e",
+      "size_bytes": 107314
+    },
+    "semantic_100_manual_labels.csv": {
+      "sha256": "e2a09003705411f60ecf495c58298b1c612fb2f4da24734678b18db1344de56b",
+      "size_bytes": 24737
+    },
+    "semantic_100_labeled.csv": {
+      "sha256": "8f6e9aecc8e4d7ed8131a17f59038bd2f1fbaef3e89e7f090fc12623f79c8974",
+      "size_bytes": 130720
+    }
+  }
+}
