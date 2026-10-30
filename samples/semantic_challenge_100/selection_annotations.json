@@ -1,0 +1,802 @@
+[
+  {
+    "docdb_family_id": "9956177",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Actuated hip, knee and ankle joints in a two-legged walking robot"
+  },
+  {
+    "docdb_family_id": "17104041",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Two-leg locomotion mechanism linking robotic legs with body posture"
+  },
+  {
+    "docdb_family_id": "18298956",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Servo locomotion control for a biped walking robot"
+  },
+  {
+    "docdb_family_id": "88233081",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Biped center-of-mass estimation using foot forces and inertial sensors"
+  },
+  {
+    "docdb_family_id": "67891741",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Force and zero-moment-point following for stable biped foot control"
+  },
+  {
+    "docdb_family_id": "48862961",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Waist and foot trajectory planning for two-legged robot gait"
+  },
+  {
+    "docdb_family_id": "88602223",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Two hip mechanisms and joint actuation expressly in a biped walking robot"
+  },
+  {
+    "docdb_family_id": "27315392",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Two-legged robot impact absorption and foot contact mechanics"
+  },
+  {
+    "docdb_family_id": "92545328",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Robot torso and articulated arm with two actively walking robotic legs"
+  },
+  {
+    "docdb_family_id": "75367175",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Biped rolling-angle feedback and compensating foot-height adjustment"
+  },
+  {
+    "docdb_family_id": "76506566",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Biped robot center-of-mass and inverse-kinematics walking control"
+  },
+  {
+    "docdb_family_id": "31185202",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Remote manipulation of bilateral legs of a two-legged walking robot"
+  },
+  {
+    "docdb_family_id": "39721329",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Robot joint trajectories derived from biped center-of-gravity dynamics"
+  },
+  {
+    "docdb_family_id": "94820375",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Driven hip-thigh-knee-ankle assemblies of a two-legged robot"
+  },
+  {
+    "docdb_family_id": "69141200",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Autonomous two-legged embodied service robot with torso arms vision speech"
+  },
+  {
+    "docdb_family_id": "52522136",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Powered left and right thighs and shanks for biped walking"
+  },
+  {
+    "docdb_family_id": "53543998",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Master-slave control of robot walking with foot-weight balance and ZMP"
+  },
+  {
+    "docdb_family_id": "14404279",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Two-legged robot ankle control using sensed moments and servo models"
+  },
+  {
+    "docdb_family_id": "54023838",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Human-simulated two-legged robot with trunk and arm-thigh coupling"
+  },
+  {
+    "docdb_family_id": "57006107",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Torso posture stabilization on a robot walking with two legs"
+  },
+  {
+    "docdb_family_id": "75611481",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Biped foothold selection and cross-stepping path planning"
+  },
+  {
+    "docdb_family_id": "80780926",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Reinforcement-learning stabilization of articulated bipedal robot"
+  },
+  {
+    "docdb_family_id": "41380764",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Torso tilt compensation and variable leg stiffness of biped robot"
+  },
+  {
+    "docdb_family_id": "93229361",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Embodied robot with articulated head chest arms waist and legs"
+  },
+  {
+    "docdb_family_id": "19165509",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Human-shaped two-legged robot with head arms hands and joints"
+  },
+  {
+    "docdb_family_id": "59430475",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Biped robot with articulated legs visual sensing neck and communication"
+  },
+  {
+    "docdb_family_id": "60326135",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Torso-supported paired hip knee joints enabling two-legged locomotion"
+  },
+  {
+    "docdb_family_id": "46128690",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Biped robot gait paths with leg-joint trajectories"
+  },
+  {
+    "docdb_family_id": "80068260",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Robot ankle-foot mechanics expressly to stabilize biped walking"
+  },
+  {
+    "docdb_family_id": "97554711",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Two-legged robot gait control learned from human motion primitives"
+  },
+  {
+    "docdb_family_id": "63067815",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Biped robot walking kinematics derived from toddler gait"
+  },
+  {
+    "docdb_family_id": "80792985",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Robot hip-ankle phase control and planned biped stride"
+  },
+  {
+    "docdb_family_id": "88362185",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Biped balance from head hip and shank inertial measurements"
+  },
+  {
+    "docdb_family_id": "73605413",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Two-leg mechanical robot with actuated upper frame and gait linkage"
+  },
+  {
+    "docdb_family_id": "94908902",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Complete head torso arms legs and powered biped balance mechanism"
+  },
+  {
+    "docdb_family_id": "62177954",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Trunk with left-right hip-knee-ankle robotic leg actuation"
+  },
+  {
+    "docdb_family_id": "94878899",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Torso and two independently articulated robot legs"
+  },
+  {
+    "docdb_family_id": "57137372",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Biped robot body hip and powered knee/leg mechanism"
+  },
+  {
+    "docdb_family_id": "58880787",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Actuated biped waist and right-left leg walking mechanism"
+  },
+  {
+    "docdb_family_id": "70993999",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "implicit_positive",
+    "reason": "Biped robot foot architecture for uneven-surface adaptation"
+  },
+  {
+    "docdb_family_id": "76116150",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Lower-limb exoskeleton worn by a human; not an independently embodied robot"
+  },
+  {
+    "docdb_family_id": "37115767",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Human-worn leg-support exoskeleton, not a self-standing humanoid machine"
+  },
+  {
+    "docdb_family_id": "55911351",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Human mobility assistance via exoskeleton, not humanoid robot autonomy"
+  },
+  {
+    "docdb_family_id": "87535537",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Wearable back and leg support exoskeleton for a person"
+  },
+  {
+    "docdb_family_id": "87221143",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Cable-driven knee assistance exoskeleton designed to be worn by a user"
+  },
+  {
+    "docdb_family_id": "96857588",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Powered assistance on the waist and legs of a human wearer"
+  },
+  {
+    "docdb_family_id": "50433249",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Bipedal exoskeleton with backpack harness for a human wearer"
+  },
+  {
+    "docdb_family_id": "89942124",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Exoskeleton hip and leg modules transfer load carried by a person"
+  },
+  {
+    "docdb_family_id": "80786567",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Walking control of a bipedal exoskeleton accommodating a human operator"
+  },
+  {
+    "docdb_family_id": "94035001",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Protective human-wearable exoskeleton, not an autonomous robot"
+  },
+  {
+    "docdb_family_id": "40287080",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Orthesis/exoskeleton assisting a person, not an independent humanoid"
+  },
+  {
+    "docdb_family_id": "83672518",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "External walking aid worn by a human body"
+  },
+  {
+    "docdb_family_id": "59784872",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Underactuated lower limb exoskeleton for human walking assistance"
+  },
+  {
+    "docdb_family_id": "53025978",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Boarding-type passenger walking assistance system rather than humanoid robot"
+  },
+  {
+    "docdb_family_id": "73401765",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Bipedal exoskeleton carrying a human operator"
+  },
+  {
+    "docdb_family_id": "93388161",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Body-worn waist-and-leg exoskeleton providing mechanical assistance"
+  },
+  {
+    "docdb_family_id": "82408355",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Control of a hydraulic power-assisted exoskeleton bearing a wearer"
+  },
+  {
+    "docdb_family_id": "86832877",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Modular knee joint for a wearable exoskeleton"
+  },
+  {
+    "docdb_family_id": "68138146",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Exoskeleton posture harness attached to a human operator"
+  },
+  {
+    "docdb_family_id": "63555747",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Wearable bodyweight-support walking aid, not an independent robot"
+  },
+  {
+    "docdb_family_id": "87457619",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Hip assistance device strapped to human waist and thighs"
+  },
+  {
+    "docdb_family_id": "87607138",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Wearable flexible exoskeleton helping human knee and hip movement"
+  },
+  {
+    "docdb_family_id": "95981562",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Exoskeleton worn by the user for support of body segments"
+  },
+  {
+    "docdb_family_id": "67059145",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Robotic rehabilitation exoskeleton applied to a patient upper limb"
+  },
+  {
+    "docdb_family_id": "58086410",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Wearable knee-joint exoskeleton with external support components"
+  },
+  {
+    "docdb_family_id": "60749022",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Recognition of supporting areas of a lower-limb wearable exoskeleton"
+  },
+  {
+    "docdb_family_id": "76978264",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Exoskeleton ankle actuator for a human-worn lower limb structure"
+  },
+  {
+    "docdb_family_id": "88662402",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Powered hip assistance exoskeleton attached to the wearer"
+  },
+  {
+    "docdb_family_id": "76043179",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Electromagnetic-clutch knee mechanism of an exoskeleton"
+  },
+  {
+    "docdb_family_id": "57104623",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Length-adjustable lower-limb exoskeleton intended for a wearer"
+  },
+  {
+    "docdb_family_id": "97051648",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Bowden-cable flexible exoskeleton supporting human hips and knees"
+  },
+  {
+    "docdb_family_id": "94510191",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Human-worn lower-limb exoskeleton with back and two leg assemblies"
+  },
+  {
+    "docdb_family_id": "96997037",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Fire rescue protective exoskeleton worn on a rescuer"
+  },
+  {
+    "docdb_family_id": "86779567",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Quadruped robot, explicitly four-footed rather than a two-legged human-form robot"
+  },
+  {
+    "docdb_family_id": "82139587",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Four-footed robot dog rather than a humanoid"
+  },
+  {
+    "docdb_family_id": "64409633",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Four-support-leg walking robot rather than humanlike biped"
+  },
+  {
+    "docdb_family_id": "86684595",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Six-legged walking robot platform rather than humanoid"
+  },
+  {
+    "docdb_family_id": "71875350",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Robot torso expressly for a four-legged bionic platform"
+  },
+  {
+    "docdb_family_id": "86627464",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Quadruped terrain locomotion rather than humanoid body control"
+  },
+  {
+    "docdb_family_id": "89466547",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Quadruped supporting platform not humanoid"
+  },
+  {
+    "docdb_family_id": "83583893",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Oscillator network for the four hips of a quadruped robot"
+  },
+  {
+    "docdb_family_id": "88362499",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Four-legged wheel-leg convertible robot rather than human form"
+  },
+  {
+    "docdb_family_id": "56758650",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Six-legged robot chassis and leg mechanics"
+  },
+  {
+    "docdb_family_id": "97155125",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Bionic wheel-legged modular robot rather than human-form humanoid"
+  },
+  {
+    "docdb_family_id": "89716220",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Autonomous mobile manipulator safety, no human-shaped embodiment"
+  },
+  {
+    "docdb_family_id": "72005735",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Table-tennis automatic return system rather than humanoid robot"
+  },
+  {
+    "docdb_family_id": "73358318",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Robot arm used for automated hair-washing rather than humanoid body"
+  },
+  {
+    "docdb_family_id": "25296628",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Cooperative robotic arms with grippers, no humanoid configuration"
+  },
+  {
+    "docdb_family_id": "67887457",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Teleoperated standalone robotic arms and hands, not a humanoid platform"
+  },
+  {
+    "docdb_family_id": "65633944",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "General robotic gripper finger mechanics, no humanoid specific design"
+  },
+  {
+    "docdb_family_id": "36594735",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "General robot hand hardware without stated humanoid platform"
+  },
+  {
+    "docdb_family_id": "39429564",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "General-purpose multifinger gripper without a humanoid-specific embodiment"
+  },
+  {
+    "docdb_family_id": "70004341",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Single-motor generic robot hand for grasping objects"
+  },
+  {
+    "docdb_family_id": "72351230",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Standalone actuated finger assembly without humanoid system"
+  },
+  {
+    "docdb_family_id": "93139837",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Video-based human fall detection rather than embodied robotics"
+  },
+  {
+    "docdb_family_id": "97243674",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Human movement analysis from video and sole contact information"
+  },
+  {
+    "docdb_family_id": "96035773",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Whole-body control of an unmanned aerial vehicle, not humanoid robotics"
+  },
+  {
+    "docdb_family_id": "76175889",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Generated virtual human body imagery rather than embodied robot control"
+  },
+  {
+    "docdb_family_id": "89400859",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Virtual digital human animation rather than physical humanoid robot"
+  },
+  {
+    "docdb_family_id": "86517301",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "selection_group": "hard_negative",
+    "reason": "Video-controlled virtual human model rather than robotics"
+  }
+]
