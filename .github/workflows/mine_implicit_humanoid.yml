@@ -21,5 +21,6 @@ jobs:
           git add -f samples/semantic_challenge_100/candidate*
           if ! git diff --cached --quiet; then
             git commit -m "Generate semantic challenge candidate pool [skip ci]"
+            git pull --rebase origin main
             git push origin HEAD:main
           fi
