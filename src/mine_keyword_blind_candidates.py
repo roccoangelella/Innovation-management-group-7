@@ -126,6 +126,12 @@ def main():
     with (OUTPUT/"candidate_pool.jsonl").open("w",encoding="utf-8") as f:
         for row in selected_rows:
             f.write(json.dumps(row,ensure_ascii=False)+"\n")
+    # Smaller review shards remain fetchable by repository API (<1 MiB each).
+    for group in CAP:
+        with (OUTPUT/f"review_{group}.jsonl").open("w",encoding="utf-8") as f:
+            for r in selected_rows:
+                if r["discovery_bucket"]==group:
+                    f.write(json.dumps(r,ensure_ascii=False)+"\n")
     with (OUTPUT/"candidate_index.csv").open("w",encoding="utf-8",newline="") as f:
         w=csv.DictWriter(f,fieldnames=["docdb_family_id","discovery_bucket","abstract_excerpt"])
         w.writeheader()
