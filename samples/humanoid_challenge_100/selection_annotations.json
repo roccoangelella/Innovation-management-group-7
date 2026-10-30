@@ -792,11 +792,11 @@
     "reason": "Anthropomorphic voice-driven work-order alarm, not humanoid-robot technology"
   },
   {
-    "docdb_family_id": "51935665",
+    "docdb_family_id": "74325090",
     "label": 0,
     "needs_review": 0,
     "confidence": "high",
     "bucket": "lexical_negative",
-    "reason": "Humanoid-shaped interactive action figurines, not an autonomous humanoid-robot technology"
+    "reason": "Anthropomorphic service behavior is implemented by a virtual software agent, not an embodied humanoid robot"
   }
 ]
