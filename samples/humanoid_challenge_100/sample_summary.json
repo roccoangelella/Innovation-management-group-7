@@ -34,6 +34,10 @@
     "humanoid_100_manual_labels.csv": {
       "sha256": "b75679472a03ed177c63caf7df19ee45ba9329fe91995c132a72a99515aef831",
       "size_bytes": 21144
+    },
+    "challenge_100_labeled.csv": {
+      "sha256": "dfb1a9593e479cd5b1f82c79973f3d54d75c6de831f9e23e5b3f8f8bf8e93005",
+      "size_bytes": 127041
     }
   }
 }
