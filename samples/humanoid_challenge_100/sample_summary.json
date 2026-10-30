@@ -20,20 +20,20 @@
   "excluded_previous_sample": true,
   "files": {
     "challenge_100_full.csv": {
-      "sha256": "42630c76d20c1a0b2ee28d3af1ff69af09fee3942a6e89709f52348884ddb7a1",
-      "size_bytes": 116021
+      "sha256": "c169eb525c2821da0149e38f767efb5b587740e71a998acc6ce5d295179ecf32",
+      "size_bytes": 116324
     },
     "humanoid_100_abstracts_en.csv": {
-      "sha256": "cb20f17cfa620dfe96e9e389b0daeeaa3edb92cc6ea2ce1823dbbe67add8523c",
-      "size_bytes": 222843
+      "sha256": "fbcc786e39f5ad908888aaa6facc08ecdc867e2474a3ce99263762758154c53e",
+      "size_bytes": 223440
     },
     "challenge_100_for_labeling.csv": {
-      "sha256": "cf651430b61801639529546e52dda1f5632eed3506c4e1445cb42a9d5cea5f56",
-      "size_bytes": 106935
+      "sha256": "fbf97e056113b24ad48225444aef5f3847d9713d2f82cd87b7c23ccd02cf2ae7",
+      "size_bytes": 107229
     },
     "humanoid_100_manual_labels.csv": {
-      "sha256": "1170161665ce0f1be18557bba7c7bc924a6074ff77fd7c00af62293cd490c611",
-      "size_bytes": 21128
+      "sha256": "b75679472a03ed177c63caf7df19ee45ba9329fe91995c132a72a99515aef831",
+      "size_bytes": 21144
     }
   }
 }
