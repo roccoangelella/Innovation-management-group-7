@@ -1,0 +1,20 @@
+{
+  "seed": 20261030,
+  "method": "fixed-seed hash-ranked candidate discovery; regex ONLY for recall/navigation, not labels",
+  "source": "humanoid_patents.zip",
+  "eligible_english_excluding_prior_100": 232536,
+  "discovery_bucket_population": {
+    "generic": 84061,
+    "other": 143245,
+    "related": 3495,
+    "explicit": 1735
+  },
+  "pool_buckets": {
+    "explicit": 180,
+    "related": 130,
+    "generic": 85,
+    "other": 40
+  },
+  "pool_size": 435,
+  "prior_random_100_excluded": 100
+}
