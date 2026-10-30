@@ -4,7 +4,7 @@ Standalone **100-family inference experiment**. Data collection, translation and
 
 ## One-command launch in Kaggle
 
-First enable **GPU** and **Internet** in Kaggle Notebook settings, attach the translated 100-family CSV (`humanoid_100_abstracts_en.csv`) as a Kaggle Dataset, and ensure Python 3.12+. If Hugging Face access is required, add your private token as Kaggle secret `HF_TOKEN` (never commit it).
+First enable **GPU** and **Internet** in Kaggle Notebook settings and ensure Python 3.12+. The repository already includes the 100 originally English, unmodified sample at `samples/random_100/humanoid_100_abstracts_en.csv`; **no translated Kaggle Dataset is required for this pilot**. If Hugging Face access is required, add a private token as Kaggle secret `HF_TOKEN` (never commit it).
 
 From a notebook cell:
 
@@ -14,9 +14,9 @@ From a notebook cell:
 !python kaggle/run.py
 ```
 
-**Only the last line is the pipeline entrypoint.** It discovers `/kaggle/input/**/humanoid_100_abstracts_en.csv` (or `outputs/sampling/humanoid_100_abstracts_en.csv` when present), checks the input, checks CUDA, installs pinned dependencies, downloads the pinned model, patches its **local** native loader for genuine FP16 execution, and runs/resumes inference. Installation and inference run in separate Python processes, so the notebook kernel does not need to be manually restarted.
+**Only the last line is the pipeline entrypoint.** It discovers the English-only sample already committed under `samples/random_100/` (or accepts a custom CSV via `--input`), checks the input, checks CUDA, installs pinned dependencies, downloads the pinned model, patches its **local** native loader for genuine FP16 execution, and runs/resumes inference. Installation and inference run in separate Python processes, so the notebook kernel does not need to be manually restarted.
 
-For a different CSV path:
+For a custom translated CSV, supply its path explicitly:
 
 ```bash
 python kaggle/run.py --input /kaggle/input/my-sample/humanoid_100_abstracts_en.csv
@@ -38,7 +38,7 @@ The checkpoint is ~9.1 GB, plus working GPU memory. On dual T4 setups, **one** 1
 - `/kaggle/working/predictions.jsonl`: append-only resumable results.
 - `/kaggle/working/run_metadata.json`: input hash, question/prompt, pinned model and revision.
 
-Only `abstract_en` is provided to the decision model. Source language, title, CPCs and metadata are not in the request. The input requires successful translation status (`original_en` or `translated`) when the field exists, and unique DOCDB family identifiers. The 100-family data must already be translated; the launch does not invoke the private translation API.
+Only `abstract_en` is provided to the decision model. Source language, title, CPCs and metadata are not in the request. The input requires successful translation status (`original_en` or `translated`) when the field exists, and unique DOCDB family identifiers. For this pilot, all 100 input abstracts were originally English, so `abstract_en` is a verbatim copy and no translation was performed. Custom non-English samples must be translated before inference; the launcher does not call the private translation API.
 
 Manual evaluation after independently labeling all 100 families:
 
@@ -48,4 +48,4 @@ python kaggle/evaluate.py --predictions /kaggle/working/predictions.csv \
   --output /kaggle/working/evaluation.json
 ```
 
-Report precision, recall, F1 and error cases with the sampling caveat: the 90/10 language mix is not the production prevalence, and the dataset is not a representative random sample. No full-corpus deployment until a held-out calibration strategy is agreed.
+Report precision, recall, F1 and error cases with the sampling caveat: this is an English-only random sample of broad CPC candidates, and it may have too few truly relevant humanoid patents for reliable precision/recall estimates. It does not assess translated non-English abstracts. No full-corpus deployment until a held-out calibration strategy is agreed.

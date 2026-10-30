@@ -1,5 +1,15 @@
 # Innovation Management · Group 7 — Humanoid robotics (Electrolux)
 
+## English-only 100-family screening pilot (2026-10-30)
+
+While the full-corpus translation runs independently, use the **100 originally English** source abstracts in [samples/random_100/random_100_for_labeling.csv](samples/random_100/random_100_for_labeling.csv). Upload this CSV with [the labeling prompt](samples/LABELING_PROMPT.md) to a separate chat. Annotations remain AI-assisted provisional judgments pending human review.
+
+The deterministic sample is drawn uniformly by fixed-seed (20261030) SHA-256 ranking of **English-language, nonempty-abstract DOCDB families**, not by CPC or presumed relevance; source metadata are preserved in [random_100_full.csv](samples/random_100/random_100_full.csv). Source ZIP has 238,824 family rows; 232,636 nonempty original-English abstracts were eligible.
+
+Because no translation is needed, [humanoid_100_abstracts_en.csv](samples/random_100/humanoid_100_abstracts_en.csv) contains *exact copies* of the original abstracts under `abstract_en` and `translation_status=original_en`. The Kaggle launcher auto-discovers this file. No uploaded dataset is required for this pilot after cloning the repo. [Sample provenance and checksums](samples/random_100/sample_summary.json).
+
+Run `python src/sample_random_100.py` to regenerate. The 90/10 stratified sampler below remains a **separate, later** multilingual evaluation plan. A random sample may contain too few true humanoid patents to estimate recall or precision precisely.
+
 PATSTAT DOCDB-family export: `src/sql_queries.py`. The translation stage below is independent of the SQL extraction and does not alter or filter its source archive.
 
 ## Full-corpus patent abstract translation

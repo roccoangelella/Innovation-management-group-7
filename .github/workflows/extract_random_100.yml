@@ -15,7 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Generate unmodified source-language sample
+      - name: Test English-only sampler
+        run: python3 -m unittest discover -s tests -p 'test_sample_random_100.py' -v
+      - name: Generate original-English sample
         run: python3 src/sample_random_100.py
       - name: Commit four resulting files to samples/random_100
         run: |

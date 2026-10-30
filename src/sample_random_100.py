@@ -1,4 +1,4 @@
-"""Reproducible random 100-family sample from the original un-translated CSV ZIP."""
+"""Reproducible random 100-family original-English-abstract sample from the source ZIP."""
 import argparse
 from collections import Counter
 import csv
@@ -28,7 +28,7 @@ def rank(family, seed):
 
 
 def sample(input_zip, n=100, seed=SEED):
-    """Return n lowest seeded hash ranks: uniform pseudorandom by eligible DOCDB ID."""
+    """Return n lowest seeded hash ranks over originally English, nonempty DOCDB IDs."""
     if n < 1:
         raise ValueError("n must be positive")
     csv.field_size_limit(sys.maxsize)
@@ -59,6 +59,9 @@ def sample(input_zip, n=100, seed=SEED):
                     excluded["empty_abstract"] += 1
                     continue
                 language = (row["abstract_language"] or "").strip().lower() or "unknown"
+                if language != "en":
+                    excluded["non_english_abstract"] += 1
+                    continue
                 eligible_languages[language] += 1
                 item = (-rank(key, seed), key, row)
                 if len(heap) < n:
@@ -71,7 +74,7 @@ def sample(input_zip, n=100, seed=SEED):
     chosen = [item[2] for item in sorted(heap, key=lambda item: (-item[0], item[1]))]
     selected_languages = Counter((r["abstract_language"] or "").strip().lower() or "unknown" for r in chosen)
     stats = {
-        "method": "Uniform seeded SHA-256 hash-ranking of DOCDB families with nonempty abstracts; no CPC/language strata or deterministic keyword relevance filtering",
+        "method": "Uniform seeded SHA-256 hash-ranking of DOCDB families with nonempty original-English abstracts; no CPC strata or relevance filtering",
         "seed": seed,
         "sample_size": n,
         "total_source_rows": total,

@@ -37,12 +37,20 @@ class TestRandomSampling(unittest.TestCase):
             _, y, _ = mod.sample(b)
             self.assertEqual([r["docdb_family_id"] for r in x], [r["docdb_family_id"] for r in y])
             self.assertEqual(100, len(x))
-            self.assertEqual(250, stats["eligible_families"])
+            self.assertEqual(166, stats["eligible_families"])
+            self.assertEqual(84, stats["excluded"]["non_english_abstract"])
+            self.assertEqual({"en": 100}, dict(stats["selected_languages"]))
             self.assertEqual(1, stats["excluded"]["empty_abstract"])
             mod.write_sample(a, path / "out")
             with (path / "out/random_100_for_labeling.csv").open(newline="") as f:
                 self.assertEqual(100, len(list(csv.DictReader(f))))
-            self.assertFalse((path / "out/humanoid_100_abstracts_en.csv").exists())
+            kaggle = path / "out/humanoid_100_abstracts_en.csv"
+            self.assertTrue(kaggle.exists())
+            with kaggle.open(newline="", encoding="utf-8") as f:
+                kaggle_rows = list(csv.DictReader(f))
+            self.assertTrue(all(r["abstract_language"] == "en" and
+                                r["abstract_en"] == r["abstract"] and
+                                r["translation_status"] == "original_en" for r in kaggle_rows))
             with zipfile.ZipFile(path / "out/random_100_for_translation.zip") as z:
                 self.assertEqual(["humanoid_patents.csv"], z.namelist())
 

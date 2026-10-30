@@ -17,7 +17,7 @@ NEW_DTYPE = 'dtype = torch.float16 if self.device.type == "cuda" else torch.floa
 
 
 def discover_input(specified=None, root=None):
-    """Fail on missing/ambiguous translated samples instead of guessing."""
+    """Fail on missing/ambiguous English-abstract input instead of guessing."""
     if specified:
         path = Path(specified).expanduser().resolve()
         if not path.is_file():
@@ -104,7 +104,7 @@ def main():
     # Validate the sample *before* downloading approximately 9 GB of weights.
     from screen import rows
     examples = list(rows(input_path))
-    print(f"Input: {input_path} ({len(examples)} translated records)", flush=True)
+    print(f"Input: {input_path} ({len(examples)} English-abstract records)", flush=True)
     if args.check:
         return
 
