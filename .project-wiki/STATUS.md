@@ -1,7 +1,9 @@
 # Project Status
 
-Updated 2026-10-29. Project documentation initialized from the 2026 kickoff, project decisions and current `main` repository code.
+Updated 2026-10-30. Project documentation reflects the course kickoff, project decisions and current `main` repository code.
 
-**Implemented:** broad CPC patent export, offline-tested translation code, and deterministic 100-family stratified sampling with synthetic-data verification. **Not evidenced as complete:** a live full-corpus translation, model relevance filtering, firm scoring, quadrant or client recommendation.
+**Implemented in code:** broad CPC patent export; resumable multilingual translation; deterministic 100-family stratified sampling; isolated Kaggle Decider Flash v1.2 FP16 pilot with `python kaggle/run.py`, native decision readout, probability journal and optional evaluation. This includes a pinned checkpoint and exact-match local dtype patch to FP16.
 
-**Next:** test translation endpoint and completeness; execute sampler on source ZIP and review language/CPC summary; resolve year semantics (priority vs filing). Unresolved: [open questions](requirements/open-questions.md). **Submission:** Sunday 20 December 2026.
+**Not verified as complete:** live endpoint translation to full coverage, actual Kaggle GPU compatibility and inference, 100-family human annotations, calibrated relevance threshold, firm scoring, quadrant or client recommendation.
+
+**Next:** generate/attach the translated 100-family CSV; execute the single-command Kaggle pilot on a GPU, inspect errors and outputs; evaluate independently annotated labels; resolve year semantics (priority vs filing). Open issues: [questions](requirements/open-questions.md). **Submission:** Sunday 20 December 2026.

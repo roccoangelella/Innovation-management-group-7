@@ -11,3 +11,7 @@ Summary: Established project-wiki v1.6.1 structure. Preserved course requirement
 ## [2026-10-30] update | WLOG-20261030-001 | Add isolated Kaggle screening pilot
 
 Changed: [current plan](../implementation/current-plan.md) and [code map](../technical/codebase-map.md) following creation of `kaggle/README.md`, `kaggle/screen.py`, `kaggle/evaluate.py` and `kaggle/notebook_cells.py`. Pilot uses native Decider Flash v1.2 and preserves per-family probabilities. Kaggle execution, manual labels and calibration are not complete; OQ-001 remains open.
+
+## [2026-10-30] update | WLOG-20261030-002 | FP16 single-command Kaggle launch
+
+Changed: [status](../STATUS.md), [code map](../technical/codebase-map.md), [testing](../technical/testing.md), [deployment](../technical/deployment.md), [plan](../implementation/current-plan.md), and [traceability](../traceability/code-map.md). Added `kaggle/run.py` to auto-discover translated sample, install model dependencies, download pinned checkpoint and patch only native CUDA dtype to FP16; `screen.py` asserts dtype. Added synthetic launcher tests. No Kaggle GPU inference has been executed or verified; OQ-001 remains open.
