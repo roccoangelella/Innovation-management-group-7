@@ -1,0 +1,47 @@
+name: Generate curated 100-case humanoid challenge
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/assemble_humanoid_challenge.py"
+      - "samples/humanoid_challenge_100/selection_annotations.json"
+      - ".github/workflows/generate_humanoid_challenge.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Produce source-preserving labeled challenge set
+        run: python3 src/assemble_humanoid_challenge.py
+      - name: Check artifact schema and disjointness
+        run: |
+          python3 - <<'PY'
+          import csv
+          from pathlib import Path
+          p=Path("samples/humanoid_challenge_100")
+          def load(n):
+              with (p/n).open(newline="",encoding="utf-8") as f:return list(csv.DictReader(f))
+          data=load("humanoid_100_abstracts_en.csv")
+          labels=load("humanoid_100_manual_labels.csv")
+          assert len(data)==len(labels)==100
+          assert [x["docdb_family_id"] for x in data]==[x["docdb_family_id"] for x in labels]
+          assert sum(x["label"]=="1" for x in labels)==50
+          assert sum(x["label"]=="0" for x in labels)==50
+          assert all(x["abstract"]==x["abstract_en"] and x["abstract_language"]=="en" for x in data)
+          assert all(x["evidence_quote"] in y["abstract"] for x,y in zip(labels,data))
+          print("100 matched unique source-faithful labels and Kaggle inputs verified")
+          PY
+      - name: Commit challenge CSV and provenance outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f samples/humanoid_challenge_100/*.csv samples/humanoid_challenge_100/sample_summary.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Materialize independent 50-50 humanoid challenge set [skip ci]"
+            git push origin HEAD:main
+          fi

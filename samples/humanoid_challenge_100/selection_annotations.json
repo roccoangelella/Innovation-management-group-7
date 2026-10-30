@@ -1,0 +1,802 @@
+[
+  {
+    "docdb_family_id": "68325199",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Structure and geared actuation of a humanoid robot crotch and hip assembly"
+  },
+  {
+    "docdb_family_id": "94517092",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Impact-resistant wrist system explicitly for humanoid robots"
+  },
+  {
+    "docdb_family_id": "44393363",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Real-time control of a humanoid via an upper-body exoskeleton"
+  },
+  {
+    "docdb_family_id": "97115579",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Joint module expressly developed for humanoid robot articulation"
+  },
+  {
+    "docdb_family_id": "93849034",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Five-finger humanoid robot hand with muscle-like finger motion"
+  },
+  {
+    "docdb_family_id": "58066708",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid body and crossed-swing legs for locomotion"
+  },
+  {
+    "docdb_family_id": "56330546",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Mechanical foot and joints expressly for a humanoid robot"
+  },
+  {
+    "docdb_family_id": "94313367",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Whole-body reachability-based motion planning for a humanoid robot"
+  },
+  {
+    "docdb_family_id": "67797659",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Anthropomorphic robot expressly designed to walk upright on two legs"
+  },
+  {
+    "docdb_family_id": "97291811",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid five-finger dexterous hand with articulated linkages"
+  },
+  {
+    "docdb_family_id": "63746873",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Coordinated motion planning for the two arms of a humanoid robot"
+  },
+  {
+    "docdb_family_id": "91776262",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid robot grasping skill learning from demonstrations"
+  },
+  {
+    "docdb_family_id": "92775937",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Mechanical thumb within a humanoid dexterous-hand/robot design"
+  },
+  {
+    "docdb_family_id": "80479373",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Hip and waist joint assembly expressly for a humanoid robot"
+  },
+  {
+    "docdb_family_id": "96897117",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Diffusion-guided humanoid robot contact and object interaction"
+  },
+  {
+    "docdb_family_id": "75598593",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Multi-axis ankle joint designed for a humanoid robot"
+  },
+  {
+    "docdb_family_id": "64759980",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Joint servo control coordinating arms, waist, legs and neck of a humanoid"
+  },
+  {
+    "docdb_family_id": "93470652",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Shank assembly explicitly proposed for biped and humanoid robots"
+  },
+  {
+    "docdb_family_id": "98654435",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Head-neck structure and electronics of a humanoid robot"
+  },
+  {
+    "docdb_family_id": "97689004",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid motion control by learned footprint planning"
+  },
+  {
+    "docdb_family_id": "96506877",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Variable-stiffness fluid-driven hand expressly in humanoid-robot domain"
+  },
+  {
+    "docdb_family_id": "94077358",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid robot center-of-mass-based motion control"
+  },
+  {
+    "docdb_family_id": "52639112",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Biped humanoid robot using pneumatic artificial muscles"
+  },
+  {
+    "docdb_family_id": "95677492",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Sound-command processing explicitly for a humanoid robot"
+  },
+  {
+    "docdb_family_id": "96156689",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Sensor-driven social behavior expression of a humanoid robot"
+  },
+  {
+    "docdb_family_id": "49987241",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Boxing humanoid robot with articulated impact-handling arms"
+  },
+  {
+    "docdb_family_id": "94055617",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Face, eyes and blinking mechanism of a humanoid robot head"
+  },
+  {
+    "docdb_family_id": "87183118",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid robot pushing an object using interaction-force control"
+  },
+  {
+    "docdb_family_id": "54343829",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Series-elastic actuation of a humanoid upper- and lower-limb system"
+  },
+  {
+    "docdb_family_id": "94568596",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid robot yaw/pitch driven lower limb mechanism"
+  },
+  {
+    "docdb_family_id": "72861919",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Indoor tour-guide/navigation service performed by a humanoid robot"
+  },
+  {
+    "docdb_family_id": "87014665",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid piano-playing robot with vision-guided key positioning"
+  },
+  {
+    "docdb_family_id": "91280839",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Autonomous humanoid with coordinated arm, leg and waist movements"
+  },
+  {
+    "docdb_family_id": "93314633",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid obstacle avoidance using scanning and model predictive control"
+  },
+  {
+    "docdb_family_id": "93767870",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Wheel-foot humanoid robot with head vision and tools"
+  },
+  {
+    "docdb_family_id": "94509145",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid imitation learning using a force-feedback exoskeleton"
+  },
+  {
+    "docdb_family_id": "94648805",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Virtual-reality teleoperation of a humanoid robot and its joints"
+  },
+  {
+    "docdb_family_id": "96705456",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Physics-constrained humanoid robot pose estimation"
+  },
+  {
+    "docdb_family_id": "95728756",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Reinforcement-learning training for a model of a humanoid robot"
+  },
+  {
+    "docdb_family_id": "90995566",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid support-leg force control with knee compensation"
+  },
+  {
+    "docdb_family_id": "94890084",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid robot natural-language task planning with skill libraries"
+  },
+  {
+    "docdb_family_id": "67236721",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid vision and walking for labyrinth navigation"
+  },
+  {
+    "docdb_family_id": "59717395",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid robot joint trajectory planning using B-splines and ZMP"
+  },
+  {
+    "docdb_family_id": "71153214",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Human-motion mapping to a humanoid robot torso and limbs"
+  },
+  {
+    "docdb_family_id": "37906758",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Skill/task execution framework explicitly for humanoid robots"
+  },
+  {
+    "docdb_family_id": "50588609",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid torso on omnidirectional mobile base with motion supervision"
+  },
+  {
+    "docdb_family_id": "75695918",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Musculoskeletal control for a humanoid robot using antagonistic muscles"
+  },
+  {
+    "docdb_family_id": "93801921",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Mechanical forearm/wrist assembly expressly provided for a humanoid robot"
+  },
+  {
+    "docdb_family_id": "93568267",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Hip-leg connecting assembly for a humanoid robot"
+  },
+  {
+    "docdb_family_id": "67576501",
+    "label": 1,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "explicit_positive",
+    "reason": "Humanoid facial skin and expression-control hardware"
+  },
+  {
+    "docdb_family_id": "85706473",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Solar panel assembly with two task-specific industrial robotic arms; no humanoid system"
+  },
+  {
+    "docdb_family_id": "59832479",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Generic human-robot interaction situation matching; no humanoid embodiment specified"
+  },
+  {
+    "docdb_family_id": "72837655",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Nursing assistance uses an omnidirectional mobile platform, not a humanoid design"
+  },
+  {
+    "docdb_family_id": "91951928",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "General multi-object grasp planning for a robotic picking arm; no humanoid link"
+  },
+  {
+    "docdb_family_id": "54480442",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Robot-arm support mounted around a surgical table, not humanoid robotics"
+  },
+  {
+    "docdb_family_id": "68236209",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Robot navigation combined with manipulator motion is described generically"
+  },
+  {
+    "docdb_family_id": "70554126",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Generic tactile and camera-equipped robotic gripper-hand; no humanoid target"
+  },
+  {
+    "docdb_family_id": "56628880",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Neurosurgical robot localization and positioning, not humanoid operation"
+  },
+  {
+    "docdb_family_id": "58427962",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Robotic arm positioned relative to a human appendage; not a humanoid robot"
+  },
+  {
+    "docdb_family_id": "64553147",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Stand-alone two-segment robot finger mechanism without a humanoid-specific link"
+  },
+  {
+    "docdb_family_id": "56974771",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Wireless manual operation of a robotic arm end-effector, not a humanoid body"
+  },
+  {
+    "docdb_family_id": "80050212",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Robot-hand finger module rotates objects; no humanoid embodiment identified"
+  },
+  {
+    "docdb_family_id": "55667687",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "High-speed legged robot leg mechanics without a stated humanoid configuration"
+  },
+  {
+    "docdb_family_id": "96453600",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Leg mechanism for unspecified legged robots, without humanoid-specific design"
+  },
+  {
+    "docdb_family_id": "94391917",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Robotic manipulation of laboratory slides, not humanoid robots"
+  },
+  {
+    "docdb_family_id": "73853711",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Multi-wheel walking vehicle-like robot, not a humanoid body"
+  },
+  {
+    "docdb_family_id": "47831722",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Human-in-the-loop teaching of an unspecified robotic arm"
+  },
+  {
+    "docdb_family_id": "95942468",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Radar sensing hardware of a self-walking robot without humanoid embodiment"
+  },
+  {
+    "docdb_family_id": "81454199",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Reconfigurable controller base for robotic arms, not specifically humanoids"
+  },
+  {
+    "docdb_family_id": "83130699",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Balancing a heavy-load industrial robot arm rather than humanoid posture"
+  },
+  {
+    "docdb_family_id": "92848884",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Legged robot field navigation without identified humanoid configuration"
+  },
+  {
+    "docdb_family_id": "57186653",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "General adaptive robot finger mechanism, no humanoid-specific connection"
+  },
+  {
+    "docdb_family_id": "67057569",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Surgical robotic arm and tool sensor system, not humanoid robotics"
+  },
+  {
+    "docdb_family_id": "62778385",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Shopping robot with chassis, seat and shopping box, not an anthropomorphic design"
+  },
+  {
+    "docdb_family_id": "68774983",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Modular robotic-arm wrist joint described without humanoid embodiment"
+  },
+  {
+    "docdb_family_id": "77925379",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Multi-legged robot counterweight mechanism rather than humanoid locomotion"
+  },
+  {
+    "docdb_family_id": "93809031",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "General hand-eye calibration of a robot, no humanoid-specific application"
+  },
+  {
+    "docdb_family_id": "86158652",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Human assistance by a single robotic arm; no humanoid robot described"
+  },
+  {
+    "docdb_family_id": "33468434",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Legged robot balances during arm tasks, but abstract does not identify a humanoid"
+  },
+  {
+    "docdb_family_id": "45391332",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "medium",
+    "bucket": "hard_negative",
+    "reason": "Charging cradle and movement test explicitly for a quadruped robot"
+  },
+  {
+    "docdb_family_id": "74130042",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Autonomous floor cleaning and obstacle avoidance, not humanoid robotics"
+  },
+  {
+    "docdb_family_id": "86207744",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Mechanical arm load balancing specifically on a robot dog, not humanoid"
+  },
+  {
+    "docdb_family_id": "91821979",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Path planning for an amphibious unmanned platform, not humanoid robots"
+  },
+  {
+    "docdb_family_id": "94627502",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Reinforcement learning for electrical micro-grid voltage regulation"
+  },
+  {
+    "docdb_family_id": "63618351",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Folding industrial robot mechanism with a hydraulic rack"
+  },
+  {
+    "docdb_family_id": "92556890",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "General large-language-model reasoning, not embodied humanoid robotics"
+  },
+  {
+    "docdb_family_id": "63001358",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Back support exoskeleton worn by a human, not a humanoid robot"
+  },
+  {
+    "docdb_family_id": "38101732",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Robotic-arm wafer transfer apparatus for semiconductor handling"
+  },
+  {
+    "docdb_family_id": "93633169",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Computer-vision monitoring of classroom student behavior"
+  },
+  {
+    "docdb_family_id": "97402681",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Optimizing industrial robot placement, not humanoid robot tasks"
+  },
+  {
+    "docdb_family_id": "58181122",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Precision-operation truss-mounted manipulator, not humanoid"
+  },
+  {
+    "docdb_family_id": "81368436",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Machine-room inspection robot with navigation and camera modules"
+  },
+  {
+    "docdb_family_id": "84045273",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Robotic following and container handling in agricultural harvesting"
+  },
+  {
+    "docdb_family_id": "76615454",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Injection-molding industrial manipulator structure"
+  },
+  {
+    "docdb_family_id": "62602944",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Vehicle-based wall-climbing inspection robot, not humanoid"
+  },
+  {
+    "docdb_family_id": "96175452",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Snake-arm continuum robot, not humanoid"
+  },
+  {
+    "docdb_family_id": "65041718",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Autonomous vehicle sensor arrangement and vehicle operation"
+  },
+  {
+    "docdb_family_id": "93653637",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Vertical farming robot arm for sowing and crop estimation"
+  },
+  {
+    "docdb_family_id": "87070026",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Rail-mounted datacenter robotic handling system, not humanoid"
+  },
+  {
+    "docdb_family_id": "97284798",
+    "label": 0,
+    "needs_review": 0,
+    "confidence": "high",
+    "bucket": "clear_negative",
+    "reason": "Automated mobile robot planning material transport routes"
+  }
+]
