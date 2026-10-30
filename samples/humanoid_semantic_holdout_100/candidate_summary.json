@@ -1,0 +1,39 @@
+{
+  "method": "Hash-ranked source-abstract discovery, class labels NOT derived from regex",
+  "source": "humanoid_patents.zip",
+  "seed": "semantic-holdout-review-20261030",
+  "source_rows": 238824,
+  "previous_family_ids_excluded": 200,
+  "excluded_explicit_cue_families": 1800,
+  "discovery_population": {
+    "industrial": 3388,
+    "robot_hand": 970,
+    "dual_arm": 513,
+    "exoskeleton": 1157,
+    "mobile_manipulator": 3736,
+    "biped_balance": 433,
+    "whole_body": 182,
+    "biped_torso_arms": 20,
+    "quadruped": 1052
+  },
+  "selected_candidate_counts": {
+    "biped_torso_arms": 20,
+    "biped_balance": 180,
+    "whole_body": 180,
+    "dual_arm": 140,
+    "robot_hand": 160,
+    "quadruped": 95,
+    "exoskeleton": 85,
+    "industrial": 100,
+    "mobile_manipulator": 110
+  },
+  "candidate_count": 1070,
+  "explicit_terms_excluded": [
+    "humanoid",
+    "anthropomorphic",
+    "human-like",
+    "human-shaped",
+    "human-form",
+    "android robot"
+  ]
+}
