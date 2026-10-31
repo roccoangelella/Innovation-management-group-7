@@ -19,3 +19,5 @@
 2026-10-30 — Added non-keyword, English-only 40/60 semantic challenge from 100 previously unused patent families, isolated Kaggle `--semantic-challenge` CLI, provenance and wiki. No explicit humanoid/anthropomorphic terms, but simple biped-vs-exoskeleton baseline still 94%; annotations AI-assisted, not human gold labels.
 
 2026-10-30 — Generated and source-verified a separate 100-case original-English keyword-blind humanoid task challenge with 40/60 provisional labels, baseline checks (60–86%), blind-review file, and explicit Kaggle `--dataset` evaluation command. Human adjudication and live GPU results pending.
+
+2026-10-31 — Verified live 100-family no-overt-cue FP16 semantic-holdout run: 38 TP, 56 TN, 4 FP, 2 FN against AI-provisional 40/60 labels at threshold 0.5; six disagreements concentrated in nonhuman-biped and whole-body-task cases. Production relevance definition, label adjudication and calibrated threshold remain open.
