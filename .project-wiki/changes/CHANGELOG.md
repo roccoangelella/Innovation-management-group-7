@@ -21,3 +21,5 @@
 2026-10-30 — Generated and source-verified a separate 100-case original-English keyword-blind humanoid task challenge with 40/60 provisional labels, baseline checks (60–86%), blind-review file, and explicit Kaggle `--dataset` evaluation command. Human adjudication and live GPU results pending.
 
 2026-10-31 — Verified live 100-family no-overt-cue FP16 semantic-holdout run: 38 TP, 56 TN, 4 FP, 2 FN against AI-provisional 40/60 labels at threshold 0.5; six disagreements concentrated in nonhuman-biped and whole-body-task cases. Production relevance definition, label adjudication and calibrated threshold remain open.
+
+2026-11-10 — Implemented two-T4 full-corpus native FP16 relevance filtering: translated CSV/ZIP input validation, optional completed translation-summary gate, stable disjoint DOCDB-family sharding, two independent resumable GPU workers, strict ID/probability-complete merge, metadata-preserving ZIP export and per-run SHA256 provenance. Extended inference journal corruption recovery and added CPU tests and Kaggle production operating guide. Live dual-GPU validation and calibrated relevance policy remain outstanding.

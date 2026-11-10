@@ -4,7 +4,7 @@ type: note
 status: active
 title: Current Plan
 created: '2026-10-29'
-updated: '2026-10-30'
+updated: '2026-11-10'
 tags: []
 related: []
 source_paths: []
@@ -25,3 +25,6 @@ confidence: confirmed
 Deadline: 20 December 2026.
 
 **Additional task-relevance stress test (implemented 2026-10-30):** `samples/humanoid_semantic_holdout_100/` contains 100 further original-English patent families labeled AI-provisionally 40 positive and 60 negative, with overt humanoid terms absent, 200 earlier IDs excluded, and independently saved blind-review file. Run `python kaggle/run.py --dataset samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv --output /kaggle/working/semantic_holdout_100/predictions.csv` to evaluate model behavior, then analyze definition disagreements between biped-compatible tasks and the existing explicit-humanoid prompt. Do not use this purposive dataset to claim production accuracy or to pick a threshold without a separate held-out evaluation.
+
+
+**2026-11-10 status:** The earlier planned independent dual-T4 native FP16 replicas are implemented as `kaggle/production_run.py` / `kaggle/production.py` with deterministic disjoint sharding, separate resumable journals and validated merged outputs. The translated full source has not been downloaded to Kaggle. Next release gates: verify translation `incomplete=0` and total family coverage, run representative concurrent two-T4 throughput/memory and interruption tests, persist outputs, and then launch the complete source. OQ-001 relevance-definition, human validation and threshold calibration remain open.

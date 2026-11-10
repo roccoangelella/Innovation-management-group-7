@@ -1,3 +1,5 @@
+**2026-11-10 — Two-T4 production path implemented (live GPU acceptance pending):** `kaggle/production_run.py` and `kaggle/production.py` validate a completed translated CSV/ZIP, deterministically partition DOCDB family IDs, launch independent CUDA-masked native FP16 Decider workers, resume separate journals and merge with strict ID/probability checks. Outputs include a full-family probabilities CSV, metadata-preserving filtered ZIP and SHA256 provenance. `kaggle/screen.py` now recovers torn final JSONL appends. Synthetic CPU tests cover source validation, GPU process assignment, sharding, export and restart. This **does not establish** concurrent T4 memory, throughput, session runtime, completed translation coverage or calibrated field precision; see [production guide](../kaggle/PRODUCTION.md).
+
 # Project Status
 
 Updated 2026-10-30. Current main includes TIP/PATSTAT candidate export, resumable translation code, two distinct 100-family samplers, and an isolated Perplexity Decider Flash v1.2 FP16 Kaggle pilot.

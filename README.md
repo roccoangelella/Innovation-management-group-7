@@ -1,3 +1,5 @@
+> **Full-corpus dual-T4 patent screening:** [Kaggle production guide](kaggle/PRODUCTION.md). Supports translated CSV/ZIP input, resumable independent FP16 GPU workers and validated merging. Live GPU acceptance remains required.
+
 # Innovation Management · Group 7 — Humanoid robotics (Electrolux)
 
 ## English-only 100-family screening pilot (2026-10-30)

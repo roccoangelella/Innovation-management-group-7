@@ -19,3 +19,8 @@ From the cloned repository root after pulling main: `python kaggle/run.py --sema
 ## Additional keyword-blind source holdout
 
 The generated `samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv` is a 100-row combined source-abstract and AI-provisional-label file; it is **not** the existing `--semantic-challenge` input. Run `python kaggle/run.py --dataset samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv --output /kaggle/working/semantic_holdout_100/predictions.csv` in the cloned Kaggle repo with GPU/Internet and cached HF weights. The explicit output directory avoids mixing result journals or input SHA manifests. Input `abstract_en` only is used for Decider; labels are compared after inference. This test was assembled from different patent families and has no GPU results yet.
+
+
+## Full-corpus two-T4 Kaggle workflow (implemented 2026-11-10)
+
+Use `python kaggle/production_run.py --input /kaggle/input/.../humanoid_patents_en.zip --translation-summary /kaggle/input/.../progress.summary.json --check`, then rerun without `--check` on Kaggle **T4 x2**, Internet enabled, and `HF_TOKEN` when required. A CSV with `abstract_en` is mandatory; the original untranslated `humanoid_patents.zip` is rejected. Outputs are under `/kaggle/working/humanoid-production` by default. Resume with unchanged input file/hash and output directory. Preserve all journals, `predictions.csv`, `filtered_patents.zip` and `production_summary.json`. Existing FP16 pinned model and prompt are unchanged. **The dual-T4 GPU acceptance benchmark has not yet been executed**; check memory, throughput and restart on 1,000–5,000 actual translated families before the complete corpus. See [production guide](../../kaggle/PRODUCTION.md).

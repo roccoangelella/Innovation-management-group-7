@@ -4,7 +4,7 @@ type: technical
 status: active
 title: Testing
 created: '2026-10-29'
-updated: '2026-10-30'
+updated: '2026-11-10'
 tags: []
 related: []
 source_paths: []
@@ -69,3 +69,8 @@ Built by `src/mine_implicit_humanoid_candidates.py` (780 source-derived English 
 **Six disagreements with provisional labels:** FP=87874416 (biped mechanical chicken, 0.57116), 88669050 (biped mechanical chicken with manipulator, 0.80102), 63379503 (magnetic wall-climbing biped, 0.54513), 74860101 (human-worn biped exoskeleton, 0.69199). FN=86069862 (head/arm teleoperation and center-of-mass planning, 0.49372), 66259327 (waist/two-foot center-of-mass balance, 0.40078). All four provisional FPs occur in 10 selected nonhuman-biped/special-walker negatives; both FNs in 9 selected positive whole-body-task cases. No disagreements in the remaining selection groups. These are *label-model disagreements*, not verified classification errors.
 
 **Comparison:** This particular additional holdout's simple lexical baselines were 60% for `humanoid|anthropomorphic`, 81% for biped words alone and 86% for a biped heuristic with exclusions, below the Decider's 94% against the same AI labels. The dataset has purposive 40/60 balance and task-oriented positives that exceed the existing `kaggle/screen.py` prompt's stricter explicit-humanoid-link criterion. Independent blind review and specification of the intended production relevance class are required **before** changing the prompt or threshold. Do not tune parameters on these 100 and then report this same set as an untouched test.
+
+
+## 2026-11-10 production two-T4 offline acceptance
+
+`kaggle/tests/test_production.py` exercises stable DOCDB-family sharding, plain CSV and single-CSV ZIP, original metadata preservation in filtered ZIP, immutable input provenance, failure on missing English text/incomplete statuses, duplicate/missing/invalid predictions, distinct GPU subprocess masks, translator-summary completion checks and exclusive lock cleanup. `kaggle/tests/test_journal.py` checks recovery of a torn final JSONL entry and rejection of corrupt/interior/unknown journal records. Run `python -m unittest discover -s kaggle/tests -v`; the existing Kaggle CI workflow watches `kaggle/**`. These are CPU/offline tests. **Still unverified:** two simultaneous model loads on real T4 GPUs, peak VRAM, full-source throughput/runtime, session persistence and translation corpus completeness.

@@ -1,3 +1,5 @@
+> **Full-corpus two-T4 production:** See [PRODUCTION.md](PRODUCTION.md) and [production_run.py](production_run.py). This document remains for the single-GPU pilot.
+
 # Kaggle · Perplexity Decider FP16 screening pilot
 
 Standalone **100-family inference experiment**. Data collection, translation and sampling remain under `src/`. There is no fine-tuning and no production filtering threshold yet.

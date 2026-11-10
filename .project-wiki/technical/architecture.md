@@ -4,7 +4,7 @@ type: technical
 status: active
 title: Architecture
 created: '2026-10-29'
-updated: '2026-10-29'
+updated: '2026-11-10'
 tags: []
 related: []
 source_paths: []
@@ -20,3 +20,8 @@ confidence: confirmed
 **Implemented (synthetic validation; real-corpus run not evidenced):** `src/sample_abstracts.py` samples 90 English and 10 non-English eligible DOCDB families using seed 20261029, bounded stable-hash candidate pools, CPC deficit balancing and non-English language diversity. Exports a source-column-preserving CSV, a translation-compatible ZIP, and a JSON report. Tests: `tests/test_sample_abstracts.py`. **Planned:** reference-label review of the 100-candidate benchmark → calibrated abstract-only keep/discard decision model → sector, technology and competitor landscaping → applicant harmonization → present/future scores → Magic Quadrant → acquisition/partnership recommendation.
 
 CPC extraction is broad **candidate generation**, not verified humanoid-robot relevance. The selected CPC codes explicitly cover adjacent robotics, exoskeleton and toy-robot concepts. No deterministic text-based relevance prefilter is authorized.
+
+
+## Implemented two-T4 screening path (2026-11-10)
+
+`kaggle/production_run.py` accepts the completed translated CSV or single-CSV ZIP (not the raw un-translated source archive), optionally gates on the translation summary (`incomplete=0`), records source/model/prompt SHA256 provenance and checks exactly two T4 GPUs. `kaggle/production.py` deterministically hashes DOCDB family IDs into disjoint shards, starts two separate CUDA-masked FP16 native Decider processes with independent journals, then verifies complete unique-ID probability outputs before writing a full prediction CSV and metadata-preserving filtered ZIP. The 0.5 decision threshold remains exploratory. Live dual-GPU memory, throughput and runtime still require verification.

@@ -4,7 +4,7 @@ type: technical
 status: active
 title: Codebase Map
 created: '2026-10-29'
-updated: '2026-10-30'
+updated: '2026-11-10'
 tags: []
 related: []
 source_paths: []
@@ -42,5 +42,11 @@ confidence: confirmed
 | `README.md` | Main data operations |
 | `pyproject.toml` | Python >=3.12 metadata |
 | `.gitignore` | Ignores secrets and outputs |
+
+| `kaggle/production_run.py` | Full-corpus dual-T4 entrypoint: translated-dataset completion gate, GPU validation, FP16 setup, two worker processes |
+| `kaggle/production.py` | Streaming CSV/ZIP validation, deterministic DOCDB shard split, GPU masks, checked merger, metadata-preserving compressed filtered export |
+| `kaggle/tests/test_production.py` | Offline synthetic production sharding, export, resume, validation and GPU-mask tests |
+| `kaggle/tests/test_journal.py` | Offline torn-append recovery and invalid journal tests |
+| `kaggle/PRODUCTION.md` | Production Kaggle usage, input contract, evidence and GPU acceptance gates |
 
 Run `python -m unittest discover -s tests -v` for existing offline tests and `python -m unittest discover -s kaggle/tests -v` for Kaggle launcher/evaluator tests. Kaggle live model execution and FP16 accuracy remain unverified. No full-corpus screening, landscaping, valuation or quadrant implementation is established.

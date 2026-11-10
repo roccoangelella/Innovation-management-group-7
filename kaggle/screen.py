@@ -67,6 +67,43 @@ def write_csv(path, results):
     tmp.replace(path)
 
 
+
+def load_journal(path, valid_ids):
+    """Read a resumable JSONL journal; discard only a torn final append."""
+    import math
+    done = {}
+    if not path.exists():
+        return done
+    with path.open("rb+") as stream:
+        valid_end = 0
+        while line := stream.readline():
+            try:
+                obj = json.loads(line)
+            except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                if not line.endswith(b"\n") and not stream.read():
+                    stream.truncate(valid_end)
+                    print("Recovered torn final JSONL append; last incomplete family will be rescored", flush=True)
+                    break
+                raise ValueError("Malformed journal entry; refusing unsafe resume") from exc
+            if not isinstance(obj, dict) or set(obj) != {"docdb_family_id", "probability_relevant", "model_decision"}:
+                raise ValueError("Invalid journal schema")
+            key = obj["docdb_family_id"]
+            prob = obj["probability_relevant"]
+            decision = obj["model_decision"]
+            if not isinstance(key, str) or key not in valid_ids or key in done:
+                raise ValueError(f"Duplicate or unexpected journal family: {key}")
+            if type(prob) not in (float, int) or not math.isfinite(prob) or not 0 <= prob <= 1:
+                raise ValueError(f"Invalid journal probability for family {key}")
+            if type(decision) is not int or decision != int(prob >= 0.5):
+                raise ValueError(f"Invalid journal decision for family {key}")
+            done[key] = obj
+            if not line.endswith(b"\n"):
+                stream.seek(0, 2)
+                stream.write(b"\n")
+                stream.flush()
+            valid_end = stream.tell()
+    return done
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True)
@@ -89,15 +126,7 @@ def main():
             raise ValueError("Existing outputs without manifest; use a clean directory.")
         metadata.write_text(json.dumps(config, indent=2), encoding="utf-8")
 
-    done = {}
-    if journal.exists():
-        for line in journal.read_text(encoding="utf-8").splitlines():
-            obj = json.loads(line)
-            key = obj["docdb_family_id"]
-            if key in done:
-                raise ValueError(f"Duplicate journal ID: {key}")
-            done[key] = obj
-
+    done = load_journal(journal, {key for key, _ in examples})
     pending = [(key, abstract) for key, abstract in examples if key not in done]
     if pending:
         import sys
