@@ -1,0 +1,25 @@
+name: Translation completion offline tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/complete_translation.py"
+      - "tests/test_complete_translation.py"
+      - ".github/workflows/translation_tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test partial-to-final translation with mocked endpoint and source ZIPs
+        run: python -m unittest discover -s tests -p test_complete_translation.py -v
