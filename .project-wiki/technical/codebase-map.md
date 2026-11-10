@@ -17,6 +17,10 @@ confidence: confirmed
 | --- | --- |
 | `src/sql_queries.py` | TIP/PATSTAT export using CPC prefixes; one CSV in ZIP |
 | `src/translate_abstracts.py` | Whole-corpus translation, batch validation, journal, English CSV |
+| `src/complete_translation.py` | Verify existing committed partial English ZIP against original source, seed journal, finish missing family abstracts and normalize completed English ZIP |
+| `.github/workflows/complete_translation.yml` | GitHub Actions Gemrouter secret-based completion, fail-closed validation and replacement commit |
+| `tests/test_complete_translation.py` | Mocked API tests for partial-to-final continuation and refusal to publish incomplete or mismatched source data |
+| `.github/workflows/translation_tests.yml` | Runs completion code's synthetic tests on GitHub without contacting Gemrouter |
 | `src/sample_abstracts.py` | Distinct 90/10 multilingual and CPC-diverse sampling implementation (generation not confirmed) |
 | `src/sample_random_100.py` | Fixed-seed uniform 100-family sampling from nonempty original-English abstracts; source-preserving outputs |
 | `samples/random_100/` | Generated 100-family labeling/full/translation CSV/ZIP and native-English Kaggle input, with manifest |

@@ -74,3 +74,8 @@ Built by `src/mine_implicit_humanoid_candidates.py` (780 source-derived English 
 ## 2026-11-10 production two-T4 offline acceptance
 
 `kaggle/tests/test_production.py` exercises stable DOCDB-family sharding, plain CSV and single-CSV ZIP, original metadata preservation in filtered ZIP, immutable input provenance, failure on missing English text/incomplete statuses, duplicate/missing/invalid predictions, distinct GPU subprocess masks, translator-summary completion checks and exclusive lock cleanup. `kaggle/tests/test_journal.py` checks recovery of a torn final JSONL entry and rejection of corrupt/interior/unknown journal records. Run `python -m unittest discover -s kaggle/tests -v`; the existing Kaggle CI workflow watches `kaggle/**`. These are CPU/offline tests. **Still unverified:** two simultaneous model loads on real T4 GPUs, peak VRAM, full-source throughput/runtime, session persistence and translation corpus completeness.
+
+
+## 2026-11-10 continuation from a partial translated ZIP
+
+`python -m unittest discover -s tests -p test_complete_translation.py -v` validates the wrapper with mocked Gemrouter responses, source-faithful CSV/ZIP fixtures, preservation of previously translated records, final English `abstract`/`abstract_en` normalization, source-language provenance retention, exclusion of originally empty abstracts, and refusal to publish on API errors or mismatched source metadata. The new `translation_tests.yml` job passed all five tests at commit `720704b`. **Not inferred from these tests:** fidelity of machine translation, actual endpoint credentials/quota, full source archive preservation and successful GitHub push after completion. The completion workflow validates the real data and must produce its own run evidence.

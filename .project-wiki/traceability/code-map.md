@@ -17,3 +17,5 @@
 | Keyword-blind additional semantic challenge | `src/mine_keyword_blind_candidates.py`; `src/assemble_semantic_holdout.py`; `samples/humanoid_semantic_holdout_100/`; `kaggle/run.py --dataset` | 100 source-verified families, 40/60 AI provisional labels, no overt humanoid cues and no overlap with first 200; held-out GPU predictions and human adjudication pending |
 
 | Dual-T4 full-corpus filtering (2026-11-10) | `kaggle/production_run.py`; `kaggle/production.py`; `kaggle/tests/test_production.py`; `kaggle/tests/test_journal.py`; `kaggle/PRODUCTION.md` | Code implemented and CPU-tested; source completion, live dual-T4 capacity/throughput and relevance threshold calibration pending |
+
+| Resume remaining non-English patent abstracts from partial committed archive | `src/complete_translation.py`; `src/translate_abstracts.py`; `.github/workflows/complete_translation.yml`; `tests/test_complete_translation.py` | Reconstructed verified journal and fail-closed full English ZIP export implemented and mocked tests passed; live endpoint completion and source-coverage audit pending |

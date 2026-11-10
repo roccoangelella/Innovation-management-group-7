@@ -1,3 +1,9 @@
+## Resuming the committed partial English ZIP (GitHub Actions)
+
+The tracked `humanoid_patents_en.zip` contains an **incomplete** English-only subset while `humanoid_patents.zip` is the immutable PATSTAT source. To complete it, use [Complete Gemrouter patent translations and publish English corpus](.github/workflows/complete_translation.yml). It uses repository Actions secrets `GEMR_API_KEY` and `LLM_ENDPOINT` (also accepts `GEMROUTER_API_KEY`/`GEMROUTER_ENDPOINT`), validates each existing translation against the source, and translates only missing nonempty abstracts through the same `gemini-cascade` endpoint. GitHub Actions publishes the completed replacement ZIP and `humanoid_patents_en_summary.json` **only when all eligible families pass validation**. Families with genuinely missing PATSTAT abstracts remain excluded and are counted separately. `abstract` and `abstract_en` both contain English; `abstract_language` preserves the source-language code. No Gemrouter credentials or endpoint are committed.
+
+Manual validation: `python src/complete_translation.py --check` (requires `LLM_ENDPOINT` to be set); offline synthetic tests: `python -m unittest discover -s tests -p test_complete_translation.py -v`.
+
 > **Full-corpus dual-T4 patent screening:** [Kaggle production guide](kaggle/PRODUCTION.md). Supports translated CSV/ZIP input, resumable independent FP16 GPU workers and validated merging. Live GPU acceptance remains required.
 
 # Innovation Management · Group 7 — Humanoid robotics (Electrolux)

@@ -1,0 +1,117 @@
+name: Complete Gemrouter patent translations and publish English corpus
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/complete_translation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: full-patent-translation
+  cancel-in-progress: false
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      GEMR_API_KEY: ${{ secrets.GEMR_API_KEY || secrets.GEMROUTER_API_KEY }}
+      LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT || secrets.GEMROUTER_ENDPOINT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Confirm configured secrets without showing values
+        shell: bash
+        run: |
+          if [ -z "$GEMR_API_KEY" ]; then
+            echo "::error::Missing GEMR_API_KEY (or GEMROUTER_API_KEY) repository secret."
+            exit 1
+          fi
+          if [ -z "$LLM_ENDPOINT" ]; then
+            echo "::error::Missing LLM_ENDPOINT (or GEMROUTER_ENDPOINT) repository secret."
+            exit 1
+          fi
+          if [[ "$LLM_ENDPOINT" != https://* ]]; then
+            echo "::error::Translation endpoint must use HTTPS."
+            exit 1
+          fi
+          echo "Gemrouter credentials and endpoint have been supplied through secrets."
+
+      - name: Validate existing translations against original PATSTAT extract
+        run: |
+          python src/complete_translation.py --check
+
+      - name: Resume only the missing abstract translations
+        run: |
+          python src/complete_translation.py --max-requests 600 --rpm 20 --passes 3
+
+      - name: Publish only after completeness and production input validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s outputs/translation/final_humanoid_patents_en.zip
+          test -s outputs/translation/humanoid_patents_en_summary.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          summary = json.loads(Path("outputs/translation/humanoid_patents_en_summary.json").read_text(encoding="utf-8"))
+          if summary["incomplete"] != 0 or summary["completed"] != summary["eligible"]:
+              raise RuntimeError("Translation coverage was not complete; refusing to publish")
+          archive = Path("outputs/translation/final_humanoid_patents_en.zip")
+          if archive.stat().st_size >= 100_000_000:
+              raise RuntimeError("Final ZIP exceeds GitHub's 100 MB per-file limit; artifact upload remains available")
+          print("Publishing verified complete English corpus:", summary["completed"], "families")
+          PY
+
+          # Prevent overwriting another contributor's more recent source/translation ZIP.
+          original_zip_sha="$(git rev-parse HEAD:humanoid_patents_en.zip)"
+          original_source_sha="$(git rev-parse HEAD:humanoid_patents.zip)"
+          git fetch origin main
+          test "$original_zip_sha" = "$(git rev-parse origin/main:humanoid_patents_en.zip)" || {
+            echo "::error::Existing translated ZIP changed remotely during translation; refusing to overwrite."
+            exit 1
+          }
+          test "$original_source_sha" = "$(git rev-parse origin/main:humanoid_patents.zip)" || {
+            echo "::error::Original source changed remotely during translation; refusing to overwrite."
+            exit 1
+          }
+          git checkout -B translation-completion-publish origin/main
+          cp outputs/translation/final_humanoid_patents_en.zip humanoid_patents_en.zip
+          cp outputs/translation/humanoid_patents_en_summary.json humanoid_patents_en_summary.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add humanoid_patents_en.zip humanoid_patents_en_summary.json
+          git commit -m "Complete all eligible patent abstract translations and replace English corpus"
+          git push origin HEAD:main
+          echo "Complete English corpus committed to main."
+
+      - name: Preserve validated full English dataset if GitHub publish fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: humanoid-translation-final-or-progress
+          path: |
+            outputs/translation/final_humanoid_patents_en.zip
+            outputs/translation/humanoid_patents_en_summary.json
+            outputs/translation/progress.summary.json
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Preserve resumable progress after interrupted or failed translation
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: humanoid-translation-restart-journal
+          path: outputs/translation/progress.jsonl
+          retention-days: 7
+          if-no-files-found: warn
