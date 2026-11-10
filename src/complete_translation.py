@@ -115,19 +115,40 @@ def prepare_seed(source, partial, state, endpoint, model):
     }
     state.parent.mkdir(parents=True, exist_ok=True)
     if state.exists() or manifest.exists():
-        if not state.exists() or not manifest.exists():
-            raise ValueError("Interrupted state without matching manifest")
-        if json.loads(manifest.read_text(encoding="utf-8")) != identity:
+        if not state.exists():
+            raise ValueError("Translation manifest exists but resume journal is missing")
+        if manifest.exists() and json.loads(manifest.read_text(encoding="utf-8")) != identity:
             raise ValueError("Existing journal belongs to another source/model/endpoint")
         prior = translator.load_progress(state)
         for family, seed_row in completed.items():
             item = prior.get(family)
             if item is None or item["abstract_en"] != seed_row["abstract_en"] or item["translation_status"] != seed_row["translation_status"]:
                 raise ValueError(f"Resumed journal does not preserve seed family {family}")
-        if set(prior) - set(completed):
-            source_ids = {row["docdb_family_id"].strip() for row in translator.input_rows(source)}
-            if set(prior) - source_ids:
-                raise ValueError("Resumed journal contains unknown family IDs")
+        extra = set(prior) - set(completed)
+        if extra:
+            # A GitHub Actions artifact contains the journal but not its
+            # endpoint-bearing manifest. Validate EVERY additional record
+            # against the immutable source before restoring that manifest.
+            for source_row in translator.input_rows(source):
+                family = source_row["docdb_family_id"].strip()
+                if family not in extra:
+                    continue
+                item = prior[family]
+                if not source_row["abstract"].strip():
+                    raise ValueError(f"Journal family has no source abstract: {family}")
+                if source_row["abstract_language"].strip().lower() == "en":
+                    if item["translation_status"] != "original_en" or item["abstract_en"] != source_row["abstract"]:
+                        raise ValueError(f"Journal original-English source mismatch: {family}")
+                elif item["translation_status"] != "translated":
+                    raise ValueError(f"Journal status/source language mismatch: {family}")
+                extra.remove(family)
+            if extra:
+                raise ValueError(f"Journal contains {len(extra)} unknown DOCDB families")
+        if not manifest.exists():
+            translator.atomic_json(manifest, identity)
+            print("Recovered validated journal artifact and recreated private run manifest", flush=True)
+        stats["journal_completed"] = len(prior)
+        stats["resume_pending"] = stats["eligible"] - len(prior)
     else:
         tmp = state.with_suffix(".jsonl.tmp")
         with tmp.open("w", encoding="utf-8") as stream:
@@ -144,6 +165,10 @@ def prepare_seed(source, partial, state, endpoint, model):
         os.replace(tmp, state)
         # Manifest contains the secret endpoint; keep it in ignored outputs only.
         translator.atomic_json(manifest, identity)
+        stats["journal_completed"] = len(completed)
+        stats["resume_pending"] = stats["eligible"] - len(completed)
+    if stats["resume_pending"] < 0:
+        raise ValueError("Resume journal exceeds eligible source family count")
     return stats
 
 

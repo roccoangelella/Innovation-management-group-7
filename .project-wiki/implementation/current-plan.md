@@ -31,3 +31,6 @@ Deadline: 20 December 2026.
 
 
 **2026-11-10 translated-data continuation:** The repository contains 236,513 completed English-abstract families and 1,025 eligible non-English families pending. `src/complete_translation.py` and GitHub Actions `complete_translation.yml` now reconstruct verified success from the partial ZIP, use the same private Gemrouter translation flow for missing abstracts, and publish the normalized English-only replacement ZIP with `humanoid_patents_en_summary.json` only if source-eligible coverage is complete. 1,286 source families lacking abstracts are excluded separately. First verify that the automated workflow succeeds and reports `incomplete=0`, then use the final dataset to benchmark dual-T4 production filtering. OQ-003 remains open on actual translation quality until audited.
+
+
+**2026-11-10 quota incident:** First Gemrouter completion attempt processed 256 additional abstracts before HTTP 429, leaving 769 eligible abstracts pending. Checkpoint artifact retained. Recovered-journal validation and reconstruction are implemented with GitHub Actions download/restore and 30-day journal reupload. Next: verify the checkpoint restore CI, confirm Gemrouter quota is replenished, manually dispatch the workflow using latest saved journal ID, then validate and publish the complete English ZIP. Avoid unbounded or immediate 429 retries.

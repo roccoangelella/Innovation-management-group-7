@@ -21,3 +21,11 @@ Changed: [status](../STATUS.md), [architecture](../technical/architecture.md), [
 Summary: The user provided Actions secrets for Gemrouter and committed a partial English corpus. Implemented strict source-ID/metadata reconciliation before seeding the translator's journal, translating only missing nonempty abstracts and publishing a replacement single-CSV ZIP only after 100% eligible coverage with English `abstract` and `abstract_en`. Preserves original PATSTAT language metadata, source ZIP and successful partial seed on errors. GitHub Actions performs translation and publishes final ZIP plus public completion summary; secrets are not committed. Synthetic tests (5) passed. Live workflow outcome is separately auditable.
 
 Questions: OQ-003 remains open for actual endpoint coverage, non-English translation fidelity and completed archive verification. OQ-001 remains open regarding relevance-screening calibration.
+
+## [2026-11-10] update | WLOG-20261110-004 | Diagnose HTTP 429 and restore resumable translations
+
+Changed: [status](../STATUS.md), [deployment](../technical/deployment.md), [testing](../technical/testing.md), [current plan](../implementation/current-plan.md), [changelog](../changes/CHANGELOG.md), `src/complete_translation.py`, `tests/test_complete_translation.py`, and `.github/workflows/complete_translation.yml`.
+
+Summary: Inspected GitHub Actions run [42849164410](https://github.com/roccoangelella/Innovation-management-group-7/actions/runs/42849164410): `HTTP 429: rate or quota exhausted` interrupted Gemrouter after 256 newly translated abstracts, reaching 236,769 of 237,538 eligible, with 769 pending. The workflow failed before publication, preserved the original ZIP, and uploaded restart journal artifact 13781484888. Implemented fail-closed restoration of a journal-only artifact with source validation, reconstitution of the private manifest, dedicated offline tests, and a workflow separation between push-triggered restoration verification and user-dispatched API calls. The endpoint's quota reset is unknown; no claim of completed English corpus.
+
+Questions: OQ-003 remains open for endpoint quota and translation fidelity. Publication remains contingent on successful completion and final data conservation checks.

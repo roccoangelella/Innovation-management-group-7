@@ -6,9 +6,16 @@ on:
     paths:
       - ".github/workflows/complete_translation.yml"
   workflow_dispatch:
+    inputs:
+      resume_run_id:
+        description: "Previous GitHub Actions run ID holding the saved translation journal"
+        required: false
+        type: string
+        default: "42849164410"
 
 permissions:
   contents: write
+  actions: read
 
 concurrency:
   group: full-patent-translation
@@ -47,15 +54,34 @@ jobs:
           fi
           echo "Gemrouter credentials and endpoint have been supplied through secrets."
 
+      - name: Recover validated translation journal from previous Actions run
+        if: ${{ (github.event.inputs.resume_run_id || '42849164410') != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: humanoid-translation-restart-journal
+          run-id: ${{ github.event.inputs.resume_run_id || '42849164410' }}
+          github-token: ${{ github.token }}
+          path: outputs/translation
+
+      - name: Confirm resume journal exists before any API requests
+        run: |
+          test -s outputs/translation/progress.jsonl || {
+            echo "::error::Failed to restore the saved journal; refusing to retranslate completed patents"
+            exit 1
+          }
+          echo "Journal restored; source and IDs will be validated before any API requests."
+
       - name: Validate existing translations against original PATSTAT extract
         run: |
           python src/complete_translation.py --check
 
       - name: Resume only the missing abstract translations
+        if: github.event_name == 'workflow_dispatch'
         run: |
           python src/complete_translation.py --max-requests 600 --rpm 20 --passes 3
 
       - name: Publish only after completeness and production input validation
+        if: github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
           set -euo pipefail
@@ -107,11 +133,11 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
 
-      - name: Preserve resumable progress after interrupted or failed translation
-        if: failure()
+      - name: Preserve resumable progress for a later quota reset
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: humanoid-translation-restart-journal
           path: outputs/translation/progress.jsonl
-          retention-days: 7
+          retention-days: 30
           if-no-files-found: warn

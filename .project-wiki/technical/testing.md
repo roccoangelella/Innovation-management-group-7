@@ -79,3 +79,8 @@ Built by `src/mine_implicit_humanoid_candidates.py` (780 source-derived English 
 ## 2026-11-10 continuation from a partial translated ZIP
 
 `python -m unittest discover -s tests -p test_complete_translation.py -v` validates the wrapper with mocked Gemrouter responses, source-faithful CSV/ZIP fixtures, preservation of previously translated records, final English `abstract`/`abstract_en` normalization, source-language provenance retention, exclusion of originally empty abstracts, and refusal to publish on API errors or mismatched source metadata. The new `translation_tests.yml` job passed all five tests at commit `720704b`. **Not inferred from these tests:** fidelity of machine translation, actual endpoint credentials/quota, full source archive preservation and successful GitHub push after completion. The completion workflow validates the real data and must produce its own run evidence.
+
+
+## Rate/quota interruption and journal artifact recovery (2026-11-10)
+
+Observed real Gemrouter HTTP 429 after 60 API attempts / 34 successful batches; 256 new English abstracts were journaled before workflow failure. No incomplete output was published, and the journal artifact was uploaded. Two new synthetic tests in `tests/test_complete_translation.py` cover a recovered journal without its secret-bearing manifest (including no repeated API calls for already translated families) and rejection of unknown DOCDB IDs. The workflow's push-triggered validation path restores the original journal artifact, validates against the source and seeded translations, and skips API/publish steps. This is a recovery-mechanism test, not evidence of quota replenishment.

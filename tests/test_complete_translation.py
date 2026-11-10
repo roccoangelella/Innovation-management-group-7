@@ -109,6 +109,41 @@ class FinishTranslationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "metadata differ"):
             finish.compare_seed(self.source, self.partial)
 
+    def test_resume_from_actions_journal_without_private_manifest(self):
+        # Simulate a GitHub Actions artifact containing the seed + one
+        # additional successfully translated family, but no secret manifest.
+        with patch.dict(os.environ, {"LLM_ENDPOINT": "https://example.invalid/v1/chat/completions", "GEMR_API_KEY": "test"}, clear=False):
+            stats = finish.prepare_seed(self.source, self.partial, self.state, os.environ["LLM_ENDPOINT"], "gemini-cascade")
+            self.assertEqual(stats["pending"], 1)
+            with self.state.open("a", encoding="utf-8") as stream:
+                stream.write(json.dumps({
+                    "docdb_family_id": "3", "abstract_en": "Japanese robot English",
+                    "translation_status": "translated",
+                }) + "\n")
+            manifest = self.state.with_suffix(".manifest.json")
+            manifest.unlink()  # The artifact excludes the secret endpoint.
+            def no_api(*args, **kwargs):
+                raise AssertionError("Already translated abstract was sent again")
+            with patch.object(translate, "request_completion", side_effect=no_api):
+                summary = finish.finish(self.arguments)
+            self.assertEqual(summary["completed"], 4)
+            self.assertEqual(summary["translated_new"], 1)
+            self.assertEqual(summary["incomplete"], 0)
+            self.assertTrue(manifest.is_file())
+
+    def test_resume_rejects_unknown_family_from_artifact(self):
+        with patch.dict(os.environ, {"LLM_ENDPOINT": "https://example.invalid/v1/chat/completions"}, clear=False):
+            finish.prepare_seed(self.source, self.partial, self.state, os.environ["LLM_ENDPOINT"], "gemini-cascade")
+            with self.state.open("a", encoding="utf-8") as stream:
+                stream.write(json.dumps({
+                    "docdb_family_id": "9999", "abstract_en": "Unrelated",
+                    "translation_status": "translated",
+                }) + "\n")
+            self.state.with_suffix(".manifest.json").unlink()
+            with self.assertRaisesRegex(ValueError, "unknown DOCDB"):
+                finish.prepare_seed(self.source, self.partial, self.state, os.environ["LLM_ENDPOINT"], "gemini-cascade")
+            self.assertFalse(self.state.with_suffix(".manifest.json").exists())
+
     def test_missing_endpoint_refused_without_network(self):
         with patch.dict(os.environ, {"LLM_ENDPOINT": ""}):
             with self.assertRaisesRegex(ValueError, "LLM_ENDPOINT"):
