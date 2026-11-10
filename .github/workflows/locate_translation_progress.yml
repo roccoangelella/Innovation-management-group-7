@@ -1,0 +1,48 @@
+name: Locate translation progress by DOCDB family ID
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/locate_translation_progress.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  locate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compute source-ordered pending queue position
+        env:
+          FAMILY_ID: "96917297"
+        run: |
+          python - <<'PY'
+          import csv, io, json, os, zipfile
+          family = os.environ["FAMILY_ID"]
+          with zipfile.ZipFile("humanoid_patents_en.zip") as archive:
+              with archive.open("humanoid_patents_en.csv") as raw:
+                  with io.TextIOWrapper(raw,encoding="utf-8-sig",newline="") as file:
+                      completed = {row["docdb_family_id"].strip() for row in csv.DictReader(file)}
+          pending_ids = []
+          source_position = None
+          with zipfile.ZipFile("humanoid_patents.zip") as archive:
+              with archive.open("humanoid_patents.csv") as raw:
+                  with io.TextIOWrapper(raw,encoding="utf-8-sig",newline="") as file:
+                      for index, row in enumerate(csv.DictReader(file), 1):
+                          key = row["docdb_family_id"].strip()
+                          if key == family:
+                              source_position = index
+                          if row["abstract"].strip() and key not in completed:
+                              pending_ids.append(key)
+          if family in pending_ids:
+              position = pending_ids.index(family)+1
+              left = len(pending_ids)-position
+              result = {"family":family,"status":"pending_from_seed","queue_position":position,"total_pending_at_start":len(pending_ids),"remaining_after_current_family":left,"completion_of_pending_percent":round(100*position/len(pending_ids),2),"source_row":source_position}
+          else:
+              result = {"family":family,"status":"already_in_seed_or_not_eligible","queue_position":None,"total_pending_at_start":len(pending_ids),"source_row":source_position,"in_committed_seed":family in completed}
+          print("TRANSLATION_PROGRESS_POSITION="+json.dumps(result,sort_keys=True))
+          PY
