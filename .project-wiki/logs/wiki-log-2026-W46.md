@@ -1,4 +1,11 @@
 
+## [2026-11-11] update | WLOG-20261111-005 | Queue-aware Kaggle dual-T4 restart
+
+Changed: project status, deployment, plan, changelog, and production workflow.
+
+Summary: Corrected direct Kaggle-to-W&B monitor passed offline tests, but corrected notebook submission failed because Kaggle had two active GPU batch slots occupied. Public cancellation endpoint returned HTTP 404/400 for IDs inferred from version numbers; no destructive deletion attempted. Added bounded retry (150 × 120 seconds, 355-minute job timeout) to GitHub Actions so the job can start when a GPU batch slot opens. Live metric confirmation must come from the separate W&B API verification job (nonzero cumulative analyzed-document count), not a mere notebook submission.
+
+
 ## [2026-11-11] update | WLOG-20261111-004 | Direct W&B progress counts from Kaggle
 
 Changed: project status, technical architecture/deployment/testing, current plan, changelog, `kaggle/wandb_live.py`, `kaggle/verify_wandb_live.py`, `kaggle/tests/test_wandb_live.py`, `kaggle/production_kernel/production.ipynb`, `.github/workflows/kaggle_production.yml`, `.github/workflows/kaggle_wandb_tests.yml`, and `kaggle/PRODUCTION_WANDB.md`.

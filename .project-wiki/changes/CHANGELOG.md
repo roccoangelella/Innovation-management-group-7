@@ -1,3 +1,5 @@
+2026-11-11 — Added bounded queue-aware retry for the two-T4 Kaggle production submission after Kaggle rejected a third simultaneous batch GPU session; adjusted GitHub Actions submission job timeout to 355 minutes. Preserves notebooks/results and refuses undocumented session cancellation or unexpected submission errors. Live direct W&B progress awaits a free GPU slot.
+
 **2026-11-11 direct telemetry update:** 2026-11-11 — Replaced Kaggle-log-based W&B mirroring with direct per-worker prediction journal telemetry in the Kaggle runtime. Added private one-run W&B credential provisioning via repository secret, isolated W&B monitor venv, 30-second cumulative counters and worker rates, explicit W&B nonzero API verification, offline journal tests, and credential cleanup. Revised production runbook and project wiki.
 
 **Operational update:** 2026-11-11 — Repaired initial Kaggle production launch errors (private model mount path mismatch and W&B kernel slug mismatch). Added manifest-based private model discovery, canonical Kaggle notebook ID extraction, and structured log parsing.

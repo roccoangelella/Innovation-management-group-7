@@ -1,5 +1,5 @@
 name: Production patent labeling - Kaggle dual T4
-# One-time resubmission after private-first W&B authentication fallback correction.
+# Bounded queue-aware resubmission after private W&B authentication correction.
 
 on:
   push:
@@ -18,7 +18,7 @@ concurrency:
 jobs:
   submit:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 355
     outputs:
       kernel_id: ${{ steps.execution.outputs.kernel_id }}
     env:
@@ -199,11 +199,34 @@ jobs:
               output.write("kernel_id="+kernel+"\n")
           print("Prepared production notebook:",kernel,os.environ["GITHUB_SHA"])
           PY
-      - name: Submit five-hour production labeling session
+      - name: Submit production kernel when a Kaggle GPU slot becomes available
         id: execution
         run: |
-          set -o pipefail
-          kaggle kernels push -p kaggle/production_kernel --accelerator NvidiaTeslaT4 --timeout 21600 | tee /tmp/kaggle_submit.log
+          set -euo pipefail
+          submitted=0
+          # Kaggle permits only two simultaneous batch GPU sessions. Prior
+          # submissions are still occupying the slots. Do not delete any
+          # notebook or guess session cancellation IDs.
+          for attempt in $(seq 1 150); do
+            kaggle kernels push -p kaggle/production_kernel --accelerator NvidiaTeslaT4 --timeout 21600 > /tmp/kaggle_submit.log 2>&1 || true
+            if grep -Eq 'Kernel version [0-9]+ successfully pushed' /tmp/kaggle_submit.log; then
+              cat /tmp/kaggle_submit.log
+              submitted=1
+              break
+            fi
+            if grep -q 'Maximum batch GPU session count of 2 reached' /tmp/kaggle_submit.log; then
+              echo "KAGGLE_GPU_QUEUE attempt=$attempt/150 reason=two_other_batch_sessions_active"
+              sleep 120
+            else
+              echo "::error::Kaggle kernel submission failed for an unexpected reason"
+              tail -20 /tmp/kaggle_submit.log
+              exit 1
+            fi
+          done
+          if [ "$submitted" -ne 1 ]; then
+            echo "::error::Kaggle GPU slots remained full throughout the bounded retry window"
+            exit 1
+          fi
           python - <<'PY'
           import os, re
           from pathlib import Path

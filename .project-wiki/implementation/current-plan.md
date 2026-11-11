@@ -1,3 +1,5 @@
+**2026-11-11 queue-aware restart:** The direct-W&B code and tests are ready, but Kaggle denied the corrected batch GPU job while two sessions remained active. Retry is now automated in the Actions `submit` step, up to 150 attempts at 120-second intervals. Do not claim live labeled-document progress until W&B `documents/analyzed` > 0. The user can stop obsolete Kaggle batch sessions in Active Events to accelerate the launch; the automation does not delete kernels or guess cancellation IDs.
+
 **2026-11-11 direct telemetry update:** 2026-11-11 — User requested direct real-time analyzed-document count in W&B. Prepared a Kaggle-private W&B credential path, 30-second journal-driven W&B client, synthetic tests, and a separate W&B API verification job that requires actual nonzero counts. Restart the current Kaggle kernel via the updated production GitHub workflow, then verify W&B chart updates at the forge.coreweave.com project, and retain each session's checkpoint. Do not infer success merely from kernel RUNNING status. Threshold calibration still pending.
 
 ---
