@@ -1,3 +1,10 @@
+
+## [2026-11-11] update | WLOG-20261111-003 | Repair Kaggle production startup and W&B monitor
+
+Changed: status, technical deployment, changelog, production Kaggle notebook, W&B monitor, and production Actions workflow.
+
+Summary: Initial production notebook verified 237,538 translated families but failed before inference due to an assumed private model mount path. W&B monitoring was pointed to the wrong Kaggle slug. Corrective changes use unique model manifest discovery, canonical URL extraction, and structured CLI log parsing. Evidence: GitHub Actions diagnostic run 42997636292. New production inference outcome not yet verified.
+
 # Wiki audit — 2026-W46 (9 November–15 November 2026)
 
 ## [2026-11-10] update | WLOG-20261110-001 | Implement offline-tested two-T4 production screening

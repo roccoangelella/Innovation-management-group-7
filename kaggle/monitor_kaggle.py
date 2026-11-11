@@ -39,9 +39,22 @@ def start():
         while time.monotonic() < deadline:
             try:
                 logs = cli("logs", KERNEL)
-                matches = re.findall(r"PROGRESS_JSON=(\{[^\r\n]*\})", logs)
-                if matches:
-                    d = json.loads(matches[-1])
+                try:
+                    events = json.loads(logs)
+                    text_logs = "".join(e.get("data", "") for e in events if isinstance(e, dict)) if isinstance(events, list) else logs
+                except json.JSONDecodeError:
+                    text_logs = logs
+                snapshots = []
+                for line in text_logs.splitlines():
+                    if "PROGRESS_JSON=" not in line:
+                        continue
+                    fragment = line.split("PROGRESS_JSON=", 1)[1].strip()
+                    try:
+                        snapshots.append(json.loads(fragment))
+                    except json.JSONDecodeError:
+                        pass
+                if snapshots:
+                    d = snapshots[-1]
                     processed = int(d["processed"])
                     if processed > last_count:
                         metrics = {

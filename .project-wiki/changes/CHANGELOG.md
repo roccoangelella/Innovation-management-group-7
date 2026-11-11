@@ -1,3 +1,5 @@
+**Operational update:** 2026-11-11 — Repaired initial Kaggle production launch errors (private model mount path mismatch and W&B kernel slug mismatch). Added manifest-based private model discovery, canonical Kaggle notebook ID extraction, and structured log parsing.
+
 # CHANGELOG
 
 2026-10-29 — Documentation baseline: project wiki created; application code unchanged.

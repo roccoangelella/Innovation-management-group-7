@@ -1,3 +1,5 @@
+**Operational update:** 2026-11-11 production troubleshooting: The first dual-T4 notebook stopped before scoring at the private model mount lookup. The notebook now locates a unique snapshot_manifest.json under /kaggle/input rather than assuming a directory name. The Actions workflow extracts the canonical Kaggle URL after submission; the W&B monitor parses Kaggle's structured log events. A subsequent run must verify actual GPU model loading and inference before reporting success.
+
 # Deployment and execution
 
 TIP/PATSTAT extraction runs in TIP; private endpoint translation runs locally under Python 3.12+ and is independent of screening.

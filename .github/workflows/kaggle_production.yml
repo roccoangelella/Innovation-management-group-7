@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 180
     outputs:
-      kernel_id: ${{ steps.push.outputs.kernel_id }}
+      kernel_id: ${{ steps.execution.outputs.kernel_id }}
     env:
       KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -147,9 +147,22 @@ jobs:
           print("Prepared production notebook:",kernel,os.environ["GITHUB_SHA"])
           PY
       - name: Submit five-hour production labeling session
+        id: execution
         run: |
-          kaggle kernels push -p kaggle/production_kernel --accelerator NvidiaTeslaT4 --timeout 21600
-          echo "PRODUCTION_KERNEL=https://www.kaggle.com/code/$KAGGLE_OWNER/humanoid-production-dual-t4"
+          set -o pipefail
+          kaggle kernels push -p kaggle/production_kernel --accelerator NvidiaTeslaT4 --timeout 21600 | tee /tmp/kaggle_submit.log
+          python - <<'PY'
+          import os, re
+          from pathlib import Path
+          log = Path("/tmp/kaggle_submit.log").read_text(encoding="utf-8")
+          match = re.search(r"https://www[.]kaggle[.]com/code/([A-Za-z0-9_-]+)/([A-Za-z0-9_-]+)", log)
+          if not match:
+              raise RuntimeError("Kaggle did not return a canonical notebook URL")
+          url = match.group(0)
+          print("PRODUCTION_KERNEL=" + url, flush=True)
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as file:
+              file.write("kernel_id=" + "/".join(match.groups()) + chr(10))
+          PY
   monitor:
     needs: submit
     runs-on: ubuntu-latest
