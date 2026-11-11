@@ -1,0 +1,55 @@
+name: Release stale Kaggle dual-T4 GPU batch sessions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/kaggle_recover_gpu_slots.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cancel_known_sessions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+    steps:
+      - name: Cancel only the two Kaggle notebook versions launched by this project
+        run: |
+          python - <<'PY'
+          import os
+          from urllib import request, error
+          token = os.environ.get("KAGGLE_API_TOKEN", "")
+          if not token:
+              raise RuntimeError("Kaggle API secret missing")
+          # Our GitHub Actions confirmed version numbers for the same
+          # notebook: 2 in run 42998215686 and 3 in run 43000807615.
+          # Kaggle's session cancellation API accepts these IDs.
+          for session in (2, 3):
+              completed = False
+              for host in ("https://www.kaggle.com", "https://api.kaggle.com"):
+                  url = host + f"/api/v1/kernels/cancel-session/{session}"
+                  req = request.Request(
+                      url, data=b"{}",
+                      headers={"Authorization": "Bearer " + token,
+                               "Content-Type": "application/json"},
+                      method="POST",
+                  )
+                  try:
+                      with request.urlopen(req, timeout=30) as response:
+                          print(f"KAGGLE_CANCEL_SESSION {session}: HTTP {response.status}", flush=True)
+                          completed = True
+                          break
+                  except error.HTTPError as exc:
+                      print(f"KAGGLE_CANCEL_SESSION {session}: HTTP {exc.code} from {host}", flush=True)
+                      if exc.code in (401, 403):
+                          raise RuntimeError("Kaggle credential lacks session cancellation permission") from None
+                  except error.URLError as exc:
+                      print(f"KAGGLE_CANCEL_SESSION {session}: network error from {host}", flush=True)
+              if not completed:
+                  raise RuntimeError(f"Failed to cancel known Kaggle session {session}")
+          print("Stale notebook session cancellation requests completed", flush=True)
+          PY
