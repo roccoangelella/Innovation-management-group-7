@@ -1,0 +1,44 @@
+name: Monitor existing Kaggle dual-T4 production notebook
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/kaggle_monitor_existing.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kaggle-existing-production-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+      KAGGLE_KERNEL_ID: roccoangelella/humanoid-patent-production-dual-t4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Kaggle and W&B CLI
+        run: python -m pip install --disable-pip-version-check kaggle six wandb
+      - name: Verify existing production notebook access and status
+        run: |
+          kaggle kernels status "$KAGGLE_KERNEL_ID"
+      - name: Stream actual Kaggle inference progress to W&B
+        run: python -u kaggle/monitor_kaggle.py
+      - name: Save checkpoint and results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: humanoid-dual-t4-monitored-output
+          path: kaggle_results/
+          retention-days: 30
+          if-no-files-found: warn
