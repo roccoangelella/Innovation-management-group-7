@@ -1,0 +1,40 @@
+name: Diagnose Kaggle production notebook failure
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/kaggle_production_diagnose.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+      KERNEL_ID: roccoangelella/humanoid-patent-production-dual-t4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Kaggle CLI
+        run: python -m pip install --disable-pip-version-check kaggle six
+      - name: Read actual Kaggle notebook status and logs
+        run: |
+          kaggle kernels status "$KERNEL_ID"
+          kaggle kernels logs "$KERNEL_ID" > kernel-log.txt 2>&1 || true
+          echo "---- Kaggle log tail ----"
+          tail -110 kernel-log.txt
+          mkdir -p kernel-diagnostics
+          cp kernel-log.txt kernel-diagnostics/kernel-log.txt
+          kaggle kernels output "$KERNEL_ID" -p kernel-diagnostics || true
+          find kernel-diagnostics -type f -maxdepth 3 -printf '%P %s bytes\n'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kaggle-production-diagnostics
+          path: kernel-diagnostics/
+          retention-days: 14
+          if-no-files-found: warn
