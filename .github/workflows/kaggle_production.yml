@@ -55,9 +55,23 @@ jobs:
         run: |
           set -euo pipefail
           data_ref="$KAGGLE_OWNER/pplx-decider-flash-private-v12"
-          if kaggle datasets status "$data_ref" >/dev/null 2>&1; then
-            echo "Existing private Kaggle checkpoint dataset found: $data_ref"
-          else
+          # Previous run successfully uploaded the private dataset. Do not
+          # repeat a multi-GB transfer because GetDatasetStatus returned 403.
+          for attempt in $(seq 1 12); do
+            if kaggle datasets files "$data_ref" --page-size 200 > /tmp/model_files.txt 2>&1; then
+              echo "Private model dataset accessible: $data_ref"
+              head -6 /tmp/model_files.txt
+              break
+            fi
+            echo "Private dataset not listed yet (attempt $attempt)."
+            if [ "$attempt" -eq 12 ]; then
+              cat /tmp/model_files.txt
+              echo "::error::Previously uploaded Kaggle private model cannot yet be read via API."
+              exit 1
+            fi
+            sleep 15
+          done
+          if false; then
             echo "Mirroring pinned private Hugging Face checkpoint into owner-only Kaggle dataset"
             python - <<'PY'
           import json, os, hashlib
@@ -95,7 +109,7 @@ jobs:
           print("Private checkpoint mirror contains",len(mapping),"files", flush=True)
           PY
             kaggle datasets create -p model_mirror -r skip --keep-tabular
-            kaggle datasets status "$data_ref"
+            echo "Private checkpoint dataset created; API may take time to index it."
           fi
       - name: Prepare private dual-T4 production kernel
         id: push
