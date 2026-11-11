@@ -119,7 +119,7 @@ jobs:
           from pathlib import Path
           p = Path("kaggle/production_kernel")
           metadata = json.loads((p/"kernel-metadata.json").read_text())
-          kernel = os.environ["KAGGLE_OWNER"] + "/humanoid-production-dual-t4"
+          kernel = os.environ["KAGGLE_OWNER"] + "/humanoid-patent-production-dual-t4"
           metadata.update({
             "id":kernel,
             "title":"Humanoid patent production dual T4",
