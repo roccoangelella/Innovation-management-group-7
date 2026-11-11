@@ -1,4 +1,5 @@
 name: Production patent labeling - Kaggle dual T4
+# One-time resubmission after private-first W&B authentication fallback correction.
 
 on:
   push:
@@ -155,6 +156,9 @@ jobs:
             sleep 10
           done
           sleep 10
+      - name: Remove prior private single-run W&B credential
+        run: |
+          kaggle datasets delete "$KAGGLE_OWNER/humanoid-wandb-auth-43000807615" -y || true
       - name: Prepare private dual-T4 production kernel
         id: push
         run: |
