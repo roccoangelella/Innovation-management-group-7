@@ -1,3 +1,5 @@
+2026-11-11 — Confirmed real nonzero inference progress via independent W&B verifier (204/237,538 families at 11:37 UTC, run kd2vlyzi) after Kaggle monitor startup fix. Added a read-only GitHub Actions workflow to report latest W&B counters and Kaggle status without resubmitting the model.
+
 2026-11-11 — Fixed Kaggle Python3.13 W&B monitor startup: `venv` failed `ensurepip` before GPU inference, causing a 30-minute W&B nonzero-progress timeout. Replaced `venv` with `pip install --target` into an isolated directory, passed `PYTHONPATH` only to the direct W&B child process, and added an offline notebook regression test. Retained the same complete 237,538-family corpus, two T4 inference workers and W&B count gate. New live outcome pending.
 
 2026-11-11 — Added bounded queue-aware retry for the two-T4 Kaggle production submission after Kaggle rejected a third simultaneous batch GPU session; adjusted GitHub Actions submission job timeout to 355 minutes. Preserves notebooks/results and refuses undocumented session cancellation or unexpected submission errors. Live direct W&B progress awaits a free GPU slot.

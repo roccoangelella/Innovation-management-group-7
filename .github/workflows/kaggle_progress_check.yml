@@ -1,0 +1,46 @@
+name: Verify live Kaggle and W&B patent screening progress
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/kaggle_progress_check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+      WANDB_BASE_URL: https://api.forge.coreweave.com
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install read-only W&B and Kaggle clients
+        run: python -m pip install --disable-pip-version-check wandb==0.31.0 kaggle six
+      - name: Fetch actual cumulative counts from the verified production W&B run
+        run: |
+          python - <<'PY'
+          import json, os, wandb
+          path = "rocchissimo936-none/humanoid-patent-filtering/kd2vlyzi"
+          run = wandb.Api(timeout=60).run(path)
+          summary = dict(run.summary)
+          relevant = {k: v for k, v in summary.items()
+                      if k.startswith(("documents/", "workers/", "throughput/", "decisions/"))}
+          print("WANDB_RUN_URL=" + run.url, flush=True)
+          print("WANDB_RUN_STATE=" + str(run.state), flush=True)
+          print("WANDB_LIVE_METRICS=" + json.dumps(relevant, sort_keys=True, default=str), flush=True)
+          if "documents/analyzed" not in relevant:
+              raise RuntimeError("Counter unavailable; cannot claim live document progress")
+          done = int(relevant["documents/analyzed"])
+          total = 237538
+          print(f"CONFIRMED_PROCESSED={done}/{total}", flush=True)
+          PY
+      - name: Fetch the associated Kaggle notebook execution status
+        run: kaggle kernels status roccoangelella/humanoid-patent-production-dual-t4

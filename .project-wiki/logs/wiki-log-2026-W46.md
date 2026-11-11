@@ -74,3 +74,9 @@ Changed: `kaggle/production_kernel/production.ipynb`, `.github/workflows/kaggle_
 Summary: Investigated failed production GitHub run 43002155460. Kaggle notebook staged source (237,538 eligible families) and private model, but Python3.13 `venv` failed internal `ensurepip` before any predictions. Independent W&B verification timed out with no nonzero analyzed count. Changed notebook to use monitor-only `pip --target` site packages and `PYTHONPATH`, avoiding venv; added regression coverage. Production restart and actual count confirmation must be independently checked from the new Actions and W&B runs.
 
 Questions: Existing relevance-model calibration and translation fidelity questions remain open; telemetry startup is an implementation issue.
+
+## [2026-11-11] update | WLOG-20261111-007 | Verify live W&B inference and current run progress
+
+Changed: project status, technical deployment, changelog, and new .github/workflows/kaggle_progress_check.yml.
+
+Evidence: Production run 43012383316 submit job passed and independent verify_wandb job completed successfully after reporting WANDB_DIRECT_COUNT=204/237538 at 11:37 UTC, URL https://forge.coreweave.com/wandb/rocchissimo936-none/humanoid-patent-filtering/runs/kd2vlyzi. Production monitor still active at that time; not proof of full screening. Added read-only W&B metric and Kaggle session status check to fetch a contemporaneous count without affecting the Kaggle execution.
