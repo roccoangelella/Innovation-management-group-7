@@ -49,6 +49,15 @@ class JournalCounterTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "truncated"):
                 counter.update()
 
+    def test_kaggle_notebook_uses_target_scoped_pip_instead_of_failing_venv(self):
+        notebook = Path(__file__).resolve().parents[1] / "production_kernel" / "production.ipynb"
+        cells = json.loads(notebook.read_text(encoding="utf-8"))["cells"]
+        script = "\n".join("".join(cell["source"]) for cell in cells if cell["cell_type"] == "code")
+        self.assertNotIn('"venv", str(monitor_venv)', script)
+        self.assertIn('"--target", str(monitor_site)', script)
+        self.assertIn('"PYTHONPATH": str(monitor_site)', script)
+        self.assertIn('sys.executable, "-u", str(ROOT / "kaggle/wandb_live.py")', script)
+
 
 if __name__ == "__main__":
     unittest.main()

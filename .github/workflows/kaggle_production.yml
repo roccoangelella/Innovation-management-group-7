@@ -1,5 +1,6 @@
 name: Production patent labeling - Kaggle dual T4
-# Bounded queue-aware resubmission after private W&B authentication correction.
+# W&B monitor uses pip --target (not venv/ensurepip) on Kaggle Python 3.13.
+# Launch retries are bounded; accept only a confirmed Kaggle submission.
 
 on:
   push:

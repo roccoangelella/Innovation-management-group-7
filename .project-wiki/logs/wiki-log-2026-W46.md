@@ -66,3 +66,11 @@ Changed: [status](../STATUS.md), [deployment](../technical/deployment.md), [test
 Summary: After final translation completion, user authorized model predictions on all 237,538 eligible DOCDB family abstracts using Kaggle T4 ×2 with simple real-time W&B operational graphs. Implementation pins source and model versions, separates physical CUDA worker processes, records progress/throughput/GPU utilization and memory without patent text, and saves a restartable checkpoint at session expiry. Secure provisioning uses GitHub's private HF secret to mirror the restricted model to a private Kaggle dataset; W&B key remains only in GitHub Actions. Validation of live Kaggle model load and final merge is pending, and provisional 0.5 predictions are not externally adjudicated classification accuracy.
 
 Questions: OQ-001 remains open on relevance boundary and human-reviewed calibration; OQ-003 remains open on independent translation fidelity. GPU quota, model access and throughput can only be verified from live run evidence.
+
+## [2026-11-11] update | WLOG-20261111-006 | Fix Kaggle W&B ensurepip failure and resubmit
+
+Changed: `kaggle/production_kernel/production.ipynb`, `.github/workflows/kaggle_production.yml`, `kaggle/tests/test_wandb_live.py`, `STATUS.md`, `technical/deployment.md`, `technical/testing.md`, `implementation/current-plan.md`, and `changes/CHANGELOG.md`.
+
+Summary: Investigated failed production GitHub run 43002155460. Kaggle notebook staged source (237,538 eligible families) and private model, but Python3.13 `venv` failed internal `ensurepip` before any predictions. Independent W&B verification timed out with no nonzero analyzed count. Changed notebook to use monitor-only `pip --target` site packages and `PYTHONPATH`, avoiding venv; added regression coverage. Production restart and actual count confirmation must be independently checked from the new Actions and W&B runs.
+
+Questions: Existing relevance-model calibration and translation fidelity questions remain open; telemetry startup is an implementation issue.
