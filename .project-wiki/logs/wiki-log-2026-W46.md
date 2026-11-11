@@ -1,4 +1,11 @@
 
+## [2026-11-11] update | WLOG-20261111-004 | Direct W&B progress counts from Kaggle
+
+Changed: project status, technical architecture/deployment/testing, current plan, changelog, `kaggle/wandb_live.py`, `kaggle/verify_wandb_live.py`, `kaggle/tests/test_wandb_live.py`, `kaggle/production_kernel/production.ipynb`, `.github/workflows/kaggle_production.yml`, `.github/workflows/kaggle_wandb_tests.yml`, and `kaggle/PRODUCTION_WANDB.md`.
+
+Summary: User explicitly required W&B to show the real analyzed-document count. The former GitHub Actions monitor could not access live Kaggle logs. Implemented direct W&B logging every 30 seconds by a Kaggle-side process reading each GPU's flushed JSONL prediction journal, exposing total/processed/remaining, per-GPU progress, speed, and provisional positives. The GitHub action provisions a temporary private Kaggle auth dataset from the W&B secret, attaches it without putting credentials in public files, verifies nonzero counts via W&B API, and deletes the private credential dataset at completion. Live inference and telemetry must still be validated.
+
+
 ## [2026-11-11] update | WLOG-20261111-003 | Repair Kaggle production startup and W&B monitor
 
 Changed: status, technical deployment, changelog, production Kaggle notebook, W&B monitor, and production Actions workflow.

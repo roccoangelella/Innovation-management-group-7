@@ -1,25 +1,28 @@
-# Kaggle production: dual T4 + W&B telemetry
+# Direct real-time Kaggle → W&B document counter (2026-11-11)
 
-Entry points: `.github/workflows/kaggle_production.yml`, `kaggle/production_kernel/production.ipynb`, and `kaggle/monitor_kaggle.py`.
+**Canonical dashboard:** https://forge.coreweave.com/wandb/rocchissimo936-none/humanoid-patent-filtering
 
-## Secure input and model access
+## What actually appears
 
-The completed `humanoid_patents_en.zip` and `humanoid_patents_en_summary.json` are cloned from a pinned GitHub commit in Kaggle. Expected count: **237,538** eligible families.
+The Kaggle notebook launches two independent GPU-T4 screening workers. The dedicated Kaggle-side monitor reads each worker's **append-only, on-disk** `predictions.jsonl` journal every 30 seconds. Only complete newline-terminated records are counted. W&B receives:
 
-The pinned native Perplexity Decider Flash v1.2 checkpoint requires authenticated Hugging Face access. GitHub Actions alone uses `HF_TOKEN` to download the pinned revision and provision an account-private Kaggle dataset. Neither the HF secret nor the W&B secret is placed into the notebook. GitHub Actions uses `KAGGLE_API_TOKEN` to submit the private dual-T4 notebook and `WANDB_API_KEY` to relay Kaggle log counters into W&B. Patent IDs and abstracts are not logged to W&B.
+- `documents/analyzed`: cumulative number of model decisions actually journaled; target **237,538**.
+- `documents/total` and `documents/remaining`: absolute progress.
+- `documents/percent`: completion percentage.
+- `workers/t4_0_analyzed` and `workers/t4_1_analyzed`: documents processed by each GPU.
+- `throughput/documents_per_second`: recent processing speed.
+- `decisions/provisional_positive`: model-positive count at exploratory 0.5 threshold, **not human-validated classification accuracy**.
 
-## Minimal W&B charts
+No patent text, DOCDB IDs or API keys enter W&B metrics. The old GitHub Actions Kaggle-log relay is no longer responsible for live counter updates, since Kaggle does not reliably make stdout available during execution.
 
-Project: `humanoid-patent-filtering`. Live metrics are processed families, completion %, per-worker counts, throughput in families/hour, estimated remaining hours, optional GPU utilization and memory per T4, and provisional model-positive fraction at threshold 0.5.
+## Secure W&B authentication
 
-These are operational and model prediction metrics, **not externally validated precision, recall or accuracy**. W&B updates depend on Kaggle execution logs becoming available.
+The GitHub Action uses the existing `WANDB_API_KEY` repository secret without embedding its value in any public GitHub commit. Kaggle's official CLI does not manage Kaggle Secrets, so the workflow creates a **single-run Kaggle dataset that is private by default** (never `--public`). It includes an owner-only token file mounted inside the private notebook. Its name contains the GitHub run ID and it is deleted when the associated monitor job exits. The notebook alternatively accepts a Kaggle-native `WANDB_API_KEY` user secret, if already configured. Credentials are not included in notebook source, output CSV, W&B charts, or exported checkpoints. **Security caveat:** while the temporary private dataset exists, the credential is available to the authenticated Kaggle account and platform; do not publish/share that dataset. Prefer Kaggle's native Secrets manager for durable setup. Key rotation is prudent if the temporary dataset was ever accidentally shared.
 
-## Session persistence
+## Session execution and validation
 
-Because 237,538 families may exceed a session, inference is limited to 300 minutes per notebook run. At end, its per-worker journals and provenance are archived in `/kaggle/working/humanoid-checkpoint.zip`. If complete, all-family `predictions.csv`, metadata-preserving `filtered_patents.zip`, and `production_summary.json` are exported. Incomplete sessions write `session_summary.json` instead of claiming full completion. The GitHub monitor downloads these outputs and saves them for 30 days as a workflow artifact.
+Source: pinned `humanoid_patents_en.zip` with 237,538 eligible translated DOCDB-family abstracts. Model: pinned native `pplx-decider-flash-v1.2` FP16 on **T4 ×2**. Model weights are provisioned through an account-private Kaggle dataset using the GitHub `HF_TOKEN`.
 
-To continue later, attach the prior `humanoid-checkpoint.zip` as a private Kaggle input, keeping original dataset and model revision fixed. The loader checks IDs, source hash and worker metadata before reusing predictions. Nothing in `/tmp` persists between Kaggle sessions.
+A dedicated GitHub job polls W&B's API (not Kaggle logs) for a positive `documents/analyzed` count and prints the actual W&B run URL. **Submission and notebook status alone do not prove inference**: wait for this job to pass. A 300-minute session writes resumable per-GPU journals and a final or partial summary into Kaggle output. Later sessions may attach the prior checkpoint; full labeling is confirmed only when the merge produces exactly 237,538 unique scored families and valid SHA-256 digests.
 
-## Methodological release gates
-
-Private Hugging Face access and the mirror's upload/storage limits may block initial setup. A requested dual-T4 accelerator does not prove successful model execution; inspect live GPU metrics. Only a full merge with exactly 237,538 unique family probabilities establishes screening completion. The 0.5 model cutoff remains exploratory pending independently adjudicated calibration samples.
+Offline counter checks: `python -m unittest discover -s kaggle/tests -p test_wandb_live.py -v`.

@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: kaggle-full-patent-production
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   submit:
@@ -23,6 +23,7 @@ jobs:
     env:
       KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -111,6 +112,49 @@ jobs:
             kaggle datasets create -p model_mirror -r skip --keep-tabular
             echo "Private checkpoint dataset created; API may take time to index it."
           fi
+      - name: Create single-run PRIVATE Kaggle credential mount for direct W&B logging
+        run: |
+          set -euo pipefail
+          if [ -z "$WANDB_API_KEY" ]; then
+            echo "::error::GitHub WANDB_API_KEY secret is missing"
+            exit 1
+          fi
+          umask 077
+          mkdir -p wandb_private
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path("wandb_private")
+          secret = os.environ["WANDB_API_KEY"]
+          if len(secret.strip()) < 20:
+              raise ValueError("W&B key format is unexpectedly short")
+          token_file = root / "wandb_auth_token.txt"
+          token_file.write_text(secret.strip(), encoding="utf-8")
+          token_file.chmod(0o600)
+          (root / "dataset-metadata.json").write_text(json.dumps({
+              "id": os.environ["KAGGLE_OWNER"] + "/humanoid-wandb-auth-" + os.environ["GITHUB_RUN_ID"],
+              "title": "Humanoid W&B Auth " + os.environ["GITHUB_RUN_ID"],
+              "licenses": [{"name": "other"}],
+              "description": "Temporary PRIVATE credential for a single direct W&B Kaggle run. Must never be made public.",
+          }))
+          print("Prepared temporary account-private W&B credential (value not logged)")
+          PY
+          # Kaggle datasets are private unless --public is explicitly passed.
+          kaggle datasets create -p wandb_private --keep-tabular -q
+          rm -f wandb_private/wandb_auth_token.txt
+          dataset="$KAGGLE_OWNER/humanoid-wandb-auth-$GITHUB_RUN_ID"
+          for attempt in $(seq 1 12); do
+            if kaggle datasets files "$dataset" > /tmp/wandb_files.txt 2>&1; then
+              echo "Temporary private W&B credential dataset is accessible"
+              break
+            fi
+            if [ "$attempt" -eq 12 ]; then
+              echo "::error::W&B credential dataset was uploaded but is not accessible"
+              exit 1
+            fi
+            sleep 10
+          done
+          sleep 10
       - name: Prepare private dual-T4 production kernel
         id: push
         run: |
@@ -130,7 +174,10 @@ jobs:
             "enable_gpu":"true",
             "enable_internet":"true",
             "machine_shape":"NvidiaTeslaT4",
-            "dataset_sources":[os.environ["KAGGLE_OWNER"]+"/pplx-decider-flash-private-v12"],
+            "dataset_sources":[
+              os.environ["KAGGLE_OWNER"]+"/pplx-decider-flash-private-v12",
+              os.environ["KAGGLE_OWNER"]+"/humanoid-wandb-auth-"+os.environ["GITHUB_RUN_ID"],
+            ],
             "competition_sources":[],
             "kernel_sources":[],
             "model_sources":[],
@@ -139,9 +186,11 @@ jobs:
           (p/"kernel-metadata.json").write_text(json.dumps(metadata,indent=2)+"\n")
           notebook = p/"production.ipynb"
           source = notebook.read_text()
-          if source.count("REPLACE_GIT_SHA") != 1:
-              raise RuntimeError("Expected exactly one source commit placeholder")
-          notebook.write_text(source.replace("REPLACE_GIT_SHA",os.environ["GITHUB_SHA"]))
+          if source.count("REPLACE_GIT_SHA") != 1 or source.count("REPLACE_RUN_ID") != 1:
+              raise RuntimeError("Expected exactly one source commit and direct-W&B-run placeholder")
+          source = source.replace("REPLACE_GIT_SHA", os.environ["GITHUB_SHA"])
+          source = source.replace("REPLACE_RUN_ID", os.environ["GITHUB_RUN_ID"])
+          notebook.write_text(source)
           with open(os.environ["GITHUB_OUTPUT"],"a") as output:
               output.write("kernel_id="+kernel+"\n")
           print("Prepared production notebook:",kernel,os.environ["GITHUB_SHA"])
@@ -163,24 +212,57 @@ jobs:
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as file:
               file.write("kernel_id=" + "/".join(match.groups()) + chr(10))
           PY
+      - name: Remove temporary W&B credential if submission failed
+        if: failure()
+        run: |
+          if [ -n "$KAGGLE_OWNER" ]; then
+            kaggle datasets delete "$KAGGLE_OWNER/humanoid-wandb-auth-$GITHUB_RUN_ID" -y || true
+          fi
+
   monitor:
     needs: submit
     runs-on: ubuntu-latest
     timeout-minutes: 355
     env:
       KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
-      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
       KAGGLE_KERNEL_ID: ${{ needs.submit.outputs.kernel_id }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install Kaggle and W&B
-        run: python -m pip install --disable-pip-version-check kaggle six wandb
-      - name: Mirror Kaggle progress to a private Weights and Biases dashboard
-        run: python -u kaggle/monitor_kaggle.py
-      - name: Preserve scores and checkpoint
+      - name: Install Kaggle CLI for completion and artifact retrieval
+        run: python -m pip install --disable-pip-version-check kaggle six
+      - name: Track Kaggle session without relying on delayed Kaggle stdout
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 710); do
+            status="$(kaggle kernels status "$KAGGLE_KERNEL_ID" 2>&1)" || {
+              echo "Transient Kaggle status request failure"
+              sleep 30
+              continue
+            }
+            if (( attempt % 10 == 1 )); then echo "KAGGLE_STATUS=$status"; fi
+            if [[ "$status" == *"KernelWorkerStatus.COMPLETE"* ]]; then
+              echo "KAGGLE_NOTEBOOK_FINISHED"
+              exit 0
+            fi
+            if [[ "$status" == *"KernelWorkerStatus.ERROR"* || "$status" == *"KernelWorkerStatus.CANCELLED"* ]]; then
+              echo "::error::Kaggle execution failed; check the notebook and diagnostics"
+              kaggle kernels logs "$KAGGLE_KERNEL_ID" | tail -60 || true
+              exit 1
+            fi
+            sleep 30
+          done
+          echo "::error::Kaggle did not finish during monitoring window"
+          exit 1
+      - name: Retrieve source-verified predictions or resumable journals
+        if: always()
+        run: |
+          mkdir -p kaggle_results
+          kaggle kernels output "$KAGGLE_KERNEL_ID" -p kaggle_results || true
+          find kaggle_results -maxdepth 2 -type f -printf '%P: %s bytes\n'
+      - name: Retain prediction results and checkpoint
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -188,3 +270,28 @@ jobs:
           path: kaggle_results/
           retention-days: 30
           if-no-files-found: warn
+      - name: Delete temporary Kaggle W&B credential dataset
+        if: always()
+        run: |
+          owner="$(printf '%s' "$KAGGLE_KERNEL_ID" | cut -d/ -f1)"
+          if [ -n "$owner" ]; then
+            kaggle datasets delete "$owner/humanoid-wandb-auth-$GITHUB_RUN_ID" -y || true
+          fi
+
+  verify_wandb:
+    needs: submit
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+      WANDB_BASE_URL: https://api.forge.coreweave.com
+      WANDB_RUN_NAME: production-dual-t4-direct-${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install W&B client
+        run: python -m pip install --disable-pip-version-check wandb==0.31.0
+      - name: Verify W&B receives real nonzero analyzed-document counts
+        run: python -u kaggle/verify_wandb_live.py

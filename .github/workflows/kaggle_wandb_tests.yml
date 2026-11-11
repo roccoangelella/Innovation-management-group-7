@@ -1,0 +1,41 @@
+name: Kaggle direct-W&B counter offline tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "kaggle/wandb_live.py"
+      - "kaggle/verify_wandb_live.py"
+      - "kaggle/tests/test_wandb_live.py"
+      - "kaggle/production_kernel/production.ipynb"
+      - ".github/workflows/kaggle_wandb_tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check monitor scripts and Kaggle notebook compile
+        run: |
+          python - <<'PY'
+          import ast
+          import json
+          from pathlib import Path
+          for path in ("kaggle/wandb_live.py", "kaggle/verify_wandb_live.py"):
+              ast.parse(Path(path).read_text(encoding="utf-8"), filename=path)
+          notebook = json.loads(Path("kaggle/production_kernel/production.ipynb").read_text(encoding="utf-8"))
+          for i, cell in enumerate(notebook["cells"]):
+              if cell["cell_type"] == "code":
+                  ast.parse("".join(cell["source"]), filename=f"notebook_cell_{i}")
+          print("Direct monitoring Python and notebook cell syntax valid")
+          PY
+      - name: Verify journal metric semantics with synthetic data
+        run: python -m unittest discover -s kaggle/tests -p test_wandb_live.py -v

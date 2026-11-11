@@ -1,3 +1,5 @@
+**2026-11-11 direct telemetry update:** 2026-11-11 — Direct W&B telemetry offline tests: `kaggle/tests/test_wandb_live.py` tests incremental unique-per-journal line counting, ignoring torn final appends, and detection of truncated journals. `.github/workflows/kaggle_wandb_tests.yml` parses Python monitor scripts and the Kaggle notebook cell and runs the synthetic counter regression. This proves only counter mechanics, not live W&B connectivity. The `verify_wandb` Actions job requires an actual nonzero W&B `documents/analyzed` value before claiming live document processing.
+
 ---
 id: TECH-TESTING
 type: technical

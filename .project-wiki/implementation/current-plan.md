@@ -1,3 +1,5 @@
+**2026-11-11 direct telemetry update:** 2026-11-11 — User requested direct real-time analyzed-document count in W&B. Prepared a Kaggle-private W&B credential path, 30-second journal-driven W&B client, synthetic tests, and a separate W&B API verification job that requires actual nonzero counts. Restart the current Kaggle kernel via the updated production GitHub workflow, then verify W&B chart updates at the forge.coreweave.com project, and retain each session's checkpoint. Do not infer success merely from kernel RUNNING status. Threshold calibration still pending.
+
 ---
 id: CURRENT-PLAN
 type: note

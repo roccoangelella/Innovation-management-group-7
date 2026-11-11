@@ -1,3 +1,5 @@
+**2026-11-11 direct telemetry update:** 2026-11-11 — Operational telemetry: Kaggle runs `kaggle/wandb_live.py` as an independent W&B uploader and reads flushed `worker_0/predictions.jsonl` / `worker_1/predictions.jsonl` directly, avoiding delayed Kaggle log APIs. Private per-run Kaggle authentication is provisioned by GitHub secret and promptly deleted; Kaggle native Secrets is supported as preferred alternative. Two FP16 Decider GPU workers continue to own predictions and end-of-session checkpoints. Count metrics are not human adjudicated model performance.
+
 ---
 id: TECH-ARCHITECTURE
 type: technical
