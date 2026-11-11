@@ -29,3 +29,11 @@ Changed: [status](../STATUS.md), [deployment](../technical/deployment.md), [test
 Summary: Inspected GitHub Actions run [42849164410](https://github.com/roccoangelella/Innovation-management-group-7/actions/runs/42849164410): `HTTP 429: rate or quota exhausted` interrupted Gemrouter after 256 newly translated abstracts, reaching 236,769 of 237,538 eligible, with 769 pending. The workflow failed before publication, preserved the original ZIP, and uploaded restart journal artifact 13781484888. Implemented fail-closed restoration of a journal-only artifact with source validation, reconstitution of the private manifest, dedicated offline tests, and a workflow separation between push-triggered restoration verification and user-dispatched API calls. The endpoint's quota reset is unknown; no claim of completed English corpus.
 
 Questions: OQ-003 remains open for endpoint quota and translation fidelity. Publication remains contingent on successful completion and final data conservation checks.
+
+## [2026-11-11] update | WLOG-20261111-001 | Start source-verified translation continuation
+
+Changed: [status](../STATUS.md), [deployment](../technical/deployment.md), [changelog](../changes/CHANGELOG.md), `.github/workflows/complete_translation.yml`.
+
+Summary: The user explicitly requested an API continuation after the prior HTTP 429. The already-validated GitHub Actions run 42857129812 supplies the source-verified recovery journal with 236,769 of 237,538 eligible DOCDB families completed. Implemented an exact commit-message-gated one-time push launch in the workflow and updated the default checkpoint ID. All ordinary push events retain no-API preflight semantics. Publication remains conditional on completed English coverage, provenance and source-hash checks. Quota availability and actual run outcome are to be verified through the resulting Actions log.
+
+Questions: OQ-003 remains open for endpoint budget, translation completeness and independent domain fidelity.

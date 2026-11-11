@@ -11,7 +11,7 @@ on:
         description: "Previous GitHub Actions run ID holding the saved translation journal"
         required: false
         type: string
-        default: "42849164410"
+        default: "42857129812"
 
 permissions:
   contents: write
@@ -55,11 +55,11 @@ jobs:
           echo "Gemrouter credentials and endpoint have been supplied through secrets."
 
       - name: Recover validated translation journal from previous Actions run
-        if: ${{ (github.event.inputs.resume_run_id || '42849164410') != '' }}
+        if: ${{ (github.event.inputs.resume_run_id || '42857129812') != '' }}
         uses: actions/download-artifact@v4
         with:
           name: humanoid-translation-restart-journal
-          run-id: ${{ github.event.inputs.resume_run_id || '42849164410' }}
+          run-id: ${{ github.event.inputs.resume_run_id || '42857129812' }}
           github-token: ${{ github.token }}
           path: outputs/translation
 
@@ -76,12 +76,12 @@ jobs:
           python src/complete_translation.py --check
 
       - name: Resume only the missing abstract translations
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.head_commit.message == 'Resume Gemrouter translation from verified checkpoint 42857129812')
         run: |
           python src/complete_translation.py --max-requests 600 --rpm 20 --passes 3
 
       - name: Publish only after completeness and production input validation
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.head_commit.message == 'Resume Gemrouter translation from verified checkpoint 42857129812')
         shell: bash
         run: |
           set -euo pipefail
