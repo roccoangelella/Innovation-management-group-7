@@ -1,4 +1,5 @@
 name: Verify live Kaggle and W&B patent screening progress
+# Read-only fresh status snapshot; trigger by push or manual dispatch.
 
 on:
   push:
