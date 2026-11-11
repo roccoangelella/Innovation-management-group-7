@@ -1,3 +1,9 @@
+## [2026-11-11] update | WLOG-20261111-006 | Fail-closed private checkpoint access retry
+
+2026-11-11 23:40 CET — Resume retry diagnosis: original Actions run 43012383316 completed with durable checkpoint artifact 13872887675. Resume run 43071759641 recovered and strictly validated 128,533/237,538 unique predictions (worker counts 61,695 and 66,838; 109,005 remaining), including source/model/shard identity. Kaggle acknowledged PRIVATE dataset creation at roccoangelella/humanoid-production-resume-43012383316, then immediately returned HTTP 403 on dataset file listing; therefore no resumed Kaggle notebook was submitted. Replaced unsafe duplicate-create behavior with bounded read-only verification of the existing private dataset and fail-closed handling of persistent access errors. Original artifact remains retained; no rescore/retranslation authorized. Evidence: https://github.com/roccoangelella/Innovation-management-group-7/actions/runs/43071759641.
+
+Changed: production workflow and project status/changelog/wiki audit. No source corpus, prediction journals, model revision or secret values changed.
+
 
 ## [2026-11-11] update | WLOG-20261111-005 | Queue-aware Kaggle dual-T4 restart
 

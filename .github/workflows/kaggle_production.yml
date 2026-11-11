@@ -149,12 +149,32 @@ jobs:
         run: |
           set -euo pipefail
           dataset="$KAGGLE_OWNER/humanoid-production-resume-43012383316"
-          if kaggle datasets files "$dataset" >/dev/null 2>&1; then
-            echo "::error::Resume dataset already exists; refusing to overwrite any prior checkpoint"
+          # Run 43071759641 already submitted this PRIVATE dataset, but
+          # Kaggle returned HTTP 403 while immediately listing its files.
+          # Never upload again or overwrite an unverified checkpoint.
+          # Poll for visibility, then verify the expected checkpoint filename.
+          # A persistent 403 is a hard stop requiring owner intervention.
+          verified=0
+          for attempt in $(seq 1 30); do
+            if kaggle datasets files "$dataset" > /tmp/resume_dataset_files.txt 2>&1; then
+              if grep -Fq 'humanoid-checkpoint.zip' /tmp/resume_dataset_files.txt; then
+                verified=1
+                break
+              fi
+              echo "::error::Private resume dataset is readable but missing humanoid-checkpoint.zip"
+              cat /tmp/resume_dataset_files.txt
+              exit 1
+            fi
+            echo "Private resume dataset not readable (attempt $attempt/30); waiting for Kaggle indexing"
+            sleep 20
+          done
+          if [ "$verified" -ne 1 ]; then
+            echo "::error::Kaggle cannot read the previously submitted PRIVATE checkpoint dataset. Do not overwrite it; check account/API dataset permissions and owner-side visibility."
+            tail -12 /tmp/resume_dataset_files.txt
             exit 1
           fi
-          kaggle datasets create -p /tmp/validated-resume-dataset --keep-tabular -q
-          kaggle datasets files "$dataset" | head -10
+          echo "Previously submitted private checkpoint dataset is readable:"
+          head -10 /tmp/resume_dataset_files.txt
       - name: Create single-run PRIVATE Kaggle credential mount for direct W&B logging
         run: |
           set -euo pipefail
