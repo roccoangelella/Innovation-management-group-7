@@ -196,7 +196,7 @@ def progress_snapshot(plan, started, previous_count=0):
             for i, values in enumerate(gpus):
                 result[f"gpu_{i}_utilization_percent"] = float(values[0].strip())
                 result[f"gpu_{i}_memory_mb"] = float(values[1].strip())
-    except (OSError, ValueError, subprocess.SubprocessError):
+    except (OSError, ValueError, TypeError, subprocess.SubprocessError):
         pass
     return result
 
