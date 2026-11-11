@@ -41,3 +41,5 @@
 2026-11-11 — Enabled an explicitly authorized one-shot GitHub push-triggered Gemrouter translation resumption from validated journal in run 42857129812 (769 families outstanding), using an exact commit-message gate so unrelated pushes remain validation-only. Publication remains conditioned on all source-eligible abstracts being translated and validated, and journaling remains resumable on quota errors.
 
 2026-11-11 — Prepared full production Kaggle submission using both T4 GPUs on the completed 237,538-family corpus. Added a private Hugging Face checkpoint mirror under GitHub/Kaggle credentials, source-pinned notebook, W&B GitHub-secret-only log relay, 30-second aggregate progress and actual GPU telemetry, 300-minute session checkpointing, and workflow artifact retention. No independent positive-label calibration is claimed; live GPU execution and full output completeness are external acceptance gates.
+
+2026-11-11 — Add source-verified dual-T4 continuation from original 128,533-family checkpoint, retaining the original artifact and private credentials; see project status and deployment.

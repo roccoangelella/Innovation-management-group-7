@@ -11,10 +11,11 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: kaggle-full-patent-production
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   submit:
@@ -114,6 +115,46 @@ jobs:
             kaggle datasets create -p model_mirror -r skip --keep-tabular
             echo "Private checkpoint dataset created; API may take time to index it."
           fi
+      - name: Ensure previous Kaggle screening session has stopped
+        run: |
+          set -euo pipefail
+          status="$(kaggle kernels status "$KAGGLE_OWNER/humanoid-patent-production-dual-t4")"
+          echo "$status"
+          [[ "$status" == *"KernelWorkerStatus.COMPLETE"* ]] || {
+            echo "::error::Previous screening session is still active or failed; refusing a concurrent launch"
+            exit 1
+          }
+      - name: Recover original durable GitHub Actions checkpoint
+        uses: actions/download-artifact@v4
+        with:
+          name: humanoid-dual-t4-production-output
+          run-id: 43012383316
+          github-token: ${{ github.token }}
+          path: recovered_checkpoint
+      - name: Validate original source and both resumable worker journals
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile
+          paths = [Path("recovered_checkpoint")/x for x in ("humanoid-checkpoint.zip","session_summary.json")]
+          if not all(p.is_file() for p in paths):
+              raise RuntimeError("Checkpoint or session summary missing from original Actions artifact")
+          with zipfile.ZipFile("/tmp/complete-original-checkpoint.zip","w",zipfile.ZIP_STORED) as z:
+              for p in paths:
+                  z.write(p,arcname=p.name)
+          PY
+          python kaggle/validate_resume.py /tmp/complete-original-checkpoint.zip humanoid_patents_en.zip /tmp/validated-resume-dataset
+      - name: Publish validated checkpoint to private Kaggle dataset
+        run: |
+          set -euo pipefail
+          dataset="$KAGGLE_OWNER/humanoid-production-resume-43012383316"
+          if kaggle datasets files "$dataset" >/dev/null 2>&1; then
+            echo "::error::Resume dataset already exists; refusing to overwrite any prior checkpoint"
+            exit 1
+          fi
+          kaggle datasets create -p /tmp/validated-resume-dataset --keep-tabular -q
+          kaggle datasets files "$dataset" | head -10
       - name: Create single-run PRIVATE Kaggle credential mount for direct W&B logging
         run: |
           set -euo pipefail
@@ -181,6 +222,7 @@ jobs:
             "machine_shape":"NvidiaTeslaT4",
             "dataset_sources":[
               os.environ["KAGGLE_OWNER"]+"/pplx-decider-flash-private-v12",
+              os.environ["KAGGLE_OWNER"]+"/humanoid-production-resume-43012383316",
               os.environ["KAGGLE_OWNER"]+"/humanoid-wandb-auth-"+os.environ["GITHUB_RUN_ID"],
             ],
             "competition_sources":[],
