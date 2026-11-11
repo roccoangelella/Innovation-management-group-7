@@ -1,0 +1,18 @@
+{
+  "total": 238824,
+  "missing": 1286,
+  "completed": 237538,
+  "original_en": 232636,
+  "translated": 4902,
+  "incomplete": 0,
+  "stop_reason": null,
+  "seed_completed": 236513,
+  "translated_new": 1025,
+  "eligible": 237538,
+  "source_sha256": "fbdc57c362f076cee1a7da5c98d7309e398425c48015064bcbf78eba4c329e72",
+  "seed_archive_sha256": "9fd66c686e5e4019165029e0aaa00b7b26a47df54d30faac0148475c5f5ae06b",
+  "final_archive_sha256": "b7ce0a36f0b3e2778292bdfe10058eb81749b304b62ed6d965dfcc837103276c",
+  "model": "gemini-cascade",
+  "prompt_version": "batch-v1",
+  "note": "All nonempty abstracts normalized to English in abstract and abstract_en; abstract_language retains original PATSTAT source language. Source families without abstracts excluded."
+}
