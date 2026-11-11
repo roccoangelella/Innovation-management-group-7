@@ -84,3 +84,8 @@ Built by `src/mine_implicit_humanoid_candidates.py` (780 source-derived English 
 ## Rate/quota interruption and journal artifact recovery (2026-11-10)
 
 Observed real Gemrouter HTTP 429 after 60 API attempts / 34 successful batches; 256 new English abstracts were journaled before workflow failure. No incomplete output was published, and the journal artifact was uploaded. Two new synthetic tests in `tests/test_complete_translation.py` cover a recovered journal without its secret-bearing manifest (including no repeated API calls for already translated families) and rejection of unknown DOCDB IDs. The workflow's push-triggered validation path restores the original journal artifact, validates against the source and seeded translations, and skips API/publish steps. This is a recovery-mechanism test, not evidence of quota replenishment.
+
+
+## 2026-11-11 production Kaggle/W&B operational validation
+
+Dual-T4 worker supervisor now emits parseable `PROGRESS_JSON` lines containing only aggregate operational metrics and optional two-GPU `nvidia-smi` utilization; runtime budget terminates workers and leaves journals for resumption without premature full merge. The Kaggle notebook restores a verified checkpoint from an optional previous Kaggle input, pins the GitHub source commit and archives journals on completion or error. GitHub-only W&B monitor converts Kaggle logs to line charts for processed patents, per-worker throughput, GPU memory/utilization and provisional positive rate, but cannot estimate human-label accuracy. Source-code changes require offline tests and live two-T4 inference checking; W&B metrics are runtime observability, not model validation evidence.

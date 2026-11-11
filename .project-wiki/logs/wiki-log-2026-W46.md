@@ -37,3 +37,11 @@ Changed: [status](../STATUS.md), [deployment](../technical/deployment.md), [chan
 Summary: The user explicitly requested an API continuation after the prior HTTP 429. The already-validated GitHub Actions run 42857129812 supplies the source-verified recovery journal with 236,769 of 237,538 eligible DOCDB families completed. Implemented an exact commit-message-gated one-time push launch in the workflow and updated the default checkpoint ID. All ordinary push events retain no-API preflight semantics. Publication remains conditional on completed English coverage, provenance and source-hash checks. Quota availability and actual run outcome are to be verified through the resulting Actions log.
 
 Questions: OQ-003 remains open for endpoint budget, translation completeness and independent domain fidelity.
+
+## [2026-11-11] update | WLOG-20261111-002 | Production dual-T4 Kaggle + minimal W&B monitoring
+
+Changed: [status](../STATUS.md), [deployment](../technical/deployment.md), [testing](../technical/testing.md), [traceability](../traceability/code-map.md), [changelog](../changes/CHANGELOG.md), new `kaggle/PRODUCTION_WANDB.md`, `kaggle/monitor_kaggle.py`, `kaggle/production_kernel/production.ipynb`, `.github/workflows/kaggle_production.yml`, and updated `kaggle/production.py` / `kaggle/production_run.py`.
+
+Summary: After final translation completion, user authorized model predictions on all 237,538 eligible DOCDB family abstracts using Kaggle T4 ×2 with simple real-time W&B operational graphs. Implementation pins source and model versions, separates physical CUDA worker processes, records progress/throughput/GPU utilization and memory without patent text, and saves a restartable checkpoint at session expiry. Secure provisioning uses GitHub's private HF secret to mirror the restricted model to a private Kaggle dataset; W&B key remains only in GitHub Actions. Validation of live Kaggle model load and final merge is pending, and provisional 0.5 predictions are not externally adjudicated classification accuracy.
+
+Questions: OQ-001 remains open on relevance boundary and human-reviewed calibration; OQ-003 remains open on independent translation fidelity. GPU quota, model access and throughput can only be verified from live run evidence.

@@ -157,13 +157,68 @@ def prepare(path, output_dir, revision, expected_rows=None):
     return {"count": total, "shard_counts": counts, "shard_paths": paths, "dir": output_dir, "input": path}
 
 
-def run_workers(plan, checkpoint, revision, device_ids=("0", "1")):
-    """Run two *distinct* GPU processes. CUDA device 0 in each child is a different T4."""
+def progress_snapshot(plan, started, previous_count=0):
+    """Only operational metrics; no labels, abstracts or IDs in logs."""
+    import math
+    done, kept = [], []
+    for worker in range(N_WORKERS):
+        path = plan["dir"] / f"worker_{worker}" / "predictions.jsonl"
+        n = k = 0
+        if path.is_file():
+            with path.open("r", encoding="utf-8") as stream:
+                for line in stream:
+                    try:
+                        row = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue  # A partially written final record is retried on resume.
+                    n += 1
+                    k += int(row.get("model_decision", 0) == 1)
+        done.append(n)
+        kept.append(k)
+    total = sum(done)
+    elapsed = max(time.monotonic() - started, 0.001)
+    rate = max(total - previous_count, 0) / elapsed
+    result = {
+        "processed": total, "total": plan["count"], "percent": round(total * 100 / plan["count"], 3),
+        "worker_0": done[0], "worker_1": done[1],
+        "rate_per_hour": round(rate * 3600, 2),
+        "eta_hours": round((plan["count"] - total) / rate / 3600, 2) if rate > 0 else None,
+        "provisional_positive": sum(kept),
+        "provisional_positive_fraction": round(sum(kept) / total, 5) if total else 0,
+    }
+    try:
+        query = subprocess.run([
+            "nvidia-smi", "--query-gpu=utilization.gpu,memory.used",
+            "--format=csv,noheader,nounits",
+        ], capture_output=True, text=True, timeout=5, check=True)
+        gpus = [line.split(",") for line in query.stdout.strip().splitlines()]
+        if len(gpus) == 2:
+            for i, values in enumerate(gpus):
+                result[f"gpu_{i}_utilization_percent"] = float(values[0].strip())
+                result[f"gpu_{i}_memory_mb"] = float(values[1].strip())
+    except (OSError, ValueError, subprocess.SubprocessError):
+        pass
+    return result
+
+
+def run_workers(plan, checkpoint, revision, device_ids=("0", "1"), max_runtime_seconds=None,
+                progress_interval_seconds=30):
+    """Independent physical T4 workers with periodic source-free progress reports.
+
+    A time-limited session stops gracefully and leaves journals for the next run.
+    Returns True only on complete inference from both workers.
+    """
     checkpoint = Path(checkpoint).resolve()
     screen_py = Path(__file__).with_name("screen.py")
     if len(device_ids) != N_WORKERS or len(set(device_ids)) != N_WORKERS:
         raise ValueError("Exactly two distinct CUDA devices are required")
+    if max_runtime_seconds is not None and max_runtime_seconds <= 0:
+        raise ValueError("Runtime limit must be positive")
     workers = []
+    started = time.monotonic()
+    baseline = sum(progress_snapshot(plan, started)["worker_" + str(i)] for i in range(N_WORKERS))
+    last_progress = started - progress_interval_seconds
+    completed = False
     try:
         for i, device in enumerate(device_ids):
             output = plan["dir"] / f"worker_{i}" / "predictions.csv"
@@ -181,8 +236,16 @@ def run_workers(plan, checkpoint, revision, device_ids=("0", "1")):
             states = [proc.poll() for proc in workers]
             failures = [(i, code) for i, code in enumerate(states) if code not in (None, 0)]
             if failures:
-                raise RuntimeError(f"GPU worker failure(s): {failures}. Resume using the same command and directory")
+                raise RuntimeError(f"GPU worker failure(s): {failures}. Resume using same dataset and output directory")
             if all(code == 0 for code in states):
+                completed = True
+                break
+            now = time.monotonic()
+            if now - last_progress >= progress_interval_seconds:
+                print("PROGRESS_JSON=" + json.dumps(progress_snapshot(plan, started, baseline)), flush=True)
+                last_progress = now
+            if max_runtime_seconds is not None and now - started >= max_runtime_seconds:
+                print("Session time budget reached. Saving worker journals; final merge deferred.", flush=True)
                 break
             time.sleep(0.5)
     finally:
@@ -191,10 +254,12 @@ def run_workers(plan, checkpoint, revision, device_ids=("0", "1")):
                 proc.terminate()
         for proc in workers:
             try:
-                proc.wait(timeout=10)
+                proc.wait(timeout=20)
             except subprocess.TimeoutExpired:
                 proc.kill()
                 proc.wait()
+    print("PROGRESS_JSON=" + json.dumps(progress_snapshot(plan, started, baseline)), flush=True)
+    return completed
 
 
 def read_worker_results(plan):

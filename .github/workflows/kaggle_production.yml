@@ -1,0 +1,163 @@
+name: Production patent labeling - Kaggle dual T4
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/kaggle_production.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kaggle-full-patent-production
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    outputs:
+      kernel_id: ${{ steps.push.outputs.kernel_id }}
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Kaggle and Hugging Face clients
+        run: python -m pip install --disable-pip-version-check --upgrade kaggle six huggingface-hub==1.31.0
+      - name: Check secure credentials
+        run: |
+          test -n "$KAGGLE_API_TOKEN" || { echo "::error::Missing KAGGLE_API_TOKEN"; exit 1; }
+          test -n "$HF_TOKEN" || { echo "::error::Missing HF_TOKEN (private model required)"; exit 1; }
+      - name: Resolve authenticated Kaggle account
+        run: |
+          kaggle kernels init -p kaggle/production_kernel
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          meta = json.loads(Path("kaggle/production_kernel/kernel-metadata.json").read_text())
+          owner = meta["id"].split("/", 1)[0]
+          if not owner or owner.lower() in ("username", "user"):
+              raise RuntimeError("Could not resolve Kaggle owner from API credentials")
+          with open(os.environ["GITHUB_ENV"], "a") as stream:
+              stream.write("KAGGLE_OWNER=" + owner + "\n")
+          print("Authenticated Kaggle owner:", owner)
+          PY
+      - name: Provision private pinned Decider checkpoint on Kaggle
+        env:
+          MODEL_ID: perplexity-ai/pplx-decider-flash-v1.2
+          MODEL_REV: 6d771ad7b5ecff5e93b8fc7b90d4c5ccc341954d
+        run: |
+          set -euo pipefail
+          data_ref="$KAGGLE_OWNER/pplx-decider-flash-private-v12"
+          if kaggle datasets status "$data_ref" >/dev/null 2>&1; then
+            echo "Existing private Kaggle checkpoint dataset found: $data_ref"
+          else
+            echo "Mirroring pinned private Hugging Face checkpoint into owner-only Kaggle dataset"
+            python - <<'PY'
+          import json, os, hashlib
+          from pathlib import Path
+          from huggingface_hub import snapshot_download
+
+          src = Path("hf_snapshot").resolve()
+          snapshot_download(
+              repo_id=os.environ["MODEL_ID"],
+              revision=os.environ["MODEL_REV"],
+              local_dir=str(src),
+              token=os.environ["HF_TOKEN"],
+          )
+          dest = Path("model_mirror").resolve()
+          dest.mkdir(exist_ok=True)
+          mapping = []
+          for path in sorted(src.rglob("*")):
+              if not path.is_file() or ".cache" in path.parts:
+                  continue
+              relative = path.relative_to(src).as_posix()
+              flat = hashlib.sha256(relative.encode()).hexdigest()[:20] + path.suffix
+              os.link(path, dest / flat)
+              mapping.append({"path":relative, "flat_name":flat})
+          if not any(x["path"] == "requirements.txt" for x in mapping):
+              raise RuntimeError("Checkpoint is missing requirements.txt")
+          if not any(x["path"].startswith("source/src/") for x in mapping):
+              raise RuntimeError("Checkpoint is missing model source")
+          (dest / "snapshot_manifest.json").write_text(json.dumps(mapping,indent=2)+"\n")
+          (dest / "dataset-metadata.json").write_text(json.dumps({
+              "id":os.environ["KAGGLE_OWNER"]+"/pplx-decider-flash-private-v12",
+              "title":"Private pinned Decider Flash model",
+              "licenses":[{"name":"other"}],
+              "description":"Private restricted model copy for the authorized account holder; original upstream terms apply."
+          }))
+          print("Private checkpoint mirror contains",len(mapping),"files", flush=True)
+          PY
+            kaggle datasets create -p model_mirror -r skip --keep-tabular
+            kaggle datasets status "$data_ref"
+          fi
+      - name: Prepare private dual-T4 production kernel
+        id: push
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p = Path("kaggle/production_kernel")
+          metadata = json.loads((p/"kernel-metadata.json").read_text())
+          kernel = os.environ["KAGGLE_OWNER"] + "/humanoid-production-dual-t4"
+          metadata.update({
+            "id":kernel,
+            "title":"Humanoid patent production dual T4",
+            "code_file":"production.ipynb",
+            "language":"python",
+            "kernel_type":"notebook",
+            "is_private":"true",
+            "enable_gpu":"true",
+            "enable_internet":"true",
+            "machine_shape":"NvidiaTeslaT4",
+            "dataset_sources":[os.environ["KAGGLE_OWNER"]+"/pplx-decider-flash-private-v12"],
+            "competition_sources":[],
+            "kernel_sources":[],
+            "model_sources":[],
+          })
+          metadata.pop("id_no",None)
+          (p/"kernel-metadata.json").write_text(json.dumps(metadata,indent=2)+"\n")
+          notebook = p/"production.ipynb"
+          source = notebook.read_text()
+          if source.count("REPLACE_GIT_SHA") != 1:
+              raise RuntimeError("Expected exactly one source commit placeholder")
+          notebook.write_text(source.replace("REPLACE_GIT_SHA",os.environ["GITHUB_SHA"]))
+          with open(os.environ["GITHUB_OUTPUT"],"a") as output:
+              output.write("kernel_id="+kernel+"\n")
+          print("Prepared production notebook:",kernel,os.environ["GITHUB_SHA"])
+          PY
+      - name: Submit five-hour production labeling session
+        run: |
+          kaggle kernels push -p kaggle/production_kernel --accelerator NvidiaTeslaT4 --timeout 21600
+          echo "PRODUCTION_KERNEL=https://www.kaggle.com/code/$KAGGLE_OWNER/humanoid-production-dual-t4"
+  monitor:
+    needs: submit
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+      KAGGLE_KERNEL_ID: ${{ needs.submit.outputs.kernel_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Kaggle and W&B
+        run: python -m pip install --disable-pip-version-check kaggle six wandb
+      - name: Mirror Kaggle progress to a private Weights and Biases dashboard
+        run: python -u kaggle/monitor_kaggle.py
+      - name: Preserve scores and checkpoint
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: humanoid-dual-t4-production-output
+          path: kaggle_results/
+          retention-days: 30
+          if-no-files-found: warn

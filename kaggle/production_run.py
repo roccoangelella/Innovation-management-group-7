@@ -74,8 +74,12 @@ def main():
     parser.add_argument("--expected-rows", type=int, help="Optional independently verified number of eligible families")
     parser.add_argument("--check", action="store_true", help="Validate and shard input without model/network/GPU")
     parser.add_argument("--skip-install", action="store_true", help="Reuse already installed checkpoint dependencies")
-    parser.add_argument("--checkpoint", default="/kaggle/working/pplx-decider-flash-v1.2-fp16")
+    parser.add_argument("--checkpoint", default="/tmp/pplx-decider-flash-v1.2-fp16")
+    parser.add_argument("--skip-download", action="store_true", help="Use a supplied local checkpoint; never call Hugging Face")
+    parser.add_argument("--session-minutes", type=float, default=420, help="Stop cleanly and retain journals before Kaggle runtime expiry")
     args = parser.parse_args()
+    if args.session_minutes <= 0:
+        parser.error("--session-minutes must be positive")
     if args.expected_rows is not None and args.expected_rows <= 0:
         parser.error("--expected-rows must be positive")
     if os.sys.version_info < (3, 12):
@@ -92,14 +96,29 @@ def main():
             pilot.install("huggingface-hub==1.31.0")
         from huggingface_hub import snapshot_download
         checkpoint = Path(args.checkpoint).expanduser().resolve()
-        snapshot_download(repo_id=pilot.MODEL_ID, revision=pilot.REVISION,
-                          local_dir=checkpoint, token=pilot.get_token())
+        if args.skip_download:
+            if not (checkpoint / "requirements.txt").is_file():
+                raise FileNotFoundError(f"Private model snapshot not staged at {checkpoint}")
+        else:
+            snapshot_download(repo_id=pilot.MODEL_ID, revision=pilot.REVISION,
+                              local_dir=checkpoint, token=pilot.get_token())
         pilot.patch_native_fp16(checkpoint)
         pilot.prepare_model_dependencies(checkpoint, skip_install=args.skip_install)
         if production.sha256(plan["input"]) != json.loads((plan["dir"] / "production_manifest.json").read_text())["input_sha256"]:
             raise ValueError("Source dataset changed during setup")
-        production.run_workers(plan, checkpoint, pilot.REVISION, devices)
-        production.merge(plan)
+        completed = production.run_workers(
+            plan, checkpoint, pilot.REVISION, devices,
+            max_runtime_seconds=args.session_minutes * 60,
+        )
+        if completed:
+            production.merge(plan)
+        else:
+            progress = production.progress_snapshot(plan, __import__("time").monotonic(), 0)
+            production.atomic_json(plan["dir"] / "session_summary.json", {
+                "complete": False, "processed": progress["processed"],
+                "total": plan["count"], "resume_required": True,
+            })
+            print("SESSION_PARTIAL=" + json.dumps(progress), flush=True)
 
 
 if __name__ == "__main__":
