@@ -152,18 +152,24 @@ jobs:
           # Run 43071759641 already submitted this PRIVATE dataset, but
           # Kaggle returned HTTP 403 while immediately listing its files.
           # Never upload again or overwrite an unverified checkpoint.
-          # Poll for visibility, then verify the expected checkpoint filename.
-          # A persistent 403 is a hard stop requiring owner intervention.
+          # Kaggle automatically EXPANDS uploaded ZIP datasets. The prior
+          # verified upload is therefore six journal/manifest files, not a
+          # literal humanoid-checkpoint.zip. Never recreate or overwrite it.
           verified=0
           for attempt in $(seq 1 30); do
             if kaggle datasets files "$dataset" > /tmp/resume_dataset_files.txt 2>&1; then
-              if grep -Fq 'humanoid-checkpoint.zip' /tmp/resume_dataset_files.txt; then
-                verified=1
-                break
-              fi
-              echo "::error::Private resume dataset is readable but missing humanoid-checkpoint.zip"
-              cat /tmp/resume_dataset_files.txt
-              exit 1
+              python - <<'PY'
+          from pathlib import Path
+          lines=Path("/tmp/resume_dataset_files.txt").read_text().splitlines()[2:]
+          observed={line.split()[0]:int(line.split()[1]) for line in lines if len(line.split())>=2 and line.split()[1].isdigit()}
+          expected={"production_manifest.json","session_summary.json"}
+          expected|={f"worker_{i}/{name}" for i in (0,1) for name in ("predictions.jsonl","run_metadata.json")}
+          if set(observed)!=expected or any(observed[p]<=0 for p in expected):
+              raise SystemExit(f"Private checkpoint layout or file sizes invalid: {observed}")
+          print("PRIVATE_EXPANDED_CHECKPOINT_VERIFIED",observed,flush=True)
+          PY
+              verified=1
+              break
             fi
             echo "Private resume dataset not readable (attempt $attempt/30); waiting for Kaggle indexing"
             sleep 20
