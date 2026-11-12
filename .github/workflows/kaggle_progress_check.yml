@@ -1,5 +1,6 @@
 name: Verify live Kaggle and W&B patent screening progress
 # Read-only fresh status snapshot; trigger by push or manual dispatch.
+# Refresh requested 2026-11-12: reconcile live Kaggle status with W&B before any cancellation or resume.
 
 on:
   push:
