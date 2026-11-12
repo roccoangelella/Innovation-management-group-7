@@ -24,5 +24,9 @@ jobs:
           git add -f samples/humanoid_challenge_100/candidate*
           if ! git diff --cached --quiet; then
             git commit -m "Generate humanoid challenge candidate pool [skip ci]"
+            # Other sample jobs may have published while this job was running.
+            # Integrate their nonoverlapping commits before the final push.
+            git fetch origin main
+            git rebase origin/main
             git push origin HEAD:main
           fi
