@@ -1,7 +1,7 @@
 {
   "seed": 20261030,
   "method": "fixed-seed hash-ranked candidate discovery; regex ONLY for recall/navigation, not labels",
-  "source": "humanoid_patents.zip",
+  "source": "data/raw/humanoid_patents.zip",
   "eligible_english_excluding_prior_100": 232536,
   "discovery_bucket_population": {
     "generic": 84061,
