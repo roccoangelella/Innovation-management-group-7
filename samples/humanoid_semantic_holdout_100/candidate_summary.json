@@ -1,6 +1,6 @@
 {
   "method": "Hash-ranked source-abstract discovery, class labels NOT derived from regex",
-  "source": "humanoid_patents.zip",
+  "source": "data/raw/humanoid_patents.zip",
   "seed": "semantic-holdout-review-20261030",
   "source_rows": 238824,
   "previous_family_ids_excluded": 200,
