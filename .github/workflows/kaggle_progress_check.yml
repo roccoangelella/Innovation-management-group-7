@@ -29,7 +29,7 @@ jobs:
         run: |
           python - <<'PY'
           import json, os, wandb
-          path = "rocchissimo936-none/humanoid-patent-filtering/kd2vlyzi"
+          path = "rocchissimo936-none/humanoid-patent-filtering/5lapyaes"
           run = wandb.Api(timeout=60).run(path)
           summary = dict(run.summary)
           relevant = {k: v for k, v in summary.items()
@@ -42,6 +42,11 @@ jobs:
           done = int(relevant["documents/analyzed"])
           total = 237538
           print(f"CONFIRMED_PROCESSED={done}/{total}", flush=True)
+          print(f"NEW_SINCE_VALIDATED_CHECKPOINT={done-128533}", flush=True)
+          if done < 128533:
+              raise RuntimeError("Regressed below saved checkpoint")
           PY
       - name: Fetch the associated Kaggle notebook execution status
-        run: kaggle kernels status roccoangelella/humanoid-patent-production-dual-t4
+        run: |
+          kaggle kernels status roccoangelella/humanoid-patent-production-dual-t4
+          kaggle kernels logs roccoangelella/humanoid-patent-production-dual-t4 | tail -40 || true
