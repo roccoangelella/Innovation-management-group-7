@@ -1,10 +1,6 @@
 name: Complete Gemrouter patent translations and publish English corpus
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/complete_translation.yml"
   workflow_dispatch:
     inputs:
       resume_run_id:
@@ -37,7 +33,34 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Detect and verify already completed English corpus
+        id: corpus
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+
+          summary_path = Path("data/translated/humanoid_patents_en_summary.json")
+          english_path = Path("data/translated/humanoid_patents_en.zip")
+          raw_path = Path("data/raw/humanoid_patents.zip")
+          complete = False
+          if summary_path.is_file() and english_path.is_file() and raw_path.is_file():
+              summary = json.loads(summary_path.read_text(encoding="utf-8"))
+              complete = summary.get("incomplete") == 0 and summary.get("completed") == summary.get("eligible") == 237538 and summary.get("stop_reason") is None
+              if complete:
+                  with english_path.open("rb") as file:
+                      english_sha = hashlib.file_digest(file, "sha256").hexdigest()
+                  with raw_path.open("rb") as file:
+                      raw_sha = hashlib.file_digest(file, "sha256").hexdigest()
+                  if english_sha != summary["final_archive_sha256"] or raw_sha != summary["source_sha256"]:
+                      raise RuntimeError("Already-published translation files no longer match their SHA256 provenance")
+                  print("COMPLETE_TRANSLATION_VERIFIED=237538/237538")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as file:
+              file.write("complete=" + str(complete).lower() + "\n")
+          PY
+
       - name: Confirm configured secrets without showing values
+        if: steps.corpus.outputs.complete != 'true'
         shell: bash
         run: |
           if [ -z "$GEMR_API_KEY" ]; then
@@ -55,7 +78,7 @@ jobs:
           echo "Gemrouter credentials and endpoint have been supplied through secrets."
 
       - name: Recover validated translation journal from previous Actions run
-        if: ${{ (github.event.inputs.resume_run_id || '42857129812') != '' }}
+        if: ${{ steps.corpus.outputs.complete != 'true' && (github.event.inputs.resume_run_id || '42857129812') != '' }}
         uses: actions/download-artifact@v4
         with:
           name: humanoid-translation-restart-journal
@@ -64,6 +87,7 @@ jobs:
           path: outputs/translation
 
       - name: Confirm resume journal exists before any API requests
+        if: steps.corpus.outputs.complete != 'true'
         run: |
           test -s outputs/translation/progress.jsonl || {
             echo "::error::Failed to restore the saved journal; refusing to retranslate completed patents"
@@ -72,16 +96,17 @@ jobs:
           echo "Journal restored; source and IDs will be validated before any API requests."
 
       - name: Validate existing translations against original PATSTAT extract
+        if: steps.corpus.outputs.complete != 'true'
         run: |
           python src/complete_translation.py --check
 
       - name: Resume only the missing abstract translations
-        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.head_commit.message == 'Resume Gemrouter translation from verified checkpoint 42857129812')
+        if: steps.corpus.outputs.complete != 'true'
         run: |
           python src/complete_translation.py --max-requests 600 --rpm 20 --passes 3
 
       - name: Publish only after completeness and production input validation
-        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.head_commit.message == 'Resume Gemrouter translation from verified checkpoint 42857129812')
+        if: steps.corpus.outputs.complete != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -122,7 +147,7 @@ jobs:
           echo "Complete English corpus committed to main."
 
       - name: Preserve validated full English dataset if GitHub publish fails
-        if: always()
+        if: always() && steps.corpus.outputs.complete != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: humanoid-translation-final-or-progress
@@ -134,7 +159,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Preserve resumable progress for a later quota reset
-        if: always()
+        if: always() && steps.corpus.outputs.complete != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: humanoid-translation-restart-journal
