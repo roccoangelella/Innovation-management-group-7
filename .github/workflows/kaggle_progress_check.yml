@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   check:
@@ -51,3 +52,69 @@ jobs:
         run: |
           kaggle kernels status roccoangelella/humanoid-patent-production-dual-t4
           kaggle kernels logs roccoangelella/humanoid-patent-production-dual-t4 | tail -40 || true
+
+  verify_final_artifact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download completed dual-T4 screening artifact
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 43149578365
+          github-token: ${{ github.token }}
+          name: humanoid-dual-t4-production-output
+          path: final_output
+      - name: Verify complete predictions, source and final filtered ZIP
+        run: |
+          python - <<'PY'
+          import csv, hashlib, io, json, math, zipfile
+          from pathlib import Path
+
+          root = Path("final_output")
+          total = 237538
+          source_sha = "b7ce0a36f0b3e2778292bdfe10058eb81749b304b62ed6d965dfcc837103276c"
+          summary = json.loads((root/"production_summary.json").read_text())
+          print("FINAL_PRODUCTION_SUMMARY="+json.dumps(summary,sort_keys=True),flush=True)
+          assert summary["input_sha256"] == source_sha, "Unexpected source dataset"
+          assert summary["n_input"] == total and summary["n_predictions"] == total, "Incomplete production summary"
+
+          def sha256(p):
+              return hashlib.file_digest(p.open("rb"),"sha256").hexdigest()
+
+          predictions_path = root/"predictions.csv"
+          zip_path = root/"filtered_patents.zip"
+          assert sha256(predictions_path) == summary["predictions_sha256"], "Prediction CSV hash mismatch"
+          assert sha256(zip_path) == summary["filtered_zip_sha256"], "Filtered archive hash mismatch"
+
+          seen = {}
+          with predictions_path.open(newline="",encoding="utf-8") as f:
+              reader = csv.DictReader(f)
+              assert set(reader.fieldnames) == {"docdb_family_id","probability_relevant","model_decision"}, "Unexpected prediction schema"
+              for row in reader:
+                  family = row["docdb_family_id"]
+                  probability = float(row["probability_relevant"])
+                  decision = int(row["model_decision"])
+                  assert family and family not in seen, "Missing or duplicate DOCDB family ID"
+                  assert math.isfinite(probability) and 0<=probability<=1 and decision==int(probability>=0.5), "Invalid probability/decision"
+                  seen[family] = decision
+          assert len(seen) == total, "Incorrect number of unique predictions"
+          relevant = sum(seen.values())
+          assert relevant == summary["n_relevant_exploratory"], "Relevant count mismatch"
+          assert total-relevant == summary["n_discarded_exploratory"], "Discard count mismatch"
+
+          with zipfile.ZipFile(zip_path) as archive:
+              assert archive.namelist() == ["filtered_patents.csv"], "Unexpected archive layout"
+              with archive.open("filtered_patents.csv") as content:
+                  reader = csv.DictReader(io.TextIOWrapper(content,encoding="utf-8",newline=""))
+                  filtered_ids=set()
+                  for row in reader:
+                      key = row["docdb_family_id"]
+                      assert key in seen and seen[key]==1 and key not in filtered_ids, "Filtered IDs mismatch"
+                      assert int(row["model_decision"])==1
+                      filtered_ids.add(key)
+          assert len(filtered_ids)==relevant, "Filtered ZIP is incomplete"
+          print(f"VERIFIED_FULL_CORPUS={len(seen)}/{total}",flush=True)
+          print(f"VERIFIED_RELEVANT={relevant}",flush=True)
+          print(f"VERIFIED_DISCARDED={total-relevant}",flush=True)
+          print("VERIFIED_SHA256_AND_IDS=true",flush=True)
+          PY
