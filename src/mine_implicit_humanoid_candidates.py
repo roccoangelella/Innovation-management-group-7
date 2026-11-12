@@ -36,7 +36,7 @@ def main():
  counts=Counter()
  rejected=Counter()
  csv.field_size_limit(sys.maxsize)
- with zipfile.ZipFile(ROOT/"humanoid_patents.zip") as archive:
+ with zipfile.ZipFile(ROOT/"data/raw/humanoid_patents.zip") as archive:
   with archive.open("humanoid_patents.csv") as b,io.TextIOWrapper(b,encoding="utf-8-sig",newline="") as f:
    rd=csv.DictReader(f)
    if not {"docdb_family_id","abstract","abstract_language"}.issubset(rd.fieldnames or []):

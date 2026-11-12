@@ -1,5 +1,7 @@
 # Full-corpus screening on Kaggle · two T4 GPUs
 
+Repository input: `data/translated/humanoid_patents_en.zip`; translation provenance: `data/translated/humanoid_patents_en_summary.json`. Published filtered subset: `data/filtered/filtered_patents.zip`. The example `/kaggle/input/` paths below are platform mounts, not repository paths.
+
 This is the **production-path implementation**, separate from `kaggle/run.py`'s 100-family development tests. It has offline regression tests; **a live two-T4 throughput/memory test is still required** before starting the entire corpus.
 
 ## Input contract

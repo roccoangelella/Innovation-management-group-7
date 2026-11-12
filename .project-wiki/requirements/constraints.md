@@ -20,4 +20,4 @@ confidence: confirmed
 - Require reproducible query, cleaning, indicators, documentation, and tests (kickoff slide 18).
 - Credentials belong in local `.env` and must not be committed.
 - Do not treat an incomplete translation export as a complete corpus. Do not equate offline unit tests with a verified live endpoint run.
-- Avoid adding further bulk PATSTAT extracts to Git; existing tracked `humanoid_patents.zip` predates this documentation change.
+- Avoid adding further bulk PATSTAT extracts to Git; existing tracked `data/raw/humanoid_patents.zip` predates this documentation change.

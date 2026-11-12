@@ -101,7 +101,7 @@ def main():
  if set(choices)&prior: raise ValueError("Overlaps previous evaluation benchmark")
  found={}
  csv.field_size_limit(sys.maxsize)
- with zipfile.ZipFile(ROOT/"humanoid_patents.zip") as z:
+ with zipfile.ZipFile(ROOT/"data/raw/humanoid_patents.zip") as z:
   with z.open("humanoid_patents.csv") as inp,io.TextIOWrapper(inp,encoding="utf-8-sig",newline="") as f:
    reader=csv.DictReader(f)
    if reader.fieldnames!=SOURCE_FIELDS: raise ValueError(f"Changed source schema: {reader.fieldnames}")
@@ -147,7 +147,7 @@ def main():
   "excluded_prior_family_count":len(prior),
   "explicit_humanoid_or_anthropomorphic_terms_found":0,
   "selection_groups":dict(Counter(v["review_group"] for v in choices.values())),
-  "source_zip_sha256":sha(ROOT/"humanoid_patents.zip"),
+  "source_zip_sha256":sha(ROOT/"data/raw/humanoid_patents.zip"),
   "files":{p.name:{"sha256":sha(p),"bytes":p.stat().st_size} for p in
            [OUT/"semantic_holdout_100_labeled.csv",OUT/"semantic_holdout_100_blind_review.csv",
             OUT/"annotation_audit.csv",OUT/"semantic_holdout_100_full.csv"]}

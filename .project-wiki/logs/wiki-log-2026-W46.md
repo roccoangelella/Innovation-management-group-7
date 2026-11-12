@@ -1,3 +1,11 @@
+## [2026-11-12] update | WLOG-20261112-001 | Reorganize canonical patent dataset directories
+
+Changed: [status](../STATUS.md), [architecture](../technical/architecture.md), [deployment](../technical/deployment.md), [codebase map](../technical/codebase-map.md), [security](../technical/security.md), [constraints](../requirements/constraints.md), [current plan](../implementation/current-plan.md), [changelog](../changes/CHANGELOG.md), [data layout](../../data/README.md), [README](../../README.md), and the active repository scripts and workflows.
+
+Summary: Retained the three nonredundant original/translated/filtered patent ZIP files and two provenance JSON files, moving them into `data/` stage folders without changing bytes or Git blob identities. Updated all active extract, translation, sampling, Kaggle notebook, and GitHub Actions references to new paths. Disabled automatic dual-T4 production launches on workflow code changes. Original corpus 237,538-family production and 3,116 provisional positives were verified by [Actions run 43191381227](https://github.com/roccoangelella/Innovation-management-group-7/actions/runs/43191381227) before relocation. The small sampling ZIP remains in `samples/random_100/`.
+
+Questions: OQ-001 remains open for independent human review and threshold calibration.
+
 ## [2026-11-11] update | WLOG-20261111-006 | Fail-closed private checkpoint access retry
 
 2026-11-11 23:40 CET — Resume retry diagnosis: original Actions run 43012383316 completed with durable checkpoint artifact 13872887675. Resume run 43071759641 recovered and strictly validated 128,533/237,538 unique predictions (worker counts 61,695 and 66,838; 109,005 remaining), including source/model/shard identity. Kaggle acknowledged PRIVATE dataset creation at roccoangelella/humanoid-production-resume-43012383316, then immediately returned HTTP 403 on dataset file listing; therefore no resumed Kaggle notebook was submitted. Replaced unsafe duplicate-create behavior with bounded read-only verification of the existing private dataset and fail-closed handling of persistent access errors. Original artifact remains retained; no rescore/retranslation authorized. Evidence: https://github.com/roccoangelella/Innovation-management-group-7/actions/runs/43071759641.

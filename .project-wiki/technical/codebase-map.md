@@ -4,7 +4,7 @@ type: technical
 status: active
 title: Codebase Map
 created: '2026-10-29'
-updated: '2026-11-10'
+updated: '2026-11-12'
 tags: []
 related: []
 source_paths: []
@@ -42,7 +42,11 @@ confidence: confirmed
 | `kaggle/tests/test_evaluate.py` | Synthetic evaluation tests for negative-only labels, unresolved cases and mismatched IDs |
 | `kaggle/notebook_cells.py` | Minimal single-command Kaggle invocation |
 | `kaggle/README.md` | Kaggle FP16 environment, input, auth, output and evaluation contract |
-| `humanoid_patents.zip` | Existing tracked candidate corpus |
+| `data/raw/humanoid_patents.zip` | Original tracked TIP/PATSTAT candidate extract; 238,824 families |
+| `data/translated/humanoid_patents_en.zip` | Validated English-abstract corpus; 237,538 eligible families |
+| `data/translated/humanoid_patents_en_summary.json` | Translation coverage and SHA256 provenance |
+| `data/filtered/filtered_patents.zip` | Validated 3,116-family provisional relevant subset |
+| `data/filtered/production_summary.json` | Dual-T4 screening summary and source/output hashes |
 | `README.md` | Main data operations |
 | `pyproject.toml` | Python >=3.12 metadata |
 | `.gitignore` | Ignores secrets and outputs |
@@ -53,4 +57,4 @@ confidence: confirmed
 | `kaggle/tests/test_journal.py` | Offline torn-append recovery and invalid journal tests |
 | `kaggle/PRODUCTION.md` | Production Kaggle usage, input contract, evidence and GPU acceptance gates |
 
-Run `python -m unittest discover -s tests -v` for existing offline tests and `python -m unittest discover -s kaggle/tests -v` for Kaggle launcher/evaluator tests. Kaggle live model execution and FP16 accuracy remain unverified. No full-corpus screening, landscaping, valuation or quadrant implementation is established.
+Run `python -m unittest discover -s tests -v` for existing offline tests and `python -m unittest discover -s kaggle/tests -v` for Kaggle launcher/evaluator tests. Kaggle live model execution and FP16 accuracy remain unverified. Full-corpus dual-T4 screening and output integrity were independently verified on 2026-11-12. Relevance adjudication, landscaping, valuation and quadrant implementation remain pending.

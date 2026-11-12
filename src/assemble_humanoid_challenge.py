@@ -15,7 +15,7 @@ import io
 
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/"samples/humanoid_challenge_100"
-ZIP=ROOT/"humanoid_patents.zip"
+ZIP=ROOT/"data/raw/humanoid_patents.zip"
 FIELDS=["docdb_family_id","year","title","title_language","abstract","abstract_language","matched_cpcs"]
 LABEL_COLUMNS=["docdb_family_id","label","needs_review","confidence","evidence_quote","reason"]
 COMBINED_COLUMNS=["docdb_family_id","abstract_en","label","needs_review","confidence","evidence_quote","reason"]

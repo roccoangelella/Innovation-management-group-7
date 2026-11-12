@@ -72,13 +72,13 @@ def mine(source, prior):
         writer.writeheader()
         for o in chosen:
             writer.writerow({k:(o["abstract"][:350] if k=="abstract_excerpt" else o[k]) for k in writer.fieldnames})
-    summary={"seed":SEED,"method":"fixed-seed hash-ranked candidate discovery; regex ONLY for recall/navigation, not labels","source":"humanoid_patents.zip","eligible_english_excluding_prior_100":eligible,"discovery_bucket_population":dict(counts),"pool_buckets":dict(Counter(o["discovery_bucket"] for o in chosen)),"pool_size":len(chosen),"prior_random_100_excluded":len(excluded)}
+    summary={"seed":SEED,"method":"fixed-seed hash-ranked candidate discovery; regex ONLY for recall/navigation, not labels","source":"data/raw/humanoid_patents.zip","eligible_english_excluding_prior_100":eligible,"discovery_bucket_population":dict(counts),"pool_buckets":dict(Counter(o["discovery_bucket"] for o in chosen)),"pool_size":len(chosen),"prior_random_100_excluded":len(excluded)}
     (output/"candidate_summary.json").write_text(json.dumps(summary,indent=2)+"\n",encoding="utf-8")
     print(json.dumps(summary,indent=2))
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
-    parser.add_argument("--source",default="humanoid_patents.zip")
+    parser.add_argument("--source",default="data/raw/humanoid_patents.zip")
     parser.add_argument("--exclude",default="samples/random_100/random_100_full.csv")
     a=parser.parse_args()
     mine(a.source,a.exclude)

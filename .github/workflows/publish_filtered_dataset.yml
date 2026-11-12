@@ -48,7 +48,7 @@ jobs:
           from pathlib import Path
 
           base = Path("completed_kaggle_output")
-          source = Path("humanoid_patents_en.zip")
+          source = Path("data/translated/humanoid_patents_en.zip")
           dataset = base / "filtered_patents.zip"
           predictions = base / "predictions.csv"
           summary = json.loads((base / "production_summary.json").read_text(encoding="utf-8"))
@@ -106,9 +106,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cp completed_kaggle_output/filtered_patents.zip filtered_patents.zip
-          cp completed_kaggle_output/production_summary.json production_summary.json
-          git add -- filtered_patents.zip production_summary.json
+          mkdir -p data/filtered
+          cp completed_kaggle_output/filtered_patents.zip data/filtered/filtered_patents.zip
+          cp completed_kaggle_output/production_summary.json data/filtered/production_summary.json
+          git add -- data/filtered/filtered_patents.zip data/filtered/production_summary.json
           git diff --cached --check
           if git diff --cached --quiet; then
             echo "Already published; no changes"

@@ -117,7 +117,7 @@ def sample(input_path, output_dir, en_size=90, other_size=10, pool_size=12000):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", default="humanoid_patents.zip")
+    parser.add_argument("--input", default="data/raw/humanoid_patents.zip")
     parser.add_argument("--output-dir", default="outputs/sampling")
     args = parser.parse_args()
     print(json.dumps(sample(args.input, args.output_dir), indent=2))

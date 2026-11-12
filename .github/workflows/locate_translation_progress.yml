@@ -23,13 +23,13 @@ jobs:
           python - <<'PY'
           import csv, io, json, os, zipfile
           family = os.environ["FAMILY_ID"]
-          with zipfile.ZipFile("humanoid_patents_en.zip") as archive:
+          with zipfile.ZipFile("data/translated/humanoid_patents_en.zip") as archive:
               with archive.open("humanoid_patents_en.csv") as raw:
                   with io.TextIOWrapper(raw,encoding="utf-8-sig",newline="") as file:
                       completed = {row["docdb_family_id"].strip() for row in csv.DictReader(file)}
           pending_ids = []
           source_position = None
-          with zipfile.ZipFile("humanoid_patents.zip") as archive:
+          with zipfile.ZipFile("data/raw/humanoid_patents.zip") as archive:
               with archive.open("humanoid_patents.csv") as raw:
                   with io.TextIOWrapper(raw,encoding="utf-8-sig",newline="") as file:
                       for index, row in enumerate(csv.DictReader(file), 1):

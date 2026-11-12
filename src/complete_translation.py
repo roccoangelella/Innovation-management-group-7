@@ -1,6 +1,6 @@
 """Complete a partially translated PATSTAT corpus without losing existing translations.
 
-The committed humanoid_patents_en.zip is the validated seed; humanoid_patents.zip
+The committed data/translated/humanoid_patents_en.zip is the validated seed; data/raw/humanoid_patents.zip
 remains the immutable original source.  Only nonempty missing abstracts are sent
 to Gemrouter.  A replacement English archive is emitted ONLY on 100% coverage.
 """
@@ -282,8 +282,8 @@ def finish(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", default="humanoid_patents.zip")
-    parser.add_argument("--partial", default="humanoid_patents_en.zip")
+    parser.add_argument("--source", default="data/raw/humanoid_patents.zip")
+    parser.add_argument("--partial", default="data/translated/humanoid_patents_en.zip")
     parser.add_argument("--state", default="outputs/translation/progress.jsonl")
     parser.add_argument("--work-csv", default="outputs/translation/humanoid_patents_en.csv")
     parser.add_argument("--final-zip", default="outputs/translation/final_humanoid_patents_en.zip")

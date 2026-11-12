@@ -3,10 +3,6 @@ name: Production patent labeling - Kaggle dual T4
 # Launch retries are bounded; accept only a confirmed Kaggle submission.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/kaggle_production.yml"
   workflow_dispatch:
 
 permissions:
@@ -144,7 +140,7 @@ jobs:
               for p in paths:
                   z.write(p,arcname=p.name)
           PY
-          python kaggle/validate_resume.py /tmp/complete-original-checkpoint.zip humanoid_patents_en.zip /tmp/validated-resume-dataset
+          python kaggle/validate_resume.py /tmp/complete-original-checkpoint.zip data/translated/humanoid_patents_en.zip /tmp/validated-resume-dataset
       - name: Publish validated checkpoint to private Kaggle dataset
         run: |
           set -euo pipefail

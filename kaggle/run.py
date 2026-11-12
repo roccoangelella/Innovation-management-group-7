@@ -42,7 +42,7 @@ def discover_input(specified=None, root=None):
         raise ValueError("Multiple translated sample CSVs found; use --input to select one: " + ", ".join(map(str, matches)))
     raise FileNotFoundError(
         f"No {FILENAME} found. Attach the translated 100-family CSV as a Kaggle Dataset "
-        "or supply --input. The un-translated humanoid_patents.zip cannot be scored."
+        "or supply --input. The un-translated data/raw/humanoid_patents.zip cannot be scored."
     )
 
 

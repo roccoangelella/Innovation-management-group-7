@@ -466,7 +466,7 @@ def run(args, translation_fn=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--input', default='humanoid_patents.zip')
+    parser.add_argument('--input', default='data/raw/humanoid_patents.zip')
     parser.add_argument('--output', default='outputs/translation/humanoid_patents_en.csv')
     parser.add_argument('--state', default='outputs/translation/progress.jsonl')
     parser.add_argument('--env', default='.env')

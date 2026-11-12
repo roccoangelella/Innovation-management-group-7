@@ -124,7 +124,7 @@ def write_sample(input_zip, output_dir, n=100, seed=SEED):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", default="humanoid_patents.zip")
+    parser.add_argument("--input", default="data/raw/humanoid_patents.zip")
     parser.add_argument("--output-dir", default="samples/random_100")
     parser.add_argument("--size", type=int, default=100)
     parser.add_argument("--seed", type=int, default=SEED)

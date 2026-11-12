@@ -1,5 +1,7 @@
 # Direct real-time Kaggle → W&B document counter (2026-11-11)
 
+**Published repository data:** `data/filtered/filtered_patents.zip` and `data/filtered/production_summary.json`. Translated input: `data/translated/humanoid_patents_en.zip`.
+
 **Canonical dashboard:** https://forge.coreweave.com/wandb/rocchissimo936-none/humanoid-patent-filtering
 
 ## What actually appears

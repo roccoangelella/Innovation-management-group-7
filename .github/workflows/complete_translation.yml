@@ -100,23 +100,23 @@ jobs:
           PY
 
           # Prevent overwriting another contributor's more recent source/translation ZIP.
-          original_zip_sha="$(git rev-parse HEAD:humanoid_patents_en.zip)"
-          original_source_sha="$(git rev-parse HEAD:humanoid_patents.zip)"
+          original_zip_sha="$(git rev-parse HEAD:data/translated/humanoid_patents_en.zip)"
+          original_source_sha="$(git rev-parse HEAD:data/raw/humanoid_patents.zip)"
           git fetch origin main
-          test "$original_zip_sha" = "$(git rev-parse origin/main:humanoid_patents_en.zip)" || {
+          test "$original_zip_sha" = "$(git rev-parse origin/main:data/translated/humanoid_patents_en.zip)" || {
             echo "::error::Existing translated ZIP changed remotely during translation; refusing to overwrite."
             exit 1
           }
-          test "$original_source_sha" = "$(git rev-parse origin/main:humanoid_patents.zip)" || {
+          test "$original_source_sha" = "$(git rev-parse origin/main:data/raw/humanoid_patents.zip)" || {
             echo "::error::Original source changed remotely during translation; refusing to overwrite."
             exit 1
           }
           git checkout -B translation-completion-publish origin/main
-          cp outputs/translation/final_humanoid_patents_en.zip humanoid_patents_en.zip
-          cp outputs/translation/humanoid_patents_en_summary.json humanoid_patents_en_summary.json
+          cp outputs/translation/final_humanoid_patents_en.zip data/translated/humanoid_patents_en.zip
+          cp outputs/translation/humanoid_patents_en_summary.json data/translated/humanoid_patents_en_summary.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add humanoid_patents_en.zip humanoid_patents_en_summary.json
+          git add data/translated/humanoid_patents_en.zip data/translated/humanoid_patents_en_summary.json
           git commit -m "Complete all eligible patent abstract translations and replace English corpus"
           git push origin HEAD:main
           echo "Complete English corpus committed to main."

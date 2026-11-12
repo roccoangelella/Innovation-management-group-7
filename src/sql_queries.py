@@ -109,7 +109,7 @@ ORDER BY f.docdb_family_id
 
 client = PatstatClient(env=ENV)
 count = 0
-with zipfile.ZipFile("humanoid_patents.zip", "w", compression=zipfile.ZIP_DEFLATED) as archive:
+with zipfile.ZipFile("data/raw/humanoid_patents.zip", "w", compression=zipfile.ZIP_DEFLATED) as archive:
     with archive.open("humanoid_patents.csv", "w") as raw:
         with io.TextIOWrapper(raw, newline="", encoding="utf-8") as output:
             writer = csv.writer(output)
@@ -120,4 +120,4 @@ with zipfile.ZipFile("humanoid_patents.zip", "w", compression=zipfile.ZIP_DEFLAT
                                  row["matched_cpcs"]])
                 count += 1
 
-print(f"Saved {count} families (64 CPC codes, {ENV}) to humanoid_patents.zip")
+print(f"Saved {count} families (64 CPC codes, {ENV}) to data/raw/humanoid_patents.zip")

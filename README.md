@@ -1,12 +1,22 @@
-## Resuming the committed partial English ZIP (GitHub Actions)
-
-The tracked `humanoid_patents_en.zip` contains an **incomplete** English-only subset while `humanoid_patents.zip` is the immutable PATSTAT source. To complete it, use [Complete Gemrouter patent translations and publish English corpus](.github/workflows/complete_translation.yml). It uses repository Actions secrets `GEMR_API_KEY` and `LLM_ENDPOINT` (also accepts `GEMROUTER_API_KEY`/`GEMROUTER_ENDPOINT`), validates each existing translation against the source, and translates only missing nonempty abstracts through the same `gemini-cascade` endpoint. GitHub Actions publishes the completed replacement ZIP and `humanoid_patents_en_summary.json` **only when all eligible families pass validation**. Families with genuinely missing PATSTAT abstracts remain excluded and are counted separately. `abstract` and `abstract_en` both contain English; `abstract_language` preserves the source-language code. No Gemrouter credentials or endpoint are committed.
-
-Manual validation: `python src/complete_translation.py --check` (requires `LLM_ENDPOINT` to be set); offline synthetic tests: `python -m unittest discover -s tests -p test_complete_translation.py -v`.
-
-> **Full-corpus dual-T4 patent screening:** [Kaggle production guide](kaggle/PRODUCTION.md). Supports translated CSV/ZIP input, resumable independent FP16 GPU workers and validated merging. Live GPU acceptance remains required.
-
 # Innovation Management · Group 7 — Humanoid robotics (Electrolux)
+
+## Production datasets
+
+The patent pipeline completed at a **provisional** relevance threshold of 0.5. The tracked datasets are organized by processing stage, preserving their original bytes.
+
+| Stage | Path | DOCDB families |
+| --- | --- | ---: |
+| Original TIP/PATSTAT extract | [data/raw/humanoid_patents.zip](data/raw/humanoid_patents.zip) | 238,824 |
+| Complete English abstracts | [data/translated/humanoid_patents_en.zip](data/translated/humanoid_patents_en.zip) | 237,538 |
+| Translation provenance | [data/translated/humanoid_patents_en_summary.json](data/translated/humanoid_patents_en_summary.json) | 237,538 eligible |
+| Provisional filtered subset | [data/filtered/filtered_patents.zip](data/filtered/filtered_patents.zip) | 3,116 |
+| Screening hashes and counts | [data/filtered/production_summary.json](data/filtered/production_summary.json) | 237,538 decisions |
+
+See [data/README.md](data/README.md) for provenance, SHA256 checksums and the full prediction artifact. The complete dual-T4 run is [GitHub Actions 43149578365](https://github.com/roccoangelella/Innovation-management-group-7/actions/runs/43149578365); [independent artifact validation 43191381227](https://github.com/roccoangelella/Innovation-management-group-7/actions/runs/43191381227) verified all 237,538 predictions and all 3,116 retained families. The model's 0.5 threshold is **not calibrated to independent human ground truth**.
+
+Production Kaggle GPU launches are now **manual only** to prevent accidental reruns when editing workflow code.
+
+
 
 ## English-only 100-family screening pilot (2026-10-30)
 
@@ -22,7 +32,7 @@ PATSTAT DOCDB-family export: `src/sql_queries.py`. The translation stage below i
 
 ## Full-corpus patent abstract translation
 
-`src/translate_abstracts.py` reads the existing `humanoid_patents.zip` (`humanoid_patents.csv`) and produces an English-abstract dataset for abstract-only patent screening. It uses only Python 3.12+ standard-library modules; no extra dependencies or Google Gemini SDK are required. The model is `gemini-cascade` through the project's private OpenAI-compatible Chat Completions endpoint.
+`src/translate_abstracts.py` reads the existing `data/raw/humanoid_patents.zip` (`humanoid_patents.csv`) and produces an English-abstract dataset for abstract-only patent screening. It uses only Python 3.12+ standard-library modules; no extra dependencies or Google Gemini SDK are required. The model is `gemini-cascade` through the project's private OpenAI-compatible Chat Completions endpoint.
 
 Configure **locally** in `.env` (this file is ignored by Git):
 
@@ -77,7 +87,7 @@ python src/sample_abstracts.py
 python -m unittest discover -s tests -v
 ```
 
-The deterministic sampler reads the **unchanged** `humanoid_patents.zip` and selects exactly 90 originally English and 10 originally non-English records, using seed `20261029`. It requires a nonempty abstract and a usable original-language code, detects duplicate DOCDB family IDs, and maintains all seven source columns without labeling or translation. SHA-256 hash-ranked bounded candidate pools make selection independent of input row order; a CPC membership-deficit heuristic encourages technology breadth without imposing equal per-CPC quotas. The ten non-English records are diversified across languages present. One family may cover several CPCs, but is sampled only once.
+The deterministic sampler reads the **unchanged** `data/raw/humanoid_patents.zip` and selects exactly 90 originally English and 10 originally non-English records, using seed `20261029`. It requires a nonempty abstract and a usable original-language code, detects duplicate DOCDB family IDs, and maintains all seven source columns without labeling or translation. SHA-256 hash-ranked bounded candidate pools make selection independent of input row order; a CPC membership-deficit heuristic encourages technology breadth without imposing equal per-CPC quotas. The ten non-English records are diversified across languages present. One family may cover several CPCs, but is sampled only once.
 
 Outputs (not automatically committed as bulk PATSTAT data):
 - `outputs/sampling/humanoid_100_abstracts.csv`: 100 unchanged source rows.

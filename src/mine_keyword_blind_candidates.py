@@ -77,7 +77,7 @@ def bucket(abstract):
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument("--input",default=str(ROOT/"humanoid_patents.zip"))
+    p.add_argument("--input",default=str(ROOT/"data/raw/humanoid_patents.zip"))
     a=p.parse_args()
     excludes=set()
     for path in [
@@ -138,7 +138,7 @@ def main():
         w.writerows({"docdb_family_id":x["docdb_family_id"],"discovery_bucket":x["discovery_bucket"],
                      "abstract_excerpt":x["abstract"][:450]} for x in selected_rows)
     summary={"method":"Hash-ranked source-abstract discovery, class labels NOT derived from regex",
-             "source":"humanoid_patents.zip", "seed":SEED,"source_rows":inspected,
+             "source":"data/raw/humanoid_patents.zip", "seed":SEED,"source_rows":inspected,
              "previous_family_ids_excluded":len(excludes),
              "excluded_explicit_cue_families":excluded_explicit,
              "discovery_population":dict(counts),
