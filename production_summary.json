@@ -1,0 +1,15 @@
+{
+  "n_input": 237538,
+  "n_predictions": 237538,
+  "n_relevant_exploratory": 3116,
+  "n_discarded_exploratory": 234422,
+  "threshold_exploratory": 0.5,
+  "input_sha256": "b7ce0a36f0b3e2778292bdfe10058eb81749b304b62ed6d965dfcc837103276c",
+  "predictions_sha256": "6c1e0fab366da81172431c852e50a1c38f346471d1c483589775c51eb49de6bc",
+  "filtered_zip_sha256": "0ed14dbe15b61a017a34d9d691b4d0cce75dce541fc135c920de589189b9e65a",
+  "worker_counts": [
+    118464,
+    119074
+  ],
+  "warning": "Threshold 0.5 is provisional. AI-assisted benchmark labels do not establish production precision."
+}
