@@ -1,0 +1,120 @@
+name: Publish validated Kaggle filtered patent dataset
+
+# One-time production artifact promotion. Rerunnable manually after verification.
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/publish_filtered_dataset.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: verified-filtered-patent-publication
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'Publish verified filtered Kaggle dataset'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out current main branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Download the actual completed Kaggle run artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: humanoid-dual-t4-production-output
+          run-id: 43149578365
+          github-token: ${{ github.token }}
+          path: completed_kaggle_output
+
+      - name: Verify exact source, all predictions, final ZIP, and SHA-256
+        shell: bash
+        run: |
+          python - <<'PY'
+          import csv
+          import hashlib
+          import io
+          import json
+          import math
+          import zipfile
+          from pathlib import Path
+
+          base = Path("completed_kaggle_output")
+          source = Path("humanoid_patents_en.zip")
+          dataset = base / "filtered_patents.zip"
+          predictions = base / "predictions.csv"
+          summary = json.loads((base / "production_summary.json").read_text(encoding="utf-8"))
+
+          def sha256(path):
+              with path.open("rb") as stream:
+                  return hashlib.file_digest(stream, "sha256").hexdigest()
+
+          expected_source = "b7ce0a36f0b3e2778292bdfe10058eb81749b304b62ed6d965dfcc837103276c"
+          expected_predictions = "6c1e0fab366da81172431c852e50a1c38f346471d1c483589775c51eb49de6bc"
+          expected_zip = "0ed14dbe15b61a017a34d9d691b4d0cce75dce541fc135c920de589189b9e65a"
+          assert sha256(source) == expected_source == summary["input_sha256"], "Source dataset SHA-256 mismatch"
+          assert sha256(predictions) == expected_predictions == summary["predictions_sha256"], "Predictions SHA-256 mismatch"
+          assert sha256(dataset) == expected_zip == summary["filtered_zip_sha256"], "Filtered dataset SHA-256 mismatch"
+          assert summary["n_input"] == summary["n_predictions"] == 237538, "Not all source families processed"
+          assert summary["n_relevant_exploratory"] == 3116, "Relevant count mismatch"
+          assert summary["n_discarded_exploratory"] == 234422, "Discard count mismatch"
+          assert summary["worker_counts"] == [118464, 119074], "GPU worker sharding mismatch"
+          assert summary["threshold_exploratory"] == 0.5, "Unexpected model threshold"
+
+          all_ids = set()
+          retained = {}
+          with predictions.open(newline="", encoding="utf-8") as stream:
+              reader = csv.DictReader(stream)
+              assert set(reader.fieldnames) == {"docdb_family_id", "probability_relevant", "model_decision"}
+              for record in reader:
+                  key = record["docdb_family_id"]
+                  p = float(record["probability_relevant"])
+                  d = int(record["model_decision"])
+                  assert key and key not in all_ids, "Empty/duplicate DOCDB family ID"
+                  assert math.isfinite(p) and 0 <= p <= 1 and d == int(p >= 0.5), "Invalid prediction"
+                  all_ids.add(key)
+                  if d:
+                      retained[key] = p
+          assert len(all_ids) == 237538 and len(retained) == 3116, "Prediction count mismatch"
+
+          with zipfile.ZipFile(dataset) as archive:
+              assert archive.namelist() == ["filtered_patents.csv"], "Unexpected ZIP contents"
+              assert archive.testzip() is None, "ZIP CRC failure"
+              zipped_ids = set()
+              with archive.open("filtered_patents.csv") as raw:
+                  reader = csv.DictReader(io.TextIOWrapper(raw, encoding="utf-8", newline=""))
+                  assert {"docdb_family_id", "probability_relevant", "model_decision"} <= set(reader.fieldnames)
+                  for record in reader:
+                      key = record["docdb_family_id"]
+                      assert key in retained and key not in zipped_ids, "ZIP includes unexpected or duplicate family"
+                      assert int(record["model_decision"]) == 1
+                      assert float(record["probability_relevant"]) == retained[key], "Prediction mismatch in ZIP"
+                      zipped_ids.add(key)
+          assert zipped_ids == set(retained), "ZIP does not contain every retained family"
+          print("VALIDATED: 237538 unique predictions, 3116 kept, 234422 discarded, both T4 workers, source and artifact SHA-256, ZIP CRC")
+          PY
+
+      - name: Commit only validated filtered ZIP and summary to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp completed_kaggle_output/filtered_patents.zip filtered_patents.zip
+          cp completed_kaggle_output/production_summary.json production_summary.json
+          git add -- filtered_patents.zip production_summary.json
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "Already published; no changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Add validated 3116-family filtered humanoid patent dataset"
+          git push origin HEAD:main
