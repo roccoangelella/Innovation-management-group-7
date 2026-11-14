@@ -36,6 +36,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Run offline syntax and compatibility regression tests before API calls
+        run: |
+          python -m py_compile src/translate_abstracts.py src/translate_novel_patents.py kaggle/validate_novel_resume.py kaggle/validate_novel_output.py kaggle/wandb_live.py
+          python -m unittest discover -s tests -p 'test_novel_pipeline.py' -v
+          python -m unittest discover -s kaggle/tests -p 'test_wandb_live.py' -v
       - name: Verify novel dataset schema and zero overlap with 64-CPC baseline
         run: python src/translate_novel_patents.py --check
       - name: Restore previously completed English corpus for Kaggle resume
@@ -401,3 +406,32 @@ jobs:
       - run: python -m pip install --disable-pip-version-check wandb==0.31.0
       - name: Independently confirm W&B received nonzero actual prediction counts
         run: python -u kaggle/verify_wandb_live.py
+
+  cleanup_token:
+    needs: [submit, monitor, verify_wandb]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check kaggle six
+      - name: Remove temporary per-run Kaggle credential even after monitor failure
+        run: |
+          set -euo pipefail
+          if [ -z "$KAGGLE_API_TOKEN" ]; then exit 0; fi
+          kaggle kernels init -p kaggle/novel_kernel
+          owner="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path("kaggle/novel_kernel/kernel-metadata.json").read_text())
+          print(data["id"].split("/",1)[0])
+          PY
+          )"
+          if [ -n "$owner" ]; then
+            kaggle datasets delete "$owner/humanoid-novel-wandb-$GITHUB_RUN_ID" -y || true
+          fi
