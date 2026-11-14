@@ -9,6 +9,7 @@ PROJECT = "rocchissimo936-none/humanoid-patent-filtering"
 
 def main():
     target = os.environ["WANDB_RUN_NAME"]
+    expected = os.getenv("WANDB_EXPECTED_TOTAL", "237538")
     if not os.environ.get("WANDB_API_KEY"):
         raise ValueError("Missing W&B API credential")
     deadline = time.monotonic() + 30 * 60
@@ -24,7 +25,7 @@ def main():
                 if run.name != target:
                     continue
                 count = int(run.summary.get("documents/analyzed", 0))
-                print(f"WANDB_DIRECT_COUNT={count}/237538", flush=True)
+                print(f"WANDB_DIRECT_COUNT={count}/{expected}", flush=True)
                 if count > 0:
                     print(
                         "WANDB_VERIFIED_LIVE_URL=https://forge.coreweave.com/wandb/"
