@@ -70,11 +70,12 @@ def validate(checkpoint, source, summary_path, destination, dataset_id):
             if len(completed) != session.get("processed") or len(completed) >= total:
                 raise ValueError("Checkpoint processed counts do not reconcile")
         destination.mkdir(parents=True)
-        for name in sorted(expected):
-            target = destination / name
-            target.parent.mkdir(parents=True, exist_ok=True)
-            with z.open(name) as inp, target.open("wb") as out:
-                shutil.copyfileobj(inp, out)
+        # Kaggle's dataset upload consumes top-level files; an uploaded ZIP is
+        # expanded by Kaggle, retaining the worker_N/ subdirectory structure.
+        # Match the already verified historical Kaggle checkpoint transport.
+        with zipfile.ZipFile(destination / "humanoid-checkpoint.zip", "w", zipfile.ZIP_DEFLATED) as packed:
+            for name in sorted(expected):
+                packed.writestr(name, z.read(name))
     (destination / "dataset-metadata.json").write_text(
         json.dumps({"id": dataset_id, "title": "Private novel patent screening resume",
                     "licenses": [{"name": "other"}],
