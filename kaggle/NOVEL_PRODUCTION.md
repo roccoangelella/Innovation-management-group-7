@@ -11,7 +11,7 @@ This is a **separate incremental batch**, not a rerun or replacement of the orig
 - Translation: private GemRouter API; source and model pinned in a journal manifest.
 - Screening: the existing pinned `perplexity-ai/pplx-decider-flash-v1.2` FP16 model revision `6d771ad7b5ecff5e93b8fc7b90d4c5ccc341954d`; two independent T4 GPU processes. The 0.5 classification threshold is exploratory, not human-calibrated.
 
-**Nothing starts on push.** Only the manual `workflow_dispatch` of [Novel humanoid patents - GemRouter then Kaggle dual T4](../.github/workflows/novel_patents_pipeline.yml) starts API/GPU work. The previous `complete_translation.yml` and `kaggle_production.yml` remain dedicated to the original corpus and must not be used for the novel batch.
+**Ordinary pushes do not start the pipeline.** Only manual `workflow_dispatch` or an explicitly authorized, exact-message launch-marker push of [Novel humanoid patents - GemRouter then Kaggle dual T4](../.github/workflows/novel_patents_pipeline.yml) starts API/GPU work. The marker path is `.github/novel_patents_launch_request.txt` and the exact commit message is `Authorize novel patent pipeline: GemRouter then Kaggle 2xT4`; do not create that marker until the user authorizes execution. The previous `complete_translation.yml` and `kaggle_production.yml` remain dedicated to the original corpus and must not be used for the novel batch.
 
 ## Before dispatch
 
@@ -23,7 +23,7 @@ This is a **separate incremental batch**, not a rerun or replacement of the orig
 
 ## Manual launch and recovery
 
-Open GitHub Actions -> **Novel humanoid patents - GemRouter then Kaggle dual T4** -> **Run workflow** with both optional inputs blank for a fresh run.
+For manual UI launch, open GitHub Actions -> **Novel humanoid patents - GemRouter then Kaggle dual T4** -> **Run workflow**, with both optional inputs blank for a fresh run. Alternatively, after explicit authorization, a single GitHub commit creating `.github/novel_patents_launch_request.txt` with the exact commit message `Authorize novel patent pipeline: GemRouter then Kaggle 2xT4` launches the fresh run. No authorization marker has been committed.
 
 The workflow sequentially:
 
