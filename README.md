@@ -1,107 +1,47 @@
-# Innovation Management · Group 7 — Humanoid robotics (Electrolux)
+# Innovation Management · Group 7 — Humanoid robots (Electrolux)
 
-## Production datasets
+Patent-based sector scouting for the 2026/27 Innovation Management project at Politecnico di Torino. Unit of analysis: **DOCDB patent family**.
 
-The patent pipeline completed at a **provisional** relevance threshold of 0.5. The tracked datasets are organized by processing stage, preserving their original bytes.
+## Datasets
 
-| Stage | Path | DOCDB families |
+| Stage | File | Families |
 | --- | --- | ---: |
-| Original TIP/PATSTAT extract | [data/raw/humanoid_patents.zip](data/raw/humanoid_patents.zip) | 238,824 |
-| Complete English abstracts | [data/translated/humanoid_patents_en.zip](data/translated/humanoid_patents_en.zip) | 237,538 |
-| Translation provenance | [data/translated/humanoid_patents_en_summary.json](data/translated/humanoid_patents_en_summary.json) | 237,538 eligible |
-| Provisional filtered subset | [data/filtered/filtered_patents.zip](data/filtered/filtered_patents.zip) | 3,116 |
-| Screening hashes and counts | [data/filtered/production_summary.json](data/filtered/production_summary.json) | 237,538 decisions |
+| TIP/PATSTAT extract | [Raw patents](data/raw/humanoid_patents.zip) | 238,824 |
+| Nonempty English abstracts (original + translated) | [English corpus](data/translated/humanoid_patents_en.zip) | 237,538 |
+| Provisional Perplexity Decider Flash screening (threshold 0.5) | [Retained patents](data/filtered/filtered_patents.zip) | 3,116 |
 
-See [data/README.md](data/README.md) for provenance, SHA256 checksums and the full prediction artifact. The complete dual-T4 run is [GitHub Actions 43149578365](https://github.com/roccoangelella/Innovation-management-group-7/actions/runs/43149578365); [independent artifact validation 43191381227](https://github.com/roccoangelella/Innovation-management-group-7/actions/runs/43191381227) verified all 237,538 predictions and all 3,116 retained families. The model's 0.5 threshold is **not calibrated to independent human ground truth**.
+The raw extract contains 1,286 families without abstracts. The full set of 237,538 screening decisions was independently checked for ID and archive integrity. **Relevance decisions are provisional, not human-validated.** See [dataset provenance, checksums, and prediction artifacts](data/README.md).
 
-Production Kaggle GPU launches are now **manual only** to prevent accidental reruns when editing workflow code.
+## Pipeline
 
+1. **Collect:** [TIP/PATSTAT SQL queries](src/sql_queries.py).
+2. **Translate:** [English-abstract translation](src/translate_abstracts.py) using a locally configured private endpoint (credentials must not be committed).
+3. **Screen:** [Perplexity Decider Flash on two Kaggle T4 GPUs](kaggle/PRODUCTION.md), implemented in [production_run.py](kaggle/production_run.py).
+4. **Validate:** [100-family evaluation runner](kaggle/run.py) and [validation methodology](.project-wiki/technical/testing.md).
 
-
-## English-only 100-family screening pilot (2026-10-30)
-
-While the full-corpus translation runs independently, use the **100 originally English** source abstracts in [samples/random_100/random_100_for_labeling.csv](samples/random_100/random_100_for_labeling.csv). Upload this CSV with [the labeling prompt](samples/LABELING_PROMPT.md) to a separate chat. Annotations remain AI-assisted provisional judgments pending human review.
-
-The deterministic sample is drawn uniformly by fixed-seed (20261030) SHA-256 ranking of **English-language, nonempty-abstract DOCDB families**, not by CPC or presumed relevance; source metadata are preserved in [random_100_full.csv](samples/random_100/random_100_full.csv). Source ZIP has 238,824 family rows; 232,636 nonempty original-English abstracts were eligible.
-
-Because no translation is needed, [humanoid_100_abstracts_en.csv](samples/random_100/humanoid_100_abstracts_en.csv) contains *exact copies* of the original abstracts under `abstract_en` and `translation_status=original_en`. The Kaggle launcher auto-discovers this file. No uploaded dataset is required for this pilot after cloning the repo. [Sample provenance and checksums](samples/random_100/sample_summary.json).
-
-Run `python src/sample_random_100.py` to regenerate. The 90/10 stratified sampler below remains a **separate, later** multilingual evaluation plan. A random sample may contain too few true humanoid patents to estimate recall or precision precisely.
-
-PATSTAT DOCDB-family export: `src/sql_queries.py`. The translation stage below is independent of the SQL extraction and does not alter or filter its source archive.
-
-## Full-corpus patent abstract translation
-
-`src/translate_abstracts.py` reads the existing `data/raw/humanoid_patents.zip` (`humanoid_patents.csv`) and produces an English-abstract dataset for abstract-only patent screening. It uses only Python 3.12+ standard-library modules; no extra dependencies or Google Gemini SDK are required. The model is `gemini-cascade` through the project's private OpenAI-compatible Chat Completions endpoint.
-
-Configure **locally** in `.env` (this file is ignored by Git):
-
-```dotenv
-GEMR_API_KEY="your-private-key"
-LLM_ENDPOINT="https://gemr.84-8-255-231.nip.io/v1/chat/completions"
-```
-
-From the repository root:
+To check the completed English corpus before a GPU run:
 
 ```bash
-# Verify languages, missing abstracts and unique DOCDB family IDs; no network calls
-python src/translate_abstracts.py --stats-only
-
-# Production run: translates ALL available non-English abstracts (no total request cap)
-python src/translate_abstracts.py
-
-# Rerun exactly the same command after a crash, interruption, or endpoint quota reset
-python src/translate_abstracts.py
-
-# Optional bounded API smoke test (attempt budget for THIS invocation only)
-python src/translate_abstracts.py --max-requests 3
-
-# Offline synthetic tests (never access the private endpoint)
-python -m unittest discover -s tests -v
+python kaggle/production_run.py --input data/translated/humanoid_patents_en.zip --expected-rows 237538 --check
 ```
 
-### Batch policy
+Offline tests: `python -m unittest discover -s tests -v` and `python -m unittest discover -s kaggle/tests -v`.
 
-By default, group up to **8** non-English abstracts per request, with a soft limit of **12,000 source characters** per request. An individual long abstract remains intact even if it exceeds this limit. Each abstract is sent separately as an entry with its original `docdb_family_id`, `source_language` from `abstract_language` (or `unknown`), and original text. The prompt specifies faithful English translation, no relevance inference, and strict JSON mapping back to each ID. A malformed/truncated/missing-ID response is **not** accepted as complete: split the batch recursively until individual problematic abstracts can be logged as still pending. Successful batches are journaled immediately; no translation response is reused for the wrong ID.
+## Perplexity validation — 31 October 2026
 
-The first run defaults to **20 requests/minute**, without assuming any provider daily quota or its reset time. Configure it with `--rpm 10` / `--rpm 0` (zero disables pacing). The default `--max-requests` is unlimited; use an explicit number if the proxy has a hard quota. `--retries 2`, `--timeout 180` and `--backoff 2` are configurable. HTTP 429 stops the current run without losing completed records; network/5xx errors get bounded retries. The API key is never committed or logged.
+**Keyword-blind, purposively selected holdout:** 100 original-English patent families (40 provisionally relevant, 60 provisionally irrelevant), threshold **0.5**. Metrics are against **AI-provisional labels**, not independent human ground truth.
 
-### Output and resumption
+| Class | Precision | Recall | F1 | Support |
+| --- | ---: | ---: | ---: | ---: |
+| Irrelevant (0) | 0.966 | 0.933 | 0.949 | 60 |
+| Relevant (1) | 0.905 | 0.950 | **0.927** | 40 |
+| Macro average | 0.935 | 0.942 | 0.938 | 100 |
+| Weighted average | 0.941 | 0.940 | 0.940 | 100 |
 
-- `outputs/translation/progress.jsonl`: append-only durable record of successfully translated abstracts and copied English originals, one entry per DOCDB family. Each append is flushed and fsynced; a truncated final JSONL line is recovered on restart.
-- `outputs/translation/progress.manifest.json`: source ZIP SHA-256, model, endpoint, and prompt version (`batch-v1`). A changed source/prompt/model/endpoint requires a **new** state directory/path; changing batch size/rate does not.
-- `outputs/translation/progress.failures.jsonl`: compact failure events (ID + error, no source abstract or secret). Failures remain pending and are retried on a subsequent run.
-- `outputs/translation/progress.summary.json`: language breakdown, counts, API attempts, successful calls, and remaining records.
-- `outputs/translation/humanoid_patents_en.csv`: atomically rebuilt CSV in the original input order, with original seven columns followed by `abstract_en,translation_status`. It contains **only completed nonempty-abstract records**. English source text is copied exactly; source identifiers and original text are unchanged. Empty abstracts are excluded and counted.
+**Accuracy:** 0.940 · **Confusion matrix:** TP 38, FP 4, TN 56, FN 2 · **Specificity:** 0.933.
 
-**Important:** the CSV may be partial when the run ends with errors or exhausted quota. Use it as a *complete* screening corpus **only when the summary contains `incomplete: 0`**. In Perplexity Decider, pass only `abstract_en` as patent text (not the original language, title, CPC, or translation notes), along with the separately versioned screening definition. The translation step does not perform classification or scoring.
+This is a stress test, **not** an unbiased estimate of production precision, recall, or threshold calibration. Independent blinded annotation and representative evaluation remain necessary. Details: [testing evidence](.project-wiki/technical/testing.md) · [sample/annotation protocol](samples/humanoid_semantic_holdout_100/ANNOTATION_PROTOCOL.md).
 
-Do not run multiple processes against the same state journal. When a request succeeds but the process crashes before the fsync, that one request may be repeated after restart. Real endpoint compatibility and translation fidelity must be verified by a live test, since the offline tests intentionally use mocked responses.
+## Documentation
 
-## Fixed 100-family evaluation benchmark
-
-Run from the repository root:
-
-```bash
-python src/sample_abstracts.py
-python -m unittest discover -s tests -v
-```
-
-The deterministic sampler reads the **unchanged** `data/raw/humanoid_patents.zip` and selects exactly 90 originally English and 10 originally non-English records, using seed `20261029`. It requires a nonempty abstract and a usable original-language code, detects duplicate DOCDB family IDs, and maintains all seven source columns without labeling or translation. SHA-256 hash-ranked bounded candidate pools make selection independent of input row order; a CPC membership-deficit heuristic encourages technology breadth without imposing equal per-CPC quotas. The ten non-English records are diversified across languages present. One family may cover several CPCs, but is sampled only once.
-
-Outputs (not automatically committed as bulk PATSTAT data):
-- `outputs/sampling/humanoid_100_abstracts.csv`: 100 unchanged source rows.
-- `outputs/sampling/humanoid_100_abstracts.zip`: identical 100 records archived under `humanoid_patents.csv`, as required by the translation reader.
-- `outputs/sampling/sampling_summary.json`: language counts, CPC coverage, missing codes, seed and limitations.
-
-To translate just the sampled ZIP without colliding with the production translation journal:
-
-```bash
-python src/translate_abstracts.py --input outputs/sampling/humanoid_100_abstracts.zip --output outputs/sampling/humanoid_100_abstracts_en.csv --state outputs/sampling/translation_progress.jsonl
-```
-
-Do **not** apply the default full-corpus translation journal to this subset: the manifest binds each journal to its source ZIP hash. This stage is only evaluation sampling, not classification or annotation. The deliberately fixed 90/10 language mix and the CPC-balanced heuristic mean the benchmark must not be interpreted as a random representative estimate of production-corpus accuracy.
-
-## Additional keyword-blind 100-family relevance stress test
-
-A disjoint original-English sample of **40 provisional positives + 60 negatives**, designed to test morphology and biped/whole-body tasks without overt humanoid name words, is available in [`samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv`](samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv). Full selection criteria, source provenance, label caveats and lexical baselines are in [the annotation protocol](samples/humanoid_semantic_holdout_100/ANNOTATION_PROTOCOL.md). Run from the repository root: `python kaggle/run.py --dataset samples/humanoid_semantic_holdout_100/semantic_holdout_100_labeled.csv --output /kaggle/working/semantic_holdout_100/predictions.csv`. No translation needed. AI labels are provisional and require independent review.
+[Project wiki](.project-wiki/INDEX.md) · [Kaggle production guide](kaggle/PRODUCTION.md) · [Dataset provenance](data/README.md)
