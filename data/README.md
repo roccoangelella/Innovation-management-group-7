@@ -4,7 +4,7 @@ The dataset archives are grouped by processing stage. Git moves preserve Git blo
 
 | Stage | File | Purpose |
 | --- | --- | --- |
-| Raw | `raw/humanoid_patents.zip` | TIP/PATSTAT candidate extract, 238,824 DOCDB families; 1,286 have no abstract |
+| Novel candidate extract | `new_humanoid_patents.zip` | Additional DOCDB families from the separate expanded query; not yet translated or screened. See [novel pipeline](../kaggle/NOVEL_PRODUCTION.md). |\n| Raw | `raw/humanoid_patents.zip` | TIP/PATSTAT candidate extract, 238,824 DOCDB families; 1,286 have no abstract |
 | Translated | `translated/humanoid_patents_en.zip` | All 237,538 families with nonempty English abstracts |
 | Translated | `translated/humanoid_patents_en_summary.json` | Translation coverage and SHA256 provenance |
 | Filtered | `filtered/filtered_patents.zip` | 3,116 provisionally relevant patent families (threshold 0.5), with source metadata |
