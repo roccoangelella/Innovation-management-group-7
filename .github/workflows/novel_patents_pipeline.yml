@@ -1,6 +1,12 @@
 name: Novel humanoid patents - GemRouter then Kaggle dual T4
 
 on:
+  # An exact-message launch-marker commit can be made only after explicit user authorization.
+  # Ordinary source edits never trigger this pipeline.
+  push:
+    branches: [main]
+    paths:
+      - '.github/novel_patents_launch_request.txt'
   workflow_dispatch:
     inputs:
       resume_translation_run_id:
@@ -24,6 +30,7 @@ concurrency:
 
 jobs:
   translate:
+    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'Authorize novel patent pipeline: GemRouter then Kaggle 2xT4'
     runs-on: ubuntu-latest
     timeout-minutes: 345
     outputs:
@@ -414,7 +421,7 @@ jobs:
 
   cleanup_token:
     needs: [submit, monitor, verify_wandb]
-    if: always()
+    if: always() && (github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'Authorize novel patent pipeline: GemRouter then Kaggle 2xT4')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
