@@ -1,0 +1,403 @@
+name: Novel humanoid patents - GemRouter then Kaggle dual T4
+
+on:
+  workflow_dispatch:
+    inputs:
+      resume_translation_run_id:
+        description: "Optional prior run ID with novel-translation-journal after a GemRouter quota stop"
+        type: string
+        required: false
+        default: ""
+      resume_screen_run_id:
+        description: "Optional prior run ID with BOTH completed translation and incomplete Kaggle checkpoint"
+        type: string
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: humanoid-novel-gemrouter-then-kaggle
+  cancel-in-progress: false
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    outputs:
+      count: ${{ steps.facts.outputs.count }}
+    env:
+      GEMR_API_KEY: ${{ secrets.GEMR_API_KEY || secrets.GEMROUTER_API_KEY }}
+      LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT || secrets.GEMROUTER_ENDPOINT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify novel dataset schema and zero overlap with 64-CPC baseline
+        run: python src/translate_novel_patents.py --check
+      - name: Restore previously completed English corpus for Kaggle resume
+        if: inputs.resume_screen_run_id != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: novel-translation-complete
+          run-id: ${{ inputs.resume_screen_run_id }}
+          github-token: ${{ github.token }}
+          path: outputs/novel_translation
+      - name: Restore incomplete GemRouter journal
+        if: inputs.resume_screen_run_id == '' && inputs.resume_translation_run_id != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: novel-translation-journal
+          run-id: ${{ inputs.resume_translation_run_id }}
+          github-token: ${{ github.token }}
+          path: outputs/novel_translation
+      - name: Translate remaining non-English abstracts with GemRouter
+        run: |
+          set -euo pipefail
+          python src/translate_novel_patents.py --max-requests 600 --passes 5 --rpm 20
+      - name: Preserve source-bound GemRouter journal for quota recovery
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: novel-translation-journal
+          path: |
+            outputs/novel_translation/progress.jsonl
+            outputs/novel_translation/progress.manifest.json
+          retention-days: 30
+          if-no-files-found: ignore
+      - name: Assert complete translated dataset and publish count
+        id: facts
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          src = Path("outputs/novel_translation/novel_humanoid_patents_en.csv")
+          summ = Path("outputs/novel_translation/novel_translation_summary.json")
+          if not src.is_file() or not summ.is_file():
+              raise RuntimeError("No complete English corpus; Kaggle submission is blocked")
+          d = json.loads(summ.read_text(encoding="utf-8"))
+          if d.get("incomplete") != 0 or d.get("completed") != d.get("eligible") or d.get("completed",0) <= 1:
+              raise RuntimeError("Translation incomplete; Kaggle submission is blocked")
+          with src.open("rb") as f:
+              digest = hashlib.file_digest(f, "sha256").hexdigest()
+          if digest != d["final_csv_sha256"]:
+              raise RuntimeError("Translated CSV digest mismatch")
+          with open(os.environ["GITHUB_OUTPUT"],"a") as out:
+              out.write(f"count={d['completed']}\n")
+          print("TRANSLATION_VERIFIED", d["completed"], "source", d["source_sha256"], flush=True)
+          PY
+      - name: Retain complete English corpus for Kaggle and retries
+        uses: actions/upload-artifact@v4
+        with:
+          name: novel-translation-complete
+          path: |
+            outputs/novel_translation/novel_humanoid_patents_en.csv
+            outputs/novel_translation/novel_translation_summary.json
+          retention-days: 30
+          if-no-files-found: error
+
+  submit:
+    needs: translate
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    outputs:
+      kernel_id: ${{ steps.launch.outputs.kernel_id }}
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+      NOVEL_COUNT: ${{ needs.translate.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Kaggle CLI
+        run: python -m pip install --disable-pip-version-check kaggle six
+      - name: Download independently verified novel English dataset
+        uses: actions/download-artifact@v4
+        with:
+          name: novel-translation-complete
+          path: staged_input
+      - name: Recover optional earlier incomplete novel screening checkpoint
+        if: inputs.resume_screen_run_id != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: novel-screening-output
+          run-id: ${{ inputs.resume_screen_run_id }}
+          github-token: ${{ github.token }}
+          path: recovered_screen
+      - name: Verify Kaggle credentials, model dataset, and owner
+        run: |
+          set -euo pipefail
+          test -n "$KAGGLE_API_TOKEN" || { echo "::error::Missing KAGGLE_API_TOKEN"; exit 1; }
+          test -n "$WANDB_API_KEY" || { echo "::error::Missing WANDB_API_KEY"; exit 1; }
+          kaggle kernels init -p kaggle/novel_kernel
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          m = json.loads(Path("kaggle/novel_kernel/kernel-metadata.json").read_text(encoding="utf-8"))
+          owner = m["id"].split("/",1)[0]
+          if not owner or owner in ("username","user"):
+              raise ValueError("Could not identify authenticated Kaggle account")
+          with open(os.environ["GITHUB_ENV"],"a") as out:
+              out.write("KAGGLE_OWNER="+owner+"\n")
+          print("KAGGLE_OWNER",owner)
+          PY
+          kaggle datasets files "$KAGGLE_OWNER/pplx-decider-flash-private-v12" > /tmp/model_files.txt
+          grep -q snapshot_manifest.json /tmp/model_files.txt || {
+            echo "::error::Missing previously provisioned private pinned Decider model";
+            exit 1;
+          }
+      - name: Create private Kaggle novel translated dataset
+        run: |
+          set -euo pipefail
+          mkdir -p novel_kaggle_input
+          cp staged_input/novel_humanoid_patents_en.csv novel_kaggle_input/
+          cp staged_input/novel_translation_summary.json novel_kaggle_input/
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=Path("novel_kaggle_input/dataset-metadata.json")
+          p.write_text(json.dumps({
+            "id":os.environ["KAGGLE_OWNER"]+"/humanoid-novel-translated-"+os.environ["GITHUB_RUN_ID"],
+            "title":"Private novel humanoid patent English corpus",
+            "licenses":[{"name":"other"}],
+            "description":"Novel-to-64-CPC family corpus, independently validated, private only",
+          },indent=2)+"\n",encoding="utf-8")
+          PY
+          kaggle datasets create -p novel_kaggle_input --keep-tabular -q
+          for attempt in $(seq 1 18); do
+            if kaggle datasets files "$KAGGLE_OWNER/humanoid-novel-translated-$GITHUB_RUN_ID" > /tmp/novel_files.txt 2>&1; then
+              grep -q 'novel_humanoid_patents_en.csv' /tmp/novel_files.txt
+              grep -q 'novel_translation_summary.json' /tmp/novel_files.txt
+              break
+            fi
+            if [ "$attempt" -eq 18 ]; then
+              echo "::error::Private translated dataset not readable on Kaggle";
+              exit 1;
+            fi
+            sleep 10
+          done
+          echo "PRIVATE_NOVEL_TRANSLATED_DATASET_AVAILABLE"
+      - name: Validate and mount previous novel journal, if requested
+        if: inputs.resume_screen_run_id != ''
+        run: |
+          set -euo pipefail
+          test -s recovered_screen/humanoid-checkpoint.zip || {
+            echo "::error::Previous screening run has no resumable checkpoint ZIP";
+            exit 1;
+          }
+          python kaggle/validate_novel_resume.py \
+            recovered_screen/humanoid-checkpoint.zip \
+            staged_input/novel_humanoid_patents_en.csv \
+            staged_input/novel_translation_summary.json \
+            novel_resume \
+            "$KAGGLE_OWNER/humanoid-novel-resume-$GITHUB_RUN_ID"
+          kaggle datasets create -p novel_resume -q
+          kaggle datasets files "$KAGGLE_OWNER/humanoid-novel-resume-$GITHUB_RUN_ID" > /tmp/resume_files.txt
+          grep -q production_manifest.json /tmp/resume_files.txt
+      - name: Create private single-run W&B credential dataset
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p novel_wandb
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root=Path("novel_wandb")
+          token=os.environ["WANDB_API_KEY"].strip()
+          if len(token)<20:
+              raise ValueError("W&B key unexpectedly short")
+          (root/"wandb_auth_token.txt").write_text(token,encoding="utf-8")
+          (root/"dataset-metadata.json").write_text(json.dumps({
+              "id":os.environ["KAGGLE_OWNER"]+"/humanoid-novel-wandb-"+os.environ["GITHUB_RUN_ID"],
+              "title":"Private novel-patent W&B credential",
+              "licenses":[{"name":"other"}],
+              "description":"Ephemeral private monitoring token. Delete after the Kaggle run.",
+          }))
+          PY
+          kaggle datasets create -p novel_wandb --keep-tabular -q
+          rm -f novel_wandb/wandb_auth_token.txt
+          for attempt in $(seq 1 18); do
+            if kaggle datasets files "$KAGGLE_OWNER/humanoid-novel-wandb-$GITHUB_RUN_ID" > /tmp/novel_wandb_files.txt 2>&1; then
+              break
+            fi
+            if [ "$attempt" -eq 18 ]; then
+              echo "::error::Temporary private W&B mount not readable";
+              exit 1;
+            fi
+            sleep 10
+          done
+      - name: Prepare isolated dual T4 notebook with pinned Git commit
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path("kaggle/novel_kernel")
+          meta=json.loads((root/"kernel-metadata.json").read_text(encoding="utf-8"))
+          owner=os.environ["KAGGLE_OWNER"]
+          dataset_sources=[
+            owner+"/pplx-decider-flash-private-v12",
+            owner+"/humanoid-novel-translated-"+os.environ["GITHUB_RUN_ID"],
+            owner+"/humanoid-novel-wandb-"+os.environ["GITHUB_RUN_ID"],
+          ]
+          resume=${{ inputs.resume_screen_run_id != '' }}
+          if resume:
+              dataset_sources.append(owner+"/humanoid-novel-resume-"+os.environ["GITHUB_RUN_ID"])
+          kernel=owner+"/humanoid-novel-patents-dual-t4"
+          meta.update({
+            "id":kernel,"title":"Novel humanoid patent production dual T4",
+            "code_file":"production.ipynb","language":"python",
+            "kernel_type":"notebook","is_private":"true",
+            "enable_gpu":"true","enable_internet":"true",
+            "machine_shape":"NvidiaTeslaT4",
+            "dataset_sources":dataset_sources,
+            "competition_sources":[],"kernel_sources":[],"model_sources":[],
+          })
+          meta.pop("id_no",None)
+          (root/"kernel-metadata.json").write_text(json.dumps(meta,indent=2)+"\n")
+          notebook=root/"production.ipynb"
+          contents=notebook.read_text(encoding="utf-8")
+          for key,value in {
+              "REPLACE_GIT_SHA":os.environ["GITHUB_SHA"],
+              "REPLACE_RUN_ID":os.environ["GITHUB_RUN_ID"],
+              "REPLACE_RESUME_ENABLED":"true" if resume else "false",
+          }.items():
+              if contents.count(key)!=1:
+                  raise ValueError("Notebook placeholder mismatch: "+key)
+              contents=contents.replace(key,value)
+          notebook.write_text(contents,encoding="utf-8")
+          print("NOVEL_DUAL_T4_READY",kernel,os.environ["GITHUB_SHA"],len(dataset_sources))
+          PY
+      - name: Submit novel dual-T4 inference, never overwrite an active session
+        id: launch
+        run: |
+          set -euo pipefail
+          kernel="$KAGGLE_OWNER/humanoid-novel-patents-dual-t4"
+          if kaggle kernels status "$kernel" > /tmp/novel_status.txt 2>&1; then
+            cat /tmp/novel_status.txt
+            if grep -Eq 'KernelWorkerStatus.(RUNNING|QUEUED|PENDING)' /tmp/novel_status.txt; then
+              echo "::error::An earlier novel screening session is active";
+              exit 1;
+            fi
+          else
+            if ! grep -Eqi '(not found|404|does not exist)' /tmp/novel_status.txt; then
+              echo "::error::Cannot safely determine prior Kaggle notebook status";
+              cat /tmp/novel_status.txt
+              exit 1
+            fi
+          fi
+          submitted=0
+          for attempt in $(seq 1 80); do
+            kaggle kernels push -p kaggle/novel_kernel --accelerator NvidiaTeslaT4 --timeout 21600 > /tmp/novel_push.log 2>&1 || true
+            if grep -Eq 'Kernel version [0-9]+ successfully pushed' /tmp/novel_push.log; then
+              submitted=1
+              break
+            fi
+            if grep -q 'Maximum batch GPU session count of 2 reached' /tmp/novel_push.log; then
+              echo "KAGGLE_GPU_SLOTS_FULL attempt=$attempt/80"
+              sleep 60
+            else
+              echo "::error::Unexpected Kaggle notebook submission failure"
+              tail -25 /tmp/novel_push.log
+              exit 1
+            fi
+          done
+          if [ "$submitted" != 1 ]; then
+            echo "::error::Kaggle GPU slots unavailable during bounded retry window"
+            exit 1
+          fi
+          cat /tmp/novel_push.log
+          echo "kernel_id=$kernel" >> "$GITHUB_OUTPUT"
+      - name: Delete temporary W&B token dataset on submission failure
+        if: failure()
+        run: |
+          if [ -n "$KAGGLE_OWNER" ]; then
+            kaggle datasets delete "$KAGGLE_OWNER/humanoid-novel-wandb-$GITHUB_RUN_ID" -y || true
+          fi
+
+  monitor:
+    needs: [translate, submit]
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+      KAGGLE_KERNEL_ID: ${{ needs.submit.outputs.kernel_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check kaggle six
+      - uses: actions/download-artifact@v4
+        with:
+          name: novel-translation-complete
+          path: staged_input
+      - name: Monitor actual Kaggle status, not merely submission
+        id: watch
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 700); do
+            status="$(kaggle kernels status "$KAGGLE_KERNEL_ID" 2>&1)" || {
+              echo "Transient status error"
+              sleep 30
+              continue
+            }
+            if (( attempt % 10 == 1 )); then echo "$status"; fi
+            if [[ "$status" == *"KernelWorkerStatus.COMPLETE"* ]]; then exit 0; fi
+            if [[ "$status" == *"KernelWorkerStatus.ERROR"* || "$status" == *"KernelWorkerStatus.CANCELLED"* ]]; then
+              echo "::error::Kaggle notebook errored/cancelled; retrieve checkpoint to resume"
+              kaggle kernels logs "$KAGGLE_KERNEL_ID" | tail -60 || true
+              exit 1
+            fi
+            sleep 30
+          done
+          echo "::error::Timed out waiting for Kaggle dual T4 completion"
+          exit 1
+      - name: Download final outputs or checkpoint even on errors
+        if: always()
+        run: |
+          mkdir -p kaggle_results
+          kaggle kernels output "$KAGGLE_KERNEL_ID" -p kaggle_results || true
+          find kaggle_results -maxdepth 2 -type f -printf '%P: %s bytes\n'
+      - name: Verify every novel ID was scored and both published digests match
+        if: steps.watch.outcome == 'success'
+        run: |
+          python kaggle/validate_novel_output.py staged_input/novel_humanoid_patents_en.csv \
+            staged_input/novel_translation_summary.json kaggle_results
+      - name: Preserve output and worker checkpoint independently of success
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: novel-screening-output
+          path: kaggle_results/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Delete ephemeral private W&B token
+        if: always()
+        run: |
+          owner="$(printf '%s' "$KAGGLE_KERNEL_ID" | cut -d/ -f1)"
+          if [ -n "$owner" ]; then
+            kaggle datasets delete "$owner/humanoid-novel-wandb-$GITHUB_RUN_ID" -y || true
+          fi
+
+  verify_wandb:
+    needs: [translate, submit]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+      WANDB_BASE_URL: https://api.forge.coreweave.com
+      WANDB_RUN_NAME: novel-dual-t4-direct-${{ github.run_id }}
+      WANDB_EXPECTED_TOTAL: ${{ needs.translate.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check wandb==0.31.0
+      - name: Independently confirm W&B received nonzero actual prediction counts
+        run: python -u kaggle/verify_wandb_live.py
