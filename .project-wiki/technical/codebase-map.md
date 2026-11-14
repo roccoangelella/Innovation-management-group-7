@@ -58,3 +58,13 @@ confidence: confirmed
 | `kaggle/PRODUCTION.md` | Production Kaggle usage, input contract, evidence and GPU acceptance gates |
 
 Run `python -m unittest discover -s tests -v` for existing offline tests and `python -m unittest discover -s kaggle/tests -v` for Kaggle launcher/evaluator tests. Kaggle live model execution and FP16 accuracy remain unverified. Full-corpus dual-T4 screening and output integrity were independently verified on 2026-11-12. Relevance adjudication, landscaping, valuation and quadrant implementation remain pending.
+
+
+## 2026-11-14 novel-family batch
+
+- `data/new_humanoid_patents.zip`: novel-only nine-field PATSTAT DOCDB extract.
+- `src/translate_novel_patents.py`: source-baseline ID intersection audit, GemRouter journal and English normalization.
+- `.github/workflows/novel_patents_pipeline.yml`: manual translation-before-Kaggle execution and private dataset staging.
+- `kaggle/novel_kernel/production.ipynb`: independent 2×T4 inference and batch-specific W&B count.
+- `kaggle/validate_novel_resume.py`, `kaggle/validate_novel_output.py`: strict journal/source and final dataset provenance gates.
+- `tests/test_novel_pipeline.py`: synthetic compatibility checks (live launch pending).
