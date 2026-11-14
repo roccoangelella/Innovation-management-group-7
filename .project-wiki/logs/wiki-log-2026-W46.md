@@ -104,3 +104,11 @@ Evidence: Production run 43012383316 submit job passed and independent verify_wa
 Changed: [README](../../README.md).
 
 Summary: Condensed the public README from 10,486 to 2,881 characters, keeping canonical dataset counts, core pipeline entry points, verification commands and documentation links. Added the 31 October Perplexity Decider Flash keyword-blind 100-family AI-provisional holdout classification report (positive-class F1 0.9268, TP=38, FP=4, TN=56, FN=2) and explicit warning that it is not a representative human-validated production performance estimate. Detailed evidence remains in [testing](../technical/testing.md); OQ-001 stays open.
+
+## [2026-11-14] update | WLOG-20261114-001 | Prepare separate incremental GemRouter and dual-T4 screening
+
+Changed: [status](../STATUS.md), [architecture](../technical/architecture.md), [deployment](../technical/deployment.md), [testing](../technical/testing.md), [current plan](../implementation/current-plan.md), [traceability](../traceability/code-map.md), [changelog](../changes/CHANGELOG.md), and source files `src/translate_abstracts.py`, `src/translate_novel_patents.py`, `kaggle/novel_kernel/production.ipynb`, `kaggle/validate_novel_resume.py`, `kaggle/validate_novel_output.py`, `kaggle/wandb_live.py`, `kaggle/verify_wandb_live.py`, `tests/test_novel_pipeline.py`, `kaggle/NOVEL_PRODUCTION.md`, `.github/workflows/novel_patents_pipeline.yml`, `data/README.md` and repository `README.md`.
+
+Summary: A manually dispatched, novel-only source-bound workflow has been implemented around the newly committed `data/new_humanoid_patents.zip`. It checks source schema, duplicate IDs and lack of overlap with the original 64-CPC corpus; journals translation and refuses incomplete coverage; stages English CSV and a private T4×2 Kaggle notebook; restores only source/model/prompt-matched journals; and checks eventual complete predictions and full metadata retention. Both Actions journal/English/output artifacts are retained for 30 days. No GemRouter or GPU run was started by the implementation; runtime preflight/GPU acceptance remains pending.
+
+Questions: OQ-001 still open (human validation of relevance definition and 0.5 threshold); translation fidelity remains an independent review concern. No new speculative requirement is inferred from the source code.
