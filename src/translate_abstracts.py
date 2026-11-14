@@ -24,6 +24,10 @@ SOURCE_FIELDS = [
     'docdb_family_id', 'year', 'title', 'title_language', 'abstract',
     'abstract_language', 'matched_cpcs',
 ]
+NOVEL_SOURCE_FIELDS = [
+    'docdb_family_id', 'year', 'title', 'title_language', 'abstract',
+    'abstract_language', 'all_cpcs', 'ipr_types', 'matching_channels',
+]
 OUTPUT_FIELDS = SOURCE_FIELDS + ['abstract_en', 'translation_status']
 PROMPT_VERSION = 'batch-v1'
 DEFAULT_ENDPOINT = 'https://gemr.84-8-255-231.nip.io/v1/chat/completions'
@@ -82,13 +86,31 @@ def load_env(path):
         os.environ.setdefault(name, value)
 
 
-def input_rows(path):
+def source_layout(path):
+    """Resolve one of the two explicitly supported PATSTAT source schemas."""
     with zipfile.ZipFile(path) as archive:
-        with archive.open('humanoid_patents.csv') as raw:
+        members = [name for name in archive.namelist()
+                   if name.lower().endswith('.csv') and not name.endswith('/')]
+        if len(members) != 1:
+            raise ValueError('Source ZIP must contain exactly one CSV member')
+        with archive.open(members[0]) as raw:
+            with io.TextIOWrapper(raw, encoding='utf-8-sig', newline='') as stream:
+                fields = csv.DictReader(stream).fieldnames
+        if fields == SOURCE_FIELDS and members[0] == 'humanoid_patents.csv':
+            return members[0], SOURCE_FIELDS
+        if fields == NOVEL_SOURCE_FIELDS and members[0] == 'new_humanoid_patents.csv':
+            return members[0], NOVEL_SOURCE_FIELDS
+        raise ValueError(f'Unexpected source member/schema: {members[0]}: {fields}')
+
+
+def input_rows(path):
+    member, expected_fields = source_layout(path)
+    with zipfile.ZipFile(path) as archive:
+        with archive.open(member) as raw:
             with io.TextIOWrapper(raw, encoding='utf-8-sig', newline='') as stream:
                 reader = csv.DictReader(stream)
-                if reader.fieldnames != SOURCE_FIELDS:
-                    raise ValueError(f'Unexpected source schema: {reader.fieldnames}')
+                if reader.fieldnames != expected_fields:
+                    raise ValueError('Source CSV header changed while reading')
                 for row in reader:
                     if None in row or any(value is None for value in row.values()):
                         raise ValueError('Malformed CSV row (extra or missing fields)')
@@ -296,7 +318,8 @@ def export(path, completed, output):
     tmp = output.with_name(output.name + '.tmp')
     written = 0
     with tmp.open('w', newline='', encoding='utf-8') as stream:
-        writer = csv.DictWriter(stream, fieldnames=OUTPUT_FIELDS)
+        _, source_columns = source_layout(path)
+        writer = csv.DictWriter(stream, fieldnames=source_columns + ['abstract_en', 'translation_status'])
         writer.writeheader()
         for row in input_rows(path):
             family = row['docdb_family_id'].strip()
