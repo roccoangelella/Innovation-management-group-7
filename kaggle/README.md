@@ -1,3 +1,7 @@
+## New patent families (2026-11-14)
+
+The incremental `data/new_humanoid_patents.zip` source has a **separate, manual-only** GitHub Actions GemRouter translation → private Kaggle dual-T4 pipeline, documented in [NOVEL_PRODUCTION.md](NOVEL_PRODUCTION.md). Do not use the original 237,538-family production workflow or journal for this novel batch.
+
 > **Full-corpus two-T4 production:** See [PRODUCTION.md](PRODUCTION.md) and [production_run.py](production_run.py). This document remains for the single-GPU pilot.
 
 # Kaggle · Perplexity Decider FP16 screening pilot
