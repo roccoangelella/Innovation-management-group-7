@@ -107,8 +107,8 @@ class NovelPipelineTests(unittest.TestCase):
 
     def test_novel_notebook_parses_and_has_no_full_corpus_assumption(self):
         nb = json.loads((ROOT / "kaggle/novel_kernel/production.ipynb").read_text(encoding="utf-8"))
-        script = "".join(cell["source"][0] if False else "".join(cell["source"])
-                         for cell in nb["cells"] if cell["cell_type"] == "code")
+        script = "\n".join("".join(cell["source"])
+                           for cell in nb["cells"] if cell["cell_type"] == "code")
         ast.parse(script)
         self.assertIn("REPLACE_RESUME_ENABLED", script)
         self.assertIn('"--total", str(count)', script)
