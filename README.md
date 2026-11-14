@@ -1,4 +1,4 @@
-**2026-11-14 incremental screening preparation:** The new `data/new_humanoid_patents.zip` candidate batch has a separate, manual-only [GemRouter → Kaggle dual-T4 workflow](kaggle/NOVEL_PRODUCTION.md). It is not included in the existing 237,538-family filtered result. The new pipeline has not been launched yet.\n\n# Innovation Management · Group 7 — Humanoid robots (Electrolux)
+**2026-11-14 incremental screening preparation:** The new `data/new_humanoid_patents.zip` candidate batch has a separate, explicitly triggered [GemRouter → Kaggle dual-T4 workflow](kaggle/NOVEL_PRODUCTION.md). It is not included in the existing 237,538-family filtered result. The new pipeline has not been launched yet.\n\n# Innovation Management · Group 7 — Humanoid robots (Electrolux)
 
 Patent-based sector scouting for the 2026/27 Innovation Management project at Politecnico di Torino. Unit of analysis: **DOCDB patent family**.
 
