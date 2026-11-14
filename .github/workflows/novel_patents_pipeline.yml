@@ -36,6 +36,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Reject ambiguous simultaneous resume requests
+        if: inputs.resume_translation_run_id != '' && inputs.resume_screen_run_id != ''
+        run: |
+          echo "::error::Supply only one resume run ID: translation OR screening, never both"
+          exit 1
       - name: Run offline syntax and compatibility regression tests before API calls
         run: |
           python -m py_compile src/translate_abstracts.py src/translate_novel_patents.py kaggle/validate_novel_resume.py kaggle/validate_novel_output.py kaggle/wandb_live.py
