@@ -244,7 +244,7 @@ jobs:
             owner+"/humanoid-novel-translated-"+os.environ["GITHUB_RUN_ID"],
             owner+"/humanoid-novel-wandb-"+os.environ["GITHUB_RUN_ID"],
           ]
-          resume=${{ inputs.resume_screen_run_id != '' }}
+          resume='${{ inputs.resume_screen_run_id != '' }}' == 'true'
           if resume:
               dataset_sources.append(owner+"/humanoid-novel-resume-"+os.environ["GITHUB_RUN_ID"])
           kernel=owner+"/humanoid-novel-patents-dual-t4"
