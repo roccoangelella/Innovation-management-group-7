@@ -19,8 +19,9 @@ def on_stop(_signal, _frame):
 
 
 class JournalCounter:
-    def __init__(self, root):
+    def __init__(self, root, total=TOTAL):
         self.root = Path(root)
+        self.total = total
         self.offsets = [0, 0]
         self.processed = [0, 0]
         self.positive = [0, 0]
@@ -48,7 +49,7 @@ class JournalCounter:
                     self.positive[worker] += int(record["model_decision"])
                     self.offsets[worker] = stream.tell()
         count = sum(self.processed)
-        if count > TOTAL:
+        if count > self.total:
             raise RuntimeError("Journal has more predictions than eligible patent families")
         return count
 
@@ -58,7 +59,7 @@ def serve(root, interval, signal_file, run_name, total=TOTAL):
         raise RuntimeError("WANDB_API_KEY is unavailable inside the Kaggle runtime")
     import wandb
 
-    counter = JournalCounter(root)
+    counter = JournalCounter(root, total=total)
     start = time.monotonic()
     previous_count = 0
     previous_time = start
@@ -106,12 +107,15 @@ def main():
     p.add_argument("--ready-file", required=True)
     p.add_argument("--run-name", default="production-dual-t4-direct")
     p.add_argument("--interval", type=float, default=30)
+    p.add_argument("--total", type=int, default=TOTAL, help="Verified eligible family count")
     args = p.parse_args()
     if args.interval < 1:
         p.error("interval must be >= 1 second")
     signal.signal(signal.SIGTERM, on_stop)
     signal.signal(signal.SIGINT, on_stop)
-    serve(args.production_dir, args.interval, args.ready_file, args.run_name)
+    if args.total <= 0:
+        p.error("--total must be positive")
+    serve(args.production_dir, args.interval, args.ready_file, args.run_name, total=args.total)
 
 
 if __name__ == "__main__":
