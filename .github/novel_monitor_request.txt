@@ -1,0 +1,3 @@
+Monitor ONLY the already-submitted Kaggle novel patent notebook at https://www.kaggle.com/code/roccoangelella/novel-humanoid-patent-production-dual-t4
+Original GPU submission: GitHub Actions run 43710347995
+Input: 22,437 translated DOCDB families. Do not launch another Kaggle kernel.
