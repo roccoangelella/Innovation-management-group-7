@@ -1,5 +1,3 @@
-**2026-11-14 incremental screening preparation:** The new `data/new_humanoid_patents.zip` candidate batch has a separate, explicitly triggered [GemRouter → Kaggle dual-T4 workflow](kaggle/NOVEL_PRODUCTION.md). It is not included in the existing 237,538-family filtered result. The new pipeline has not been launched yet.\n\n# Innovation Management · Group 7 — Humanoid robots (Electrolux)
-
 Patent-based sector scouting for the 2026/27 Innovation Management project at Politecnico di Torino. Unit of analysis: **DOCDB patent family**.
 
 ## Datasets
@@ -8,9 +6,11 @@ Patent-based sector scouting for the 2026/27 Innovation Management project at Po
 | --- | --- | ---: |
 | TIP/PATSTAT extract | [Raw patents](data/raw/humanoid_patents.zip) | 238,824 |
 | Nonempty English abstracts (original + translated) | [English corpus](data/translated/humanoid_patents_en.zip) | 237,538 |
-| Provisional Perplexity Decider Flash screening (threshold 0.5) | [Retained patents](data/filtered/filtered_patents.zip) | 3,116 |
+| Original 64-CPC query: Decider Flash positives (threshold 0.5) | [Original retained patents](data/filtered/filtered_patents.zip) | 3,116 |
+| Novel query: additional Decider Flash positives (threshold 0.5) | [Novel verified artifact](https://github.com/roccoangelella/Innovation-management-group-7/actions/runs/43710629726/artifacts/14162007316) | 3,986 |
+| **Final deduplicated positive patent dataset** | **[humanoid_patents_final.csv](data/final/humanoid_patents_final.csv)** | **7,102** |
 
-The raw extract contains 1,286 families without abstracts. The full set of 237,538 screening decisions was independently checked for ID and archive integrity. **Relevance decisions are provisional, not human-validated.** See [dataset provenance, checksums, and prediction artifacts](data/README.md).
+The original raw extract contains 1,286 families without abstracts. The novel query added 22,533 distinct candidates, of which 22,437 had nonempty abstracts; 3,986 were provisionally retained. The two positive sets have no overlapping DOCDB family IDs. The final CSV has English abstracts, identifiers, original metadata, query-specific CPC fields and prediction probabilities. The full set of 237,538 screening decisions was independently checked for ID and archive integrity. **Relevance decisions are provisional, not human-validated.** See [dataset provenance, checksums, and prediction artifacts](data/README.md).
 
 ## Pipeline
 
