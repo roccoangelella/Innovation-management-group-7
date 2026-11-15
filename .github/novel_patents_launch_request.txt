@@ -1,0 +1,4 @@
+Authorized first run of the novel-family GemRouter translation and Kaggle 2xT4 filtering pipeline.
+Input: data/new_humanoid_patents.zip
+Workflow: .github/workflows/novel_patents_pipeline.yml
+Requested: 2026-11-15
