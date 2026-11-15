@@ -3,3 +3,4 @@ Input: data/new_humanoid_patents.zip
 Workflow: .github/workflows/novel_patents_pipeline.yml
 Requested: 2026-11-15
 Retry: 2026-11-15, after fixing offline notebook hardcoded-count assertion.
+Resume request: 2026-11-15; use validated 22,437-family English artifact from run 43700985713. Fix Kaggle-owner shell step; do not retranslate.
