@@ -3,3 +3,4 @@ Original verified Decider positives: 3,116 (data/filtered/filtered_patents.zip).
 Novel verified Decider positives: 3,986 (GitHub Actions run 43710629726, artifact 14162007316).
 Expected unique DOCDB families: 7,102. Expected final SHA256: de06e29a8c9053a80183ee3ed2e739d6e552892c528f8b93cb348adc70fc6132.
 Write only data/final/humanoid_patents_final.csv. No model inference or translation reruns.
+Retry publication with raw CSV bytes preserved; source/final SHA-256 validated in prior run 43720798063.
