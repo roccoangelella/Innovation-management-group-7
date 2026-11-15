@@ -1,0 +1,65 @@
+name: Publish final validated humanoid patent CSV
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/final_patents_publish_request.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: final-humanoid-patents-csv-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'Publish validated 7102-family final humanoid CSV'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository with write credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download separately validated 3986-positive novel Kaggle output
+        uses: actions/download-artifact@v4
+        with:
+          name: novel-screening-output-monitor-43710347995
+          run-id: 43710629726
+          github-token: ${{ github.token }}
+          path: novel_screening_output
+      - name: Reconstruct final CSV from BOTH original verified source ZIPs
+        run: |
+          set -euo pipefail
+          python -m py_compile src/build_final_humanoid_dataset.py
+          python src/build_final_humanoid_dataset.py \
+            --original data/filtered/filtered_patents.zip \
+            --original-summary data/filtered/production_summary.json \
+            --novel novel_screening_output/filtered_patents.zip \
+            --novel-summary novel_screening_output/production_summary.json \
+            --output data/final/humanoid_patents_final.csv
+          echo 'de06e29a8c9053a80183ee3ed2e739d6e552892c528f8b93cb348adc70fc6132  data/final/humanoid_patents_final.csv' | sha256sum --check
+          test "$(wc -c < data/final/humanoid_patents_final.csv)" -eq 17371429
+          echo "COMPLETE_SOURCE_VERIFIED_FINAL_CSV=7102"
+      - name: Publish only validated CSV on main
+        run: |
+          set -euo pipefail
+          git add -- data/final/humanoid_patents_final.csv
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "Already published, identical verified content"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Publish final 7102-family verified humanoid patent CSV"
+          git push origin HEAD:main
+          git ls-tree -r HEAD -- data/final/humanoid_patents_final.csv
