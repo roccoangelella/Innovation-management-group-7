@@ -56,6 +56,14 @@ jobs:
           python -m unittest discover -s kaggle/tests -p 'test_wandb_live.py' -v
       - name: Verify novel dataset schema and zero overlap with 64-CPC baseline
         run: python src/translate_novel_patents.py --check
+      - name: Restore successful 2026-11-15 novel translation without retranslating
+        if: github.event_name == 'push'
+        uses: actions/download-artifact@v4
+        with:
+          name: novel-translation-complete
+          run-id: 43700985713
+          github-token: ${{ github.token }}
+          path: outputs/novel_translation
       - name: Restore previously completed English corpus for Kaggle resume
         if: inputs.resume_screen_run_id != ''
         uses: actions/download-artifact@v4
@@ -164,6 +172,9 @@ jobs:
               out.write("KAGGLE_OWNER="+owner+"\n")
           print("KAGGLE_OWNER",owner)
           PY
+      - name: Validate pinned private Kaggle model checkpoint is readable
+        run: |
+          set -euo pipefail
           kaggle datasets files "$KAGGLE_OWNER/pplx-decider-flash-private-v12" > /tmp/model_files.txt
           grep -q snapshot_manifest.json /tmp/model_files.txt || {
             echo "::error::Missing previously provisioned private pinned Decider model";
