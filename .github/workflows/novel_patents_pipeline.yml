@@ -175,9 +175,10 @@ jobs:
       - name: Validate pinned private Kaggle model checkpoint is readable
         run: |
           set -euo pipefail
-          kaggle datasets files "$KAGGLE_OWNER/pplx-decider-flash-private-v12" > /tmp/model_files.txt
+          kaggle datasets files "$KAGGLE_OWNER/pplx-decider-flash-private-v12" --page-size 200 > /tmp/model_files.txt
           grep -q snapshot_manifest.json /tmp/model_files.txt || {
-            echo "::error::Missing previously provisioned private pinned Decider model";
+            echo "::error::Private model listing is missing the snapshot manifest (Kaggle paginates file listings).";
+            head -12 /tmp/model_files.txt
             exit 1;
           }
       - name: Create private Kaggle novel translated dataset
