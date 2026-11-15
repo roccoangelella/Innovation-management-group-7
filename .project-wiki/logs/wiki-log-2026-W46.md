@@ -112,3 +112,11 @@ Changed: [status](../STATUS.md), [architecture](../technical/architecture.md), [
 Summary: An opt-in, dispatch- or exact-message-marker-triggered, novel-only source-bound workflow has been implemented around the newly committed `data/new_humanoid_patents.zip`. It checks source schema, duplicate IDs and lack of overlap with the original 64-CPC corpus; journals translation and refuses incomplete coverage; stages English CSV and a private T4×2 Kaggle notebook; restores only source/model/prompt-matched journals; and checks eventual complete predictions and full metadata retention. Both Actions journal/English/output artifacts are retained for 30 days. No GemRouter or GPU run was started by the implementation; runtime preflight/GPU acceptance remains pending.
 
 Questions: OQ-001 still open (human validation of relevance definition and 0.5 threshold); translation fidelity remains an independent review concern. No new speculative requirement is inferred from the source code.
+
+## [2026-11-15] update | WLOG-20261115-001 | Publish complete 7,102-family provisional humanoid patent CSV
+
+Changed: [status](../STATUS.md), [deployment](../technical/deployment.md), [codebase](../technical/codebase-map.md), [traceability](../traceability/code-map.md), [changelog](../changes/CHANGELOG.md), [data documentation](../../data/README.md), [README](../../README.md); implementation `src/build_final_humanoid_dataset.py`, `.github/workflows/publish_final_humanoid_csv.yml` and `data/final/humanoid_patents_final.csv`.
+
+Summary: The complete original (3,116) and novel (3,986) positive-only Kaggle outputs were recombined into 7,102 unique DOCDB families without cross-batch overlap. The merger enforced source-filtered ZIP SHA256, schema, family uniqueness and provisional binary decisions; final CSV SHA256 `de06e29a8c9053a80183ee3ed2e739d6e552892c528f8b93cb348adc70fc6132` was confirmed by [publication run 43720922493](https://github.com/roccoangelella/Innovation-management-group-7/actions/runs/43720922493), committing 17,371,429 bytes to main (commit 851cad5). Different CPC source semantics are explicitly retained as `matched_cpcs` and `all_cpcs`; no human-label calibration was inferred.
+
+Questions: OQ-001 stays open; source relevance decisions at 0.5 are model provisional.
