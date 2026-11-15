@@ -68,3 +68,10 @@ Run `python -m unittest discover -s tests -v` for existing offline tests and `py
 - `kaggle/novel_kernel/production.ipynb`: independent 2×T4 inference and batch-specific W&B count.
 - `kaggle/validate_novel_resume.py`, `kaggle/validate_novel_output.py`: strict journal/source and final dataset provenance gates.
 - `tests/test_novel_pipeline.py`: synthetic compatibility checks (live launch pending).
+
+
+## 2026-11-15 final unified dataset publication
+
+- `src/build_final_humanoid_dataset.py`: deterministic two-source merger; expects the original and novel screened ZIPs and their production summaries, validates source SHA256 and original column contracts, rejects duplicate DOCDB family IDs within or between cohorts, and emits numeric-ID-sorted final CSV with `source_query` provenance.
+- `.github/workflows/publish_final_humanoid_csv.yml`: explicit-message/manual GitHub Actions export and push; downloads validated novel run 43710629726's artifact, verifies full output SHA256 and 7,102 unique families, then commits only `data/final/humanoid_patents_final.csv`.
+- `data/final/humanoid_patents_final.csv`: 7,102 provisional model-positive families (3,116 original; 3,986 novel); record schema and source-specific CPC meanings in `data/README.md`.
