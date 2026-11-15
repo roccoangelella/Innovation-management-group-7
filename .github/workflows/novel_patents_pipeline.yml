@@ -314,7 +314,21 @@ jobs:
               exit 1;
             fi
           else
-            if ! grep -Eqi '(not found|404|does not exist)' /tmp/novel_status.txt; then
+            # Kaggle returns a permission error when a never-created private
+            # notebook slug is queried. Check our OWNED kernel listing to
+            # distinguish a new notebook from an inaccessible existing one.
+            if grep -Fq "Permission 'kernels.get' was denied" /tmp/novel_status.txt; then
+              if ! kaggle kernels list --mine --page-size 200 -v > /tmp/owned_kernels.csv 2>&1; then
+                echo "::error::Cannot verify owned Kaggle notebooks; refusing to overwrite";
+                tail -12 /tmp/owned_kernels.csv
+                exit 1
+              fi
+              if grep -Fq "$kernel" /tmp/owned_kernels.csv; then
+                echo "::error::The novel Kaggle slug already exists but its status is inaccessible; refusing overwrite"
+                exit 1
+              fi
+              echo "NEW_NOVEL_KERNEL_CONFIRMED_ABSENT_IN_OWNED_LIST"
+            elif ! grep -Eqi '(not found|404|does not exist)' /tmp/novel_status.txt; then
               echo "::error::Cannot safely determine prior Kaggle notebook status";
               cat /tmp/novel_status.txt
               exit 1
