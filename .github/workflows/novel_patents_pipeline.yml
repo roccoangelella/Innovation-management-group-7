@@ -355,7 +355,20 @@ jobs:
             exit 1
           fi
           cat /tmp/novel_push.log
-          echo "kernel_id=$kernel" >> "$GITHUB_OUTPUT"
+          # Kaggle can derive a canonical notebook slug from the title instead
+          # of preserving metadata.id. Always use its returned URL.
+          python - <<'PY'
+          import os, re
+          from pathlib import Path
+          log = Path("/tmp/novel_push.log").read_text(encoding="utf-8")
+          found = re.search(r"https://www[.]kaggle[.]com/code/([A-Za-z0-9_-]+)/([A-Za-z0-9_-]+)", log)
+          if not found:
+              raise RuntimeError("Kaggle submission succeeded but supplied no canonical notebook URL")
+          kernel_id = "/".join(found.groups())
+          print("NOVEL_KERNEL_CANONICAL_ID=" + kernel_id, flush=True)
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write("kernel_id=" + kernel_id + "\n")
+          PY
       - name: Delete temporary W&B token dataset on submission failure
         if: failure()
         run: |
