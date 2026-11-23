@@ -30,7 +30,7 @@ SUBSIDIARY_MAP = {
 }
 
 def clean_single_name(name):
-    name = re.sub(r"\\s+", " ", re.sub(r"[.,]", " ", name.upper().strip())).strip()
+    name = re.sub(r"\s+", " ", re.sub(r"[.,]", " ", name.upper().strip())).strip()
     changed = True
     while changed:
         changed = False
