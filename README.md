@@ -47,3 +47,7 @@ This is a stress test, **not** an unbiased estimate of production precision, rec
 ## Documentation
 
 [Project wiki](.project-wiki/INDEX.md) · [Kaggle production guide](kaggle/PRODUCTION.md) · [Dataset provenance](data/README.md)
+
+## Step 1 — sector landscape
+
+`pip install -r requirements-step1.txt` then `python src/step1_landscape.py` for the CPU preview. See [methodology and completion gates](.project-wiki/implementation/step1-plan.md) and [TIP extraction/runbook](.project-wiki/technical/step1.md). Preview is not a validated sector estimate.

@@ -1,0 +1,28 @@
+{
+  "year_min": 2000,
+  "year_max": 2026,
+  "last_complete_year": 2022,
+  "ipr_type": "PI",
+  "top_n": 8,
+  "seed": 42,
+  "clusters": 10,
+  "patent_model": "graziasveva93/sbert-adapt-ub",
+  "comparison_periods": [
+    [
+      2000,
+      2009
+    ],
+    [
+      2010,
+      2016
+    ],
+    [
+      2017,
+      2022
+    ]
+  ],
+  "recent_growth_window": [
+    2017,
+    2022
+  ]
+}

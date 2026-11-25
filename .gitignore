@@ -14,3 +14,7 @@ wheels/
 .env.*
 !.env.example
 outputs/translation/
+
+# Local PATSTAT enrichment and unreviewed landscape outputs
+/data/step1_local/
+/outputs/step1*/

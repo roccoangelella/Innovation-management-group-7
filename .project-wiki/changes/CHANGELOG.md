@@ -1,3 +1,5 @@
+2026-11-25 — Added Step 1 methodology, local TIP metadata export, CPU preview, fractional landscape analysis, exploratory text clustering and synthetic CI. No source data altered; final PATSTAT and validation gates remain open.
+
 2026-11-15 — Published the unified positive-only `data/final/humanoid_patents_final.csv` to main (7,102 unique DOCDB families, 3,116 original + 3,986 novel, zero overlap). Source ZIP SHA256/metadata/provisional positive-decision checks and final CSV SHA256 `de06e29a8c9053a80183ee3ed2e739d6e552892c528f8b93cb348adc70fc6132` passed in Actions run 43720922493; published in commit 851cad5. Original source archives retained; 0.5 threshold and relevance remain provisional.
 
 2026-11-14 — Prepared a explicitly authorized incremental patent pipeline for `data/new_humanoid_patents.zip`: explicit second PATSTAT schema, zero-overlap check against original DOCDB families, source-bound GemRouter translation with journal recovery, private per-run Kaggle dual-T4 screening, dynamic W&B counters, validated resume and complete-result digest/ID gates. Existing original-corpus files and production workflow remain unchanged. No API or GPU run was triggered.

@@ -17,3 +17,6 @@ confidence: confirmed
 - **OQ-002 (open):** The kickoff requires earliest *priority* year; `src/sql_queries.py` currently computes minimum `earliest_filing_year`. Correct before longitudinal analysis?
 - **OQ-003 (open):** Has the private model endpoint demonstrated full-batch translation coverage and acceptable domain translation fidelity? Implementation and offline tests exist, but live evaluation is not established here.
 - **OQ-004 (open):** What applicant name harmonization, future-value methodology, historical time split, and outcome baselines will be used?
+
+
+2026-11-25 reconciliation: OQ-002 partially resolved in design: professor Tutorial 0/02 explicitly uses minimum TLS201 earliest_filing_year across PI family applications as the earliest-priority convention; new export implements that convention. Actual PROD output and historical derivation remain to be checked. OQ-001 still open; Step 1 preview is not a representative validation. OQ-004 remains open for later scoring. See [Step 1 plan](../implementation/step1-plan.md).

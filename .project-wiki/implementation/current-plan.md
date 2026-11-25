@@ -42,3 +42,8 @@ Deadline: 20 December 2026.
 
 
 **2026-11-10 quota incident:** First Gemrouter completion attempt processed 256 additional abstracts before HTTP 429, leaving 769 eligible abstracts pending. Checkpoint artifact retained. Recovered-journal validation and reconstruction are implemented with GitHub Actions download/restore and 30-day journal reupload. Next: verify the checkpoint restore CI, confirm Gemrouter quota is replenished, manually dispatch the workflow using latest saved journal ID, then validate and publish the complete English ZIP. Avoid unbounded or immediate 429 retries.
+
+
+## 2026-11-25 — Step 1
+
+[Detailed plan](step1-plan.md) and [runbook](../technical/step1.md): preview and TIP metadata path implemented; execute PROD export, verify counts/coverage and validate interpretations before publication. Step 0 relevance remains provisional.

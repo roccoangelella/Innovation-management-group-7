@@ -98,3 +98,6 @@ Dual-T4 worker supervisor now emits parseable `PROGRESS_JSON` lines containing o
 ## 2026-11-14 incremental batch acceptance checks (prepared)
 
 Added `tests/test_novel_pipeline.py` for a synthetic two-schema translation, non-overlap rejection, metadata-preserving English normalization, end-output SHA256/family-coverage checks and notebook Python AST parsing. `kaggle/validate_novel_resume.py` reconstructs the exact SHA256-partitioned two-worker input and checks the resumable journal's IDs, model/prompt, source hash and decisions before mounting it. `kaggle/validate_novel_output.py` checks complete predictions, hashes and original metadata fields in the filtered archive. The new GitHub workflow runs syntax/compatibility tests before consuming GemRouter quota. These tests and guards were authored but no live Kaggle/GemRouter run has occurred; successful actual Actions tests, model load, GPU count, outputs and W&B delivery are future acceptance evidence.
+
+
+2026-11-25: Step 1 synthetic tests and CPU source-preview CI added; inspect the workflow result for execution evidence. Real TIP PROD enrichment and pinned SBERT run not verified. [Runbook](step1.md).

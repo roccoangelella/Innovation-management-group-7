@@ -1,5 +1,5 @@
 version: 1
-updated: '2026-11-15'
+updated: '2026-11-25'
 documents:
   - id: PROJECT
     type: project
@@ -99,4 +99,22 @@ documents:
     tags: []
     related: []
     source_paths: []
+    confidence: confirmed
+  - id: STEP1-PLAN
+    type: note
+    title: Step 1 sector landscape plan
+    path: implementation/step1-plan.md
+    status: active
+    tags: []
+    related: [CURRENT-PLAN, PRODUCT-BRIEF, TECH-STEP1]
+    source_paths: [src/step1_extract.py, src/step1_landscape.py, src/step1_semantic.py, config/step1.json]
+    confidence: confirmed
+  - id: TECH-STEP1
+    type: technical
+    title: Step 1 landscape implementation
+    path: technical/step1.md
+    status: active
+    tags: []
+    related: [STEP1-PLAN, TECH-CODEBASE-MAP, TECH-TESTING]
+    source_paths: [src/step1_extract.py, src/step1_landscape.py, src/step1_semantic.py, tests/test_step1.py, config/step1.json, requirements-step1.txt]
     confidence: confirmed

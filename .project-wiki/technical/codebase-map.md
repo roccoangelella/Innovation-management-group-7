@@ -75,3 +75,6 @@ Run `python -m unittest discover -s tests -v` for existing offline tests and `py
 - `src/build_final_humanoid_dataset.py`: deterministic two-source merger; expects the original and novel screened ZIPs and their production summaries, validates source SHA256 and original column contracts, rejects duplicate DOCDB family IDs within or between cohorts, and emits numeric-ID-sorted final CSV with `source_query` provenance.
 - `.github/workflows/publish_final_humanoid_csv.yml`: explicit-message/manual GitHub Actions export and push; downloads validated novel run 43710629726's artifact, verifies full output SHA256 and 7,102 unique families, then commits only `data/final/humanoid_patents_final.csv`.
 - `data/final/humanoid_patents_final.csv`: 7,102 provisional model-positive families (3,116 original; 3,986 novel); record schema and source-specific CPC meanings in `data/README.md`.
+
+
+Step 1: `src/step1_extract.py` (TIP metadata + denominators), `src/step1_landscape.py` (fractional indicators and figures), `src/step1_semantic.py` (exploratory clustering), `config/step1.json`, `tests/test_step1.py`, `.github/workflows/step1_preview.yml`. See [runbook](step1.md).
